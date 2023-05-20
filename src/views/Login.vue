@@ -15,6 +15,7 @@
               variant="outlined"
               color="red"
               name="email"
+              class="my-input"
           >
           </v-text-field>
 
@@ -25,26 +26,24 @@
               variant="outlined"
               color="red"
               name="password"
+              class="my-input"
               @click:append-inner="show_password = !show_password"
           >
           </v-text-field>
 
-          <v-row class="form-bottom-row">
-            <v-checkbox
-                label="Nhớ mật khẩu"
-                color="#0074BD"
-                class="form-check-box"
-                name="remember_me"
-            ></v-checkbox>
-
-            <div>
+          <div class="form-bottom-row">
+            <div class="check-box-group">
+              <input class="check-box-input" type="checkbox" id="check-box-remember">
+              <label for="check-box-remember" class="check-box-label">Nhớ mật khẩu</label>
+            </div>
+            <div class="forgot-password">
               Quên mật khẩu ?
             </div>
-          </v-row>
+          </div>
 
           <v-btn class="base-button button-login">Đăng nhập</v-btn>
         </form>
-        <div>
+        <div class="bottom-content">
           <p>Bạn chưa có tài khoản  <router-link :to="{name: 'register'}" class="another-action">Đăng ký</router-link></p>
           <div class="countries-select">
             <v-select
@@ -64,9 +63,11 @@
 <script>
 import AccountLayout from "../Layouts/AccountLayout.vue";
 import Alert from "@/components/Alert.vue";
+import mixins from "@/mixins/mixins";
 
 export default {
   name: "Login",
+  mixins: [mixins],
   components: {Alert, AccountLayout},
   data() {
     return {
@@ -74,15 +75,29 @@ export default {
       countries: ["Việt Nam", "Mỹ"],
       country_selected: "Việt Nam",
     }
+  },
+  created() {
+    this.setWindowTitle("Login")
   }
 }
 </script>
 
 <style scoped>
 .form-bottom-row {
+  display: flex;
+  justify-content: space-between;
 }
 .button-login {
   background-color: #EC1C24;
+  margin-top: 3rem;
 }
-
+.countries-select {
+  font-weight: 500;
+}
+.bottom-content {
+  margin-top: 1.5rem;
+}
+.forgot-password {
+  font-size: 14px;
+}
 </style>
