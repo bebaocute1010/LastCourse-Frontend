@@ -1,5 +1,5 @@
 <template>
-  <v-overlay v-model="show_overplay">
+  <v-overlay v-model="alert.show">
     <div class="alert-container">
       <v-alert
           closable
@@ -19,27 +19,20 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import mixins from "@/mixins/mixins";
 
 export default {
   name: "Alert",
+  mixins: [mixins],
   computed: {
-    ...mapGetters([
-        "alert",
-    ])
   },
   data() {
     return {
-      show_overplay: false
     }
   },
   methods: {
-    ...mapActions([
-        "hideAlert",
-    ]),
     onHide() {
       this.hideAlert()
-      this.show_overplay = false
     }
   }
 }
