@@ -19,12 +19,16 @@
 </template>
 
 <script>
-import mixins from "@/mixins/mixins";
+import mixins from "@/mixins/mixins"
+import { mapGetters } from "vuex"
 
 export default {
   name: "Alert",
   mixins: [mixins],
   computed: {
+    ...mapGetters([
+        'alert'
+    ])
   },
   data() {
     return {
