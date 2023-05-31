@@ -1,5 +1,5 @@
 <template>
-  <div class="verify-otp-page center-row">
+  <div class="basic-page verify-otp-page center-row">
     <Alert/>
     <AccountLayout class="hide-logo">
       <div class="form-content">
@@ -20,13 +20,22 @@
           />
         </div>
         <div class="otp-wait-time">
-          <button :disabled="!(otp_time_wait === '')" @click="sendOtp">{{otp_time_wait ? ("Gửi lại mã OTP(" + otp_time_wait  + ")"): "Gửi mã OTP"}}</button>
+          <button :disabled="!(otp_time_wait === '')" @click="sendOtp">
+            {{ otp_time_wait ? ("Gửi lại mã OTP(" + otp_time_wait + ")") : "Gửi mã OTP" }}
+          </button>
         </div>
 
-        <v-btn :disabled=!isAllDigitsFilled :class="{'base-button': true, 'btn-confirm': true, 'otp-filled':isAllDigitsFilled}" :to="{name: 'register-information'}">Xác nhận</v-btn>
+        <v-btn
+            :disabled=!isAllDigitsFilled
+            :class="{'base-button': true, 'btn-confirm': true, 'otp-filled':isAllDigitsFilled}"
+            @click="onsubmit"
+        >Xác nhận
+        </v-btn>
 
         <div class="bottom-content">
-          <p>Bạn đã có tài khoản  <router-link :to="{name: 'login'}" class="another-action">Đăng Nhập</router-link></p>
+          <p>Bạn đã có tài khoản
+            <router-link :to="{name: 'login'}" class="another-action">Đăng Nhập</router-link>
+          </p>
         </div>
       </div>
     </AccountLayout>
@@ -35,12 +44,12 @@
 
 <script>
 import AccountLayout from "@/Layouts/AccountLayout.vue";
-import Alert from "@/components/Alert.vue";
-import mixins from "@/mixins/mixins";
+import {mapGetters} from "vuex";
+import router from "@/router";
+
 export default {
   name: "VerifyOTP",
-  mixins: [mixins],
-  components: {AccountLayout, Alert},
+  components: {AccountLayout},
   data() {
     return {
       otp_digits: ['', '', '', '', '', ''],
@@ -51,34 +60,56 @@ export default {
   },
   computed: {
     isAllDigitsFilled() {
-      for (let i=0; i<this.otp_digits.length; i++) {
+      for (let i = 0; i < this.otp_digits.length; i++) {
         if (this.otp_digits[i] === '' || !/^\d*$/.test(this.otp_digits[i])) {
           return false
         }
       }
       return true
-    }
+    },
+    ...mapGetters(["email_register"])
   },
   created() {
     this.setWindowTitle('Verify OTP')
-    let current_time = new Date().getTime()
-    this.wait_until = new Date(current_time + (10 * 1000));
   },
   mounted() {
+    if (!this.email_register) {
+      router.push({name: "register"})
+      return
+    }
+    this.sendOtp()
   },
   methods: {
+    onsubmit() {
+      let otp = this.otp_digits.join('')
+      axios.post("auth/verify-account", {
+        "email": this.email_register,
+        "otp": otp
+      })
+          .then(response => {
+            this.showAlert(response.data.title, response.data.message, "success", "register-information")
+          })
+          .catch(error => {
+            this.showAlert(error.response.data.title, error.response.data.message, "error", null)
+          })
+    },
     sendOtp() {
-      let current_time = new Date().getTime()
-      this.wait_until = new Date(current_time + (10 * 1000));
-      this.showAlert("Gửi mã OTP thành công", "Gửi mã OTP thành công, vui lòng kiểm tra Email của bạn !", "success")
-      this.countDown();
+      axios.post("auth/get-otp", {"email": this.email_register})
+          .then(response => {
+            this.wait_until = response.data.timestamp
+            this.countDown()
+            this.showAlert("Gửi mã OTP thành công", "Gửi mã OTP thành công, vui lòng kiểm tra Email của bạn !", "success", "")
+          })
+          .catch(error => {
+            console.log(error)
+          })
     },
     countDown() {
       this.interval_id = setInterval(() => {
         let current_time = new Date().getTime();
-        if (this.wait_until && this.wait_until > current_time) {
-          let dif =  this.wait_until.getTime() - current_time;
-          let seconds = dif / 1000;
+        let distance = this.wait_until - current_time;
+        if (distance > 0) {
+          let seconds = distance / 1000;
           this.otp_time_wait = this.convertSeconds(seconds)
         } else {
           this.otp_time_wait = ""
@@ -109,10 +140,12 @@ export default {
 <style scoped>
 .form-content {
 }
-.otp-container:focus-within .otp-input{
+
+.otp-container:focus-within .otp-input {
   border: 1px solid #EC1C24;
   outline: none;
 }
+
 .otp-input {
   width: 54px;
   height: 54px;
@@ -124,9 +157,11 @@ export default {
   line-height: 29px;
   text-align: center;
 }
+
 .otp-input:first-child {
   margin-left: 0;
 }
+
 .otp-wait-time {
   color: #6F6F6F;
   font-weight: 700;
@@ -134,9 +169,11 @@ export default {
   text-align: left;
   margin-top: 3.5rem;
 }
-.v-btn--disabled{
+
+.v-btn--disabled {
   background-color: #6F6F6F !important;
 }
+
 .otp-filled {
   background-color: #EC1C24;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="login-page">
+  <div class="basic-page login-page">
     <Alert/>
     <AccountLayout>
       <div class="form-content">
@@ -9,46 +9,51 @@
             Đăng nhập tài khoản ngay bây giờ
           </p>
         </div>
-        <form @submit.prevent="submit">
-          <v-text-field
+        <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
+          <TextFieldWithValidation
+              class="my-input"
+              name="account"
               label="E-mail/Tên đăng nhập"
-              class="my-input"
+              type="text"
               variant="outlined"
-              color="red"
-              name="email"
-              v-model="email.value.value"
-              :error-messages="email.errorMessage.value"
-          >
-          </v-text-field>
-
-          <v-text-field
-              label="Mật khẩu"
+              color="red"/>
+          <TextFieldWithValidation
               class="my-input"
-              variant="outlined"
-              color="red"
               name="password"
-              v-model="password.value.value"
+              label="Mật khẩu"
               :type="show_password ? 'text' : 'password'"
               :append-inner-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
-              :error-messages="password.errorMessage.value"
               @click:append-inner="show_password = !show_password"
-          >
-          </v-text-field>
+              variant="outlined"
+              color="red"/>
 
           <div class="form-bottom-row">
-            <div class="check-box-group">
-              <input class="check-box-input" type="checkbox" id="check-box-remember" v-model="remember.value.value">
-              <label for="check-box-remember" class="check-box-label">Nhớ mật khẩu</label>
-            </div>
+            <Field
+                name="remember"
+                :value="true"
+                type="checkbox"
+                v-slot="{ value, handleChange, errors }"
+            >
+              <v-checkbox
+                  class="my-check-box hide-input-detail"
+                  :model-value="value"
+                  @update:modelValue="handleChange"
+                  label="Nhớ mật khẩu"
+                  color="#0074BD"
+              />
+            </Field>
             <span class="forgot-password" @click="forgotPasswordShow">
               Quên mật khẩu ?
             </span>
           </div>
 
           <v-btn type="submit" class="base-button button-login">Đăng nhập</v-btn>
-        </form>
+        </Form>
+
         <div class="bottom-content">
-          <p>Bạn chưa có tài khoản  <router-link :to="{name: 'register'}" class="another-action">Đăng ký</router-link></p>
+          <p>Bạn chưa có tài khoản
+            <router-link :to="{name: 'register'}" class="another-action">Đăng ký</router-link>
+          </p>
           <div class="countries-select">
             <v-select
                 :items="countries"
@@ -66,36 +71,30 @@
 
 <script>
 import AccountLayout from "../Layouts/AccountLayout.vue";
-import Alert from "@/components/Alert.vue";
-import mixins from "@/mixins/mixins";
-import { useField, useForm } from 'vee-validate'
+import {useRouter} from "vue-router";
 
 export default {
   name: "Login",
-  mixins: [mixins],
-  components: {Alert, AccountLayout},
+  components: {AccountLayout},
   setup() {
-    const { handleSubmit } = useForm({
-      validationSchema: {
-        password (value) {
-          if (value?.length > 8) return true
-          return "Mật khẩu phải nhiều hơn 8 ký tự."
-        },
-        email (value) {
-          if (!value) return  "Vui lòng nhập Email hoặc Tên đăng nhập."
-          return true
+    const schema = {
+      account: (value) => {
+        if (!value) {
+          return "Vui lòng nhập Email hoặc Tên đăng nhập."
         }
+        if (value?.length < 8) {
+          return "Tên đăng nhập phải nhiều hơn 8 ký tự."
+        }
+        return true
       },
-    })
-    const email = useField("email")
-    const password = useField("password")
-    const remember = useField("remember")
+      password: (value) => {
+        if (value?.length >= 8) return true
+        return "Mật khẩu phải nhiều hơn 8 ký tự."
+      },
+    }
 
-    const submit = handleSubmit(values => {
-      console.log(values)
-    })
-
-    return { email, password, remember, submit }
+    const router = useRouter()
+    return {schema, router}
   },
   data() {
     return {
@@ -106,9 +105,22 @@ export default {
   },
   created() {
     this.setWindowTitle("Login")
-    this.remember.value.value = false
   },
   methods: {
+    onSubmit(values) {
+      axios.post("auth/login", values)
+          .then(response => {
+            this.showAlert(
+                response.data.title,
+                response.data.message,
+                "success",
+                null
+            )
+          })
+          .catch(error => {
+            this.showAlert(error.response.data.title, error.response.data.message, "error", null)
+          })
+    },
     forgotPasswordShow() {
       this.showAlert("Bạn quên mật khẩu rồi à ?", "Quên thì tạo account mới đi nhé =))", "success")
     }
@@ -119,16 +131,23 @@ export default {
 <style scoped>
 .form-bottom-row {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
 }
+
 .button-login {
   background-color: #EC1C24;
 }
+
 .countries-select {
   font-weight: 500;
 }
+
 .forgot-password {
   cursor: pointer;
   font-size: 14px;
+  width: 40%;
+}
+.forgot-password:hover {
+  color: #0074BD;
 }
 </style>

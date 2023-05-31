@@ -1,5 +1,6 @@
 <template>
-  <div class="register-page">
+  <div class="basic-page register-page">
+    <Alert/>
     <DialogRules :dialog_visible="dialog_visible" @updateDialogVisible="updateDialogVisible"/>
     <AccountLayout>
       <div class="form-content">
@@ -10,33 +11,45 @@
           </p>
         </div>
 
-        <form @submit.prevent="submit">
-          <v-text-field
-              label="E-mail"
+        <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
+          <TextFieldWithValidation
               class="my-input"
+              name="email"
+              label="E-mail"
               variant="outlined"
               color="red"
-              name="email"
-              v-model="email.value.value"
-              :error-messages="email.errorMessage.value"
+          />
+
+          <Field
+              name="agreement"
+              :value="true"
+              type="checkbox"
+              v-slot="{ value, handleChange, errors }"
           >
-          </v-text-field>
-
-          <div class="check-box-group">
-            <input class="check-box-input" type="checkbox" id="check-box-agreement" name="agreement" v-model="agreement.value.value">
-            <label for="check-box-agreement" class="check-box-label">Tôi đồng ý với các <span @click.prevent="dialog_visible = true" class="check-box-label-highlight">Chính sách và điều khoản</span></label>
-          </div>
-          <div class="v-input__details">
-            <div class="error-message v-messages" role="alert" aria-live="polite">
-              <div class="v-messages__message">{{agreement.errorMessage.value}}</div>
-            </div>
-          </div>
-
-          <v-btn class="base-button button-register" type="submit">Tiếp tục</v-btn>
-        </form>
+            <v-checkbox
+                class="my-check-box"
+                :model-value="value"
+                @update:modelValue="handleChange"
+                color="#0074BD"
+                :error-messages="errors"
+            >
+              <template v-slot:label>
+                <label class="check-box-label">
+                  <span @click="handleChange">Tôi đồng ý với các </span>
+                  <span @click.prevent="dialog_visible = true" class="check-box-label-highlight">
+                    Chính sách và điều khoản
+                  </span>
+                </label>
+              </template>
+            </v-checkbox>
+          </Field>
+          <v-btn type="submit" class="base-button button-register">Tiếp tục</v-btn>
+        </Form>
 
         <div class="bottom-content">
-          <p>Bạn đã có tài khoản  <router-link :to="{name: 'login'}" class="another-action">Đăng Nhập</router-link></p>
+          <p>Bạn đã có tài khoản
+            <router-link :to="{name: 'login'}" class="another-action">Đăng Nhập</router-link>
+          </p>
           <div class="countries-select">
             <v-select
                 :items="countries"
@@ -53,16 +66,14 @@
 </template>
 
 <script>
-import AccountLayout from "@/Layouts/AccountLayout.vue";
-import DialogRules from "@/components/Register/DialogRules.vue";
-import mixins from "@/mixins/mixins";
-import {useForm, useField} from "vee-validate";
-import { useRouter } from "vue-router"
+import AccountLayout from "@/Layouts/AccountLayout.vue"
+import DialogRules from "@/components/Register/DialogRules.vue"
+import Alert from "@/components/Alert.vue";
+import {mapActions} from "vuex";
 
 export default {
   name: "Register",
-  mixins: [mixins],
-  components: {DialogRules, AccountLayout},
+  components: {Alert, DialogRules, AccountLayout},
   data() {
     return {
       countries: ["Việt Nam", "Mỹ"],
@@ -71,38 +82,37 @@ export default {
     }
   },
   setup() {
-    const router = useRouter()
-    const redirectTo = (page_name) => {
-      router.push({name: page_name});
-    };
-    const { handleSubmit } = useForm({
-      validationSchema: {
-        email(value) {
-          if (!value)
-            return "Vui lòng nhập Email."
-          if (/^[a-z.0-9]+@[a-z.0-9]+\.[a-z]+$/i.test(value)) return true
-          return "Email không hợp lệ"
-        },
-        agreement(value) {
-          if (!value) return "Vui lòng chấp nhận Chính sách và điều khoản"
-          return true
-        }
+    const schema = {
+      email: (value) => {
+        if (!value)
+          return "Vui lòng nhập Email."
+        if (/^[a-z.0-9]+@[a-z.0-9]+\.[a-z]+$/i.test(value)) return true
+        return "Email không hợp lệ"
+      },
+      agreement(value) {
+        if (!value) return "Vui lòng chấp nhận Chính sách và điều khoản"
+        return true
       }
-    })
-    const email = useField("email")
-    const agreement = useField("agreement")
-
-    const submit = handleSubmit(values => {
-      console.log(values)
-      redirectTo("verify")
-    })
-
-    return { email, agreement, submit }
+    }
+    return {schema}
   },
   created() {
     this.setWindowTitle("Register")
   },
   methods: {
+    ...mapActions([
+        "setEmailRegister"
+    ]),
+    onSubmit(values) {
+      axios.post("auth/register", {"email": values.email})
+          .then(response => {
+            this.setEmailRegister(values.email)
+            this.showAlert(response.data.title, response.data.message, "success", "verify")
+          })
+          .catch(error => {
+            this.showAlert(error.response.data.title, error.response.data.message, "error", null)
+          })
+    },
     updateDialogVisible(value) {
       this.dialog_visible = value
     },
@@ -114,14 +124,17 @@ export default {
 .button-register {
   background-color: #6F6F6F;
 }
+
 .check-box-label-highlight {
   color: #0074BD;
   font-weight: 600;
 }
+
 .v-messages {
   opacity: 1;
 }
-.error-message .v-messages__message{
+
+.error-message .v-messages__message {
   text-align: left;
   padding-left: 16px;
   color: #b00020;

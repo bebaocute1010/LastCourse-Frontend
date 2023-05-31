@@ -4,5 +4,11 @@ export default {
     },
     offAlert({commit}) {
         commit("hideAlert")
-    }
+    },
+    setEmailRegister({commit}, email) {
+        commit('setEmailRegister', email)
+    },
+    clearEmailRegister({commit}) {
+        commit('clearEmailRegister')
+    },
 }
