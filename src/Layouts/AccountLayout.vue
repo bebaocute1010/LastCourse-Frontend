@@ -36,10 +36,14 @@ export default {
 </script>
 
 <style>
+.basic-page {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+}
 .container {
-  margin: auto;
   max-width: 1200px;
-  padding: 4% 15px 0;
 }
 
 .center-row .content {
@@ -87,7 +91,6 @@ export default {
 }
 
 .form-heading-title {
-  margin-top: -1rem;
   font-weight: 600;
   font-size: 1.5rem;
 }
@@ -114,31 +117,6 @@ export default {
   border-radius: 100px !important;
   text-transform: none !important;
   margin-top: 3rem;
-}
-
-.check-box-group {
-  display: flex;
-  align-items: center;
-}
-
-.check-box-input {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 5px;
-  border: 1px solid #0074BD;
-  accent-color: #0074BD;
-  cursor: pointer;
-}
-
-.check-box-label {
-  margin-left: 14px;
-  font-size: 14px;
-  line-height: 17px;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  cursor: pointer;
 }
 
 .hide-logo .right-content .logo {
@@ -209,5 +187,27 @@ export default {
 
 .countries-select .mdi-menu-down::before {
   color: #0074BD;
+}
+
+.my-check-box .v-label{
+  font-size: 14px;
+  opacity: 1;
+  color: #2A2A2A;
+}
+
+.my-check-box .v-selection-control {
+  min-height: unset !important;
+}
+.my-check-box .check-box-label {
+  cursor: pointer;
+}
+
+.my-check-box .v-selection-control__input > .v-icon {
+  opacity: 1;
+  color: #0074BD;
+}
+
+.hide-input-detail .v-input__details {
+  display: none;
 }
 </style>

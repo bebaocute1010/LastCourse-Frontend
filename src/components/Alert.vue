@@ -6,7 +6,7 @@
           :title="alert.title"
           :type="alert.type"
           rounded="3"
-          class="alert-success"
+          :class="'my-alert ' + alert.class_name"
           :text="alert.message"
           @click:close="onHide"
       >
@@ -19,17 +19,9 @@
 </template>
 
 <script>
-import mixins from "@/mixins/mixins"
-import { mapGetters } from "vuex"
 
 export default {
   name: "Alert",
-  mixins: [mixins],
-  computed: {
-    ...mapGetters([
-        'alert'
-    ])
-  },
   data() {
     return {
     }
@@ -49,12 +41,24 @@ v-overlay {
 .alert-container {
   width: 100vw;
 }
-.alert-success {
-  width: 686px;
+.my-alert {
+  width: 686px !important;
   height: 84px;
   margin: 84px auto 0;
+}
+.success {
   background: #EBF4EC !important;
   border: 1px solid #D7EAD9 !important;
   color: #28A138 !important;
+}
+.warning {
+  background: #FDF0E3 !important;
+  border: 1px solid #FAE2C7 !important;
+  color: #E98305 !important;
+}
+.error {
+  background: #FAEAEA !important;
+  border: 1px solid #F4D2D2 !important;
+  color: #E60A32 !important;
 }
 </style>

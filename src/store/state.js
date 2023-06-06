@@ -4,5 +4,8 @@ export default {
         message: "",
         type: "",
         show: false,
-    }
+        class_name: "",
+        to: null
+    },
+    email_register: "",
 }
