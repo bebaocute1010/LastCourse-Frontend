@@ -1,5 +1,5 @@
 <template>
-  <v-system-bar window color="#EC1C24">
+  <div id="system-bar">
     <div class="container">
       <ul class="system-bar--menu">
         <a href="#">
@@ -27,13 +27,13 @@
         </li>
       </ul>
     </div>
-  </v-system-bar>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "SystemBar"
-}
+  name: "SystemBar",
+};
 </script>
 
 <style scoped>
@@ -45,16 +45,21 @@ a {
   text-decoration: none;
 }
 
-.v-system-bar .v-icon {
-  opacity: 1;
+#system-bar {
+  width: 100vw;
+  height: 32px;
+  background-color: #EC1C24;
+  font-size: 14px;
+  font-weight: 400;
 }
-
 .container {
   width: 100%;
+  height: 100%;
   max-width: 1240px;
   display: flex;
   margin: auto;
   justify-content: space-between;
+  align-items: center;
 }
 
 .system-bar--menu {

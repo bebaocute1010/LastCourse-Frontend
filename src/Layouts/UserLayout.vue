@@ -1,21 +1,19 @@
 <template>
-  <v-app>
-    <v-layout class="user-layout">
-      <SystemBar/>
-      <Header/>
+  <v-app style="position: relative">
+    <SystemBar />
+    <Header />
+    <div id="body-content">
+      <v-row>
+        <Alert />
+        <UserNavigation />
 
-      <UserNavigation/>
-
-      <v-main class="main-content">
-        <slot></slot>
-      </v-main>
-
-      <v-navigation-drawer location="right">
-        <v-list>
-          <v-list-item title="Drawer right"></v-list-item>
-        </v-list>
-      </v-navigation-drawer>
-    </v-layout>
+        <v-main>
+          <div class="main-content">
+            <slot></slot>
+          </div>
+        </v-main>
+      </v-row>
+    </div>
   </v-app>
 </template>
 
@@ -26,20 +24,26 @@ import UserNavigation from "@/components/UserNavigation.vue";
 
 export default {
   name: "UserLayout",
-  components: {UserNavigation, Header, SystemBar}
-}
+  components: { UserNavigation, Header, SystemBar },
+};
 </script>
 
 <style>
 .container {
   max-width: 1200px;
 }
-
+.body-content {
+  position: relative;
+}
 .user-layout {
-  background: #E5E5E5;
+  background: #e5e5e5;
 }
 
 .main-content {
-
+  padding: 0 30px;
+  background-color: #e5e5e5;
+}
+.v-row {
+  margin: unset !important;
 }
 </style>
