@@ -114,7 +114,7 @@ export default {
       axios
         .post("auth/login", values)
         .then((response) => {
-          this.showAlert(response.data.title, response.data.message, "success", null);
+          this.showAlert(response.data.title, response.data.message, "success", "all-products");
         })
         .catch((error) => {
           this.showAlert(
