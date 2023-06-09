@@ -7,18 +7,18 @@
         </div>
 
         <div class="slogan">
-          <p class="h1-text">
-            Sản phẩm chất lượng
+          <p class="h1-text">Sản phẩm chất lượng</p>
+          <p>
+            Tất cả các sản phẩm trên M Clothing đều dược đăng bán bởi các nhà cung cấp, uy
+            tín và đảm bảo chât lượng
           </p>
-          <p>Tất cả các sản phẩm trên M Clothing đều dược đăng bán bởi các nhà cung cấp, uy tín và đảm bảo chât
-            lượng</p>
         </div>
       </v-col>
 
       <v-col cols="5">
         <div class="right-content">
           <div class="logo">
-            <v-img src="/src/assets/logo.svg"/>
+            <v-img src="/src/assets/logo.svg" />
           </div>
           <main>
             <slot></slot>
@@ -31,8 +31,8 @@
 
 <script>
 export default {
-  name: "AccountLayout"
-}
+  name: "AccountLayout",
+};
 </script>
 
 <style>
@@ -105,12 +105,12 @@ export default {
 
 .another-action {
   font-weight: 600;
-  color: #EE273C;
+  color: #ee273c;
   text-decoration: none;
 }
 
 .base-button {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
   width: 278px !important;
   height: 44px !important;
   padding: 11px 21px !important;
@@ -186,13 +186,13 @@ export default {
 }
 
 .countries-select .mdi-menu-down::before {
-  color: #0074BD;
+  color: #0074bd;
 }
 
-.my-check-box .v-label{
+.my-check-box .v-label {
   font-size: 14px;
   opacity: 1;
-  color: #2A2A2A;
+  color: #2a2a2a;
 }
 
 .my-check-box .v-selection-control {
@@ -204,7 +204,7 @@ export default {
 
 .my-check-box .v-selection-control__input > .v-icon {
   opacity: 1;
-  color: #0074BD;
+  color: #0074bd;
 }
 
 .hide-input-detail .v-input__details {

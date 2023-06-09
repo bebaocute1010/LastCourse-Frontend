@@ -2,36 +2,31 @@
   <v-overlay v-model="alert.show">
     <div class="alert-container">
       <v-alert
-          closable
-          :title="alert.title"
-          :type="alert.type"
-          rounded="3"
-          :class="'my-alert ' + alert.class_name"
-          :text="alert.message"
-          @click:close="onHide"
+        closable
+        :title="alert.title"
+        :type="alert.type"
+        rounded="3"
+        :class="'my-alert ' + alert.class_name"
+        :text="alert.message"
+        @click:close="onHide"
       >
-        <template slot="prepend">
-          <v-icon>mdi-success</v-icon>
-        </template>
       </v-alert>
     </div>
   </v-overlay>
 </template>
 
 <script>
-
 export default {
   name: "Alert",
   data() {
-    return {
-    }
+    return {};
   },
   methods: {
     onHide() {
-      this.hideAlert()
-    }
-  }
-}
+      this.hideAlert();
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -47,18 +42,18 @@ v-overlay {
   margin: 84px auto 0;
 }
 .success {
-  background: #EBF4EC !important;
-  border: 1px solid #D7EAD9 !important;
-  color: #28A138 !important;
+  background: #ebf4ec !important;
+  border: 1px solid #d7ead9 !important;
+  color: #28a138 !important;
 }
 .warning {
-  background: #FDF0E3 !important;
-  border: 1px solid #FAE2C7 !important;
-  color: #E98305 !important;
+  background: #fdf0e3 !important;
+  border: 1px solid #fae2c7 !important;
+  color: #e98305 !important;
 }
 .error {
-  background: #FAEAEA !important;
-  border: 1px solid #F4D2D2 !important;
-  color: #E60A32 !important;
+  background: #faeaea !important;
+  border: 1px solid #f4d2d2 !important;
+  color: #e60a32 !important;
 }
 </style>
