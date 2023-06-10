@@ -669,10 +669,6 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
 #main-content {
   display: flex;
   column-gap: 50px;
@@ -687,6 +683,7 @@ export default {
   border-radius: 8px;
   padding: 20px 33px;
 }
+
 .block-info .v-col {
   padding: 0;
 }
