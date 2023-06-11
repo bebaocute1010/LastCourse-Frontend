@@ -1,5 +1,11 @@
 <template>
   <UserLayout>
+    <DialogDelete
+      :dialog="dialog.show"
+      :title="dialog.title"
+      :text="dialog.text"
+      @result="dialogResult"
+    />
     <Breadcrumbs :items="breadcrumbs" />
     <div id="main-content">
       <div class="content-headding">
@@ -44,6 +50,7 @@
           <v-icon class="content-search__icon">mdi-magnify</v-icon>
         </div>
       </div>
+
       <div class="content-search-table">
         <v-data-table
           :headers="table_headers"
@@ -52,6 +59,7 @@
           v-model="selected"
           class="elevation-1"
           show-select
+          height="460"
         >
           <template v-slot:[`item.product`]="{ item }">
             <div class="product">
@@ -78,11 +86,11 @@
           </template>
           <template v-slot:[`item.actions`]>
             <div class="actions-group-button">
-              <div class="action-button edit-item-button">
+              <div class="user-not-select action-button edit-item-button">
                 <v-icon>mdi-pencil-box</v-icon>
                 <span>Sửa</span>
               </div>
-              <div class="action-button delete-item-button">
+              <div class="user-not-select action-button delete-item-button" @click="showDialog()">
                 <v-icon>mdi-delete</v-icon>
                 <span>Xóa</span>
               </div>
@@ -132,13 +140,20 @@
 <script>
 import UserLayout from "@/Layouts/UserLayout.vue";
 import Breadcrumbs from "@/components/Breadcrumbs.vue";
+import DialogDelete from "../../../components/DialogDelete.vue";
 
 export default {
   name: "AllProduct",
-  components: { UserLayout, Breadcrumbs },
+  components: { UserLayout, Breadcrumbs, DialogDelete },
   data() {
     return {
       selected_all: false,
+      dialog: {
+        show: false,
+        title: "",
+        content: "",
+      },
+      id_item_editting: null,
       search: "",
       breadcrumbs: [
         {
@@ -272,19 +287,57 @@ export default {
           sold: 30,
           remaining: 10,
         },
+
+        {
+          id: 7,
+          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
+          price: 100000,
+          image:
+            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
+          status: 1,
+          warehouse: "Hà nội",
+          sold: 30,
+          remaining: 10,
+        },
+
+        {
+          id: 8,
+          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
+          price: 100000,
+          image:
+            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
+          status: 1,
+          warehouse: "Hà nội",
+          sold: 30,
+          remaining: 10,
+        },
       ],
     };
   },
   watch: {
     selected() {
-      if (this.selected.length == this.table_rows.length) {
-        this.selected_all = true;
-      } else {
-        this.selected_all = false;
-      }
+      this.selected_all = this.isSelectedAll();
+    },
+    status_selected() {
+      this.selected_all = this.isSelectedAll();
     },
   },
   methods: {
+    isSelectedAll() {
+      return this.selected.length == this.filterStatus(this.status_selected).length;
+    },
+    hideDialog() {
+      this.dialog.show = false;
+      this.dialog.title = this.dialog.text = "";
+    },
+    showDialog() {
+      this.dialog.title = "Xóa sản phẩm";
+      this.dialog.text = "Sau khi xóa sản phẩm bạn sẽ không thể hoàn tác";
+      this.dialog.show = true;
+    },
+    dialogResult(value) {
+      this.hideDialog();
+    },
     formattedNumber(num) {
       return num.toLocaleString("de-DE");
     },
@@ -304,7 +357,7 @@ export default {
         this.selected = [];
         this.selected_all = false;
       } else {
-        this.table_rows.forEach((item) => {
+        this.filterStatus(this.status_selected).forEach((item) => {
           if (!this.selected.includes(item.id)) {
             this.selected.push(item.id);
           }
