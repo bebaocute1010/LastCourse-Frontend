@@ -1,7 +1,5 @@
 //import css
-import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css';
-import 'vuetify/dist/vuetify.min.css';
 import './assets/main.css'
 //
 import App from './App.vue'

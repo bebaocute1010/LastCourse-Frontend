@@ -19,3 +19,11 @@ body {
   font-size: 16px;
   font-weight: 400;
 }
+
+input:focus-visible {
+  outline: none;
+}
+
+.user-not-select{
+  user-select: none;
+}
