@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  --text-color-default: #2A2A2A;
+  --text-color-default: #2a2a2a;
 }
 
 *,
@@ -11,11 +11,14 @@
   margin: 0;
   padding: 0;
 }
+*:focus-visible {
+  outline: none;
+}
 
 body {
   color: var(--text-color-default);
   line-height: 1.5;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px;
   font-weight: 400;
 }
@@ -24,6 +27,6 @@ input:focus-visible {
   outline: none;
 }
 
-.user-not-select{
+.user-not-select {
   user-select: none;
 }
