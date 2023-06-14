@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Resigter/Register.vue";
@@ -6,46 +6,52 @@ import VerifyOTP from "@/views/Resigter/VerifyOTP.vue";
 import RegisterInformation from "@/views/Resigter/RegisterInformation.vue";
 import AddProduct from "@/views/User/Product/AddProduct.vue";
 import AllProducts from "@/views/User/Product/AllProducts.vue";
+import Search from "@/views/Search.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: Home
+      path: "/",
+      name: "home",
+      component: Home,
     },
     {
-      path: '/login',
-      name: 'login',
-      component: Login
+      path: "/search",
+      name: "search",
+      component: Search
     },
     {
-      path: '/register',
-      name: 'register',
-      component: Register
+      path: "/login",
+      name: "login",
+      component: Login,
     },
     {
-      path: '/verify',
-      name: 'verify',
-      component: VerifyOTP
+      path: "/register",
+      name: "register",
+      component: Register,
     },
     {
-      path: '/register-information',
-      name: 'register-information',
-      component: RegisterInformation
+      path: "/verify",
+      name: "verify",
+      component: VerifyOTP,
     },
     {
-      path: '/user/product/add',
-      name: 'add-product',
-      component: AddProduct
+      path: "/register-information",
+      name: "register-information",
+      component: RegisterInformation,
     },
     {
-      path: '/user/product/all',
-      name: 'all-products',
-      component: AllProducts
-    }
-  ]
-})
+      path: "/user/product/add",
+      name: "add-product",
+      component: AddProduct,
+    },
+    {
+      path: "/user/product/all",
+      name: "all-products",
+      component: AllProducts,
+    },
+  ],
+});
 
-export default router
+export default router;

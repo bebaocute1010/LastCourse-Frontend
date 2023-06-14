@@ -28,9 +28,9 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .container {
-  max-width: 1200px;
+  max-width: 1175px;
 }
 .body-content {
   position: relative;

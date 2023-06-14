@@ -514,8 +514,6 @@ export default {
   border-radius: 8px;
   border: 1.5px solid #0172cb;
 }
-#table-footer__checkbox {
-}
 #table-footer__label {
   user-select: none;
   padding-left: 35px;
