@@ -1,6 +1,6 @@
 <template>
   <div class="products-grid container">
-    <div class="products-grid__headding">
+    <div v-if="!hidden_headding ?? true" class="products-grid__headding">
       <p class="products-grid__title">{{ name }}</p>
       <button :id="'btn-view-all-' + id" class="products-grid__btn-view-all">
         Xem tất cả
@@ -47,6 +47,11 @@ export default {
     column_number: {
       type: Number,
       required: false
+    },
+    hidden_headding: {
+      type: Boolean,
+      required: false,
+      default: false,
     }
   },
   methods: {

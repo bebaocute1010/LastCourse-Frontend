@@ -54,3 +54,6 @@
 .icon-size-14 .mdi{
   font-size: 14px;
 }
+.shop-profile__avatar .v-avatar {
+  border: 2px solid #ffffff;
+}

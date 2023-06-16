@@ -8,6 +8,7 @@ import AddProduct from "@/views/User/Product/AddProduct.vue";
 import AllProducts from "@/views/User/Product/AllProducts.vue";
 import Search from "@/views/Search.vue";
 import ProductDetail from "@/views/ProductDetail.vue";
+import ShopProfile from "@/views/ShopProfile.vue";
 import Cart from "@/views/Cart.vue";
 
 const router = createRouter({
@@ -27,6 +28,11 @@ const router = createRouter({
       path: "/chi-tiet-san-pham",
       name: "product-detail",
       component: ProductDetail,
+    },
+    {
+      path: "/chi-tiet-shop",
+      name: "shop-profile",
+      component: ShopProfile,
     },
     {
       path: "/gio-hang",

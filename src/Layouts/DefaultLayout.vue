@@ -4,10 +4,16 @@
     <header><Header @search="search" :search_rs="search_rs" /></header>
 
     <div id="body-content">
-      <HomeNavigation />
-      <Alert />
+      <HomeNavigation v-if="!hidden_nav ?? true" />
       <v-main>
-        <div class="main-content">
+        <div
+          class="main-content"
+          :style="{
+            'margin-top': hidden_nav ? 0 : '-100vh',
+            'padding-top': hidden_nav ? 0 : '24px',
+          }"
+        >
+          <Alert />
           <slot></slot>
         </div>
       </v-main>
@@ -37,8 +43,13 @@ export default {
     hidden_footer: {
       type: Boolean,
       required: false,
-      default: false
-    }
+      default: false,
+    },
+    hidden_nav: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   methods: {
     search(value) {
@@ -53,7 +64,6 @@ export default {
   padding: 24px 0 0;
   width: 100vw;
   background: #e5e5e5;
-  margin-top: -100vh;
 }
 #body-content {
   position: relative;

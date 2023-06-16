@@ -80,7 +80,7 @@
             <div>
               <div
                 class="quantity-order__button user-not-select"
-                @click="order_quantity = order_quantity > 0 ? order_quantity - 1 : 0"
+                @click="order_quantity = Math.max(order_quantity - 1, 1)"
               >
                 <v-icon>mdi-minus</v-icon>
               </div>
@@ -91,7 +91,7 @@
               />
               <div
                 class="quantity-order__button user-not-select"
-                @click="order_quantity = order_quantity + 1"
+                @click="order_quantity = Math.min(order_quantity + 1, inventory)"
               >
                 <v-icon>mdi-plus</v-icon>
               </div>
@@ -114,7 +114,7 @@
 
     <section id="product-extend">
       <div class="container">
-        <div id="product-extend-content">
+        <div id="product-extend-content" ref="extendContent">
           <div id="product-extend__headding" class="user-not-select">
             <div id="shop-info">
               <v-avatar id="shop__avatar"
@@ -231,6 +231,7 @@
                         color="#FFB800"
                         size="14"
                         readonly
+                        model-value="5"
                       ></v-rating>
                       <p class="____quantity">({{ formatNumber(1234) }})</p>
                     </div>
@@ -246,6 +247,7 @@
                         class="icon-size-14"
                         length="4"
                         color="#FFB800"
+                        model-value="4"
                         size="14"
                         readonly
                       ></v-rating>
@@ -262,6 +264,7 @@
                       <v-rating
                         class="icon-size-14"
                         length="3"
+                        model-value="3"
                         color="#FFB800"
                         size="14"
                         readonly
@@ -280,6 +283,7 @@
                         class="icon-size-14"
                         length="2"
                         color="#FFB800"
+                        model-value="2"
                         size="14"
                         readonly
                       ></v-rating>
@@ -296,6 +300,7 @@
                       <v-rating
                         class="icon-size-14"
                         length="1"
+                        model-value="1"
                         color="#FFB800"
                         size="14"
                         readonly
@@ -336,7 +341,9 @@
                           <div
                             v-if="index === 2 && comment.images.length > 3"
                             class="__comment__image__last-item"
-                          ><span>+{{ comment.images.length - 3 }}</span></div>
+                          >
+                            <span>+{{ comment.images.length - 3 }}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -352,8 +359,18 @@
             ></v-pagination>
           </div>
         </div>
-        <div id="products-relate">
-          
+        <div id="products-relate" ref="relateProducts">
+          <p class="product-extend__item-headding">Sản phẩm tương tự</p>
+          <product
+            v-for="item in products_relate"
+            :key="item.id"
+            :name="item.name"
+            :image="item.image"
+            :price="item.price"
+            :sold="item.sold"
+            :rate="item.rate"
+          >
+          </product>
         </div>
       </div>
     </section>
@@ -362,10 +379,11 @@
 
 <script>
 import BannerSlides from "../components/BannerSlides.vue";
+import Product from "../components/Product.vue";
 import SlideImages from "../components/SlideImages.vue";
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
 export default {
-  components: { DefaultLayout, BannerSlides, SlideImages },
+  components: { DefaultLayout, BannerSlides, SlideImages, Product },
   name: "ProductDetail",
   data() {
     return {
@@ -643,7 +661,112 @@ export default {
           ],
         },
       ],
+      products_relate: [
+        {
+          id: 1,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 1200,
+        },
+        {
+          id: 2,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 1200,
+        },
+        {
+          id: 3,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 200,
+        },
+        {
+          id: 4,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 200,
+        },
+        {
+          id: 5,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 200,
+        },
+        {
+          id: 6,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          rate: 5,
+        },
+        {
+          id: 7,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          rate: 5,
+        },
+        {
+          id: 8,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 200,
+        },
+        {
+          id: 9,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 200,
+        },
+        {
+          id: 10,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 200,
+        },
+        {
+          id: 11,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 200,
+        },
+        {
+          id: 12,
+          image:
+            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
+          name: "Áo phông nữ uzzlang chất siêu đẹp",
+          price: 123000,
+          sold: 200,
+        },
+      ],
     };
+  },
+  mounted() {
+    this.setMaxHeight();
+    window.addEventListener("resize", this.setMaxHeight);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.setMaxHeight);
   },
   methods: {
     formatNumber(number) {
@@ -658,11 +781,39 @@ export default {
 
       return number.toString();
     },
+    setMaxHeight() {
+      const extendContentHeight = this.$refs.extendContent.offsetHeight;
+      this.$refs.relateProducts.style.maxHeight = extendContentHeight + "px";
+    },
   },
 };
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  column-gap: 16px;
+}
+#products-relate .product-extend__item-headding {
+  margin: 0;
+}
+
+#product-extend-content {
+  display: flex;
+  flex-direction: column;
+  row-gap: 22px;
+}
+#products-relate {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 16px;
+  padding: 16px;
+  width: 266px;
+  background: #ffffff;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
 .__comment__image__last-item {
   width: 100%;
   height: 100%;
@@ -808,11 +959,6 @@ export default {
   display: flex;
   justify-content: space-between;
 }
-#product-extend-content {
-  display: flex;
-  flex-direction: column;
-  row-gap: 22px;
-}
 #shop__location {
   display: flex;
   align-items: center;
@@ -954,10 +1100,6 @@ export default {
 #images__arrow {
   display: flex;
   justify-content: space-between;
-}
-#product .container {
-  display: flex;
-  column-gap: 16px;
 }
 #product-images {
   background: #ffffff;
