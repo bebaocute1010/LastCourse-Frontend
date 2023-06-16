@@ -10,6 +10,7 @@ import Search from "@/views/Search.vue";
 import ProductDetail from "@/views/ProductDetail.vue";
 import ShopProfile from "@/views/ShopProfile.vue";
 import Cart from "@/views/Cart.vue";
+import Payment from "@/views/Payment.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,11 @@ const router = createRouter({
       path: "/chi-tiet-san-pham",
       name: "product-detail",
       component: ProductDetail,
+    },
+    {
+      path: "/thanh-toan",
+      name: "payment",
+      component: Payment,
     },
     {
       path: "/chi-tiet-shop",
