@@ -10,49 +10,14 @@
       </div>
       <div class="features-list">
         <v-list v-model:opened="open">
-          <ListGroup
-            prepend_icon="mdi-clipboard-text"
-            title="Quản lý đơn hàng"
-            :items="bill_features"
-            value="Quản lý đơn hàng"
-          />
+          <v-list-item prepend-icon="mdi-clipboard-text" title="Quản lý đơn hàng" value="Quản lý đơn hàng"></v-list-item>
           <ListGroup
             prepend_icon="mdi-shopping"
             title="Quản lý sản phẩm"
             :items="product_features"
             value="Quản lý sản phẩm"
           />
-          <ListGroup
-            prepend_icon="mdi-store"
-            title="Quản lý thông tin shop"
-            :items="shop_features"
-            value="Quản lý thông tin shop"
-          />
-          <ListGroup
-            prepend_icon="mdi-poll"
-            title="Phân tích bán hàng"
-            :items="[]"
-            value="Phân tích bán hàng"
-          />
-          <ListGroup
-            prepend_icon="mdi-sale"
-            title="Tham gia Flash sale"
-            :items="[]"
-            value="Tham gia Flash sale"
-          />
-          <ListGroup
-            prepend_icon="mdi-cog"
-            title="Thiết lập shop"
-            :items="[]"
-            value="Thiết lập shop"
-          />
-          <ListGroup
-            prepend_icon="mdi-forum"
-            title="Trò chuyện với MClothing"
-            :items="[]"
-            value="Trò chuyện với MClothing"
-          />
-          <v-list-item prepend-icon="mdi-logout">Đăng xuất</v-list-item>
+          <v-list-item prepend-icon="mdi-logout" value="Đăng xuất">Đăng xuất</v-list-item>
         </v-list>
       </div>
     </div>
@@ -69,20 +34,10 @@ export default {
     return {
       open: [],
       product_features: [
-        ["Thêm sản phẩm", "/user/product/add"],
-        ["Tất cả sản phẩm", "/user/product/all"],
-        ["Còn hàng"],
-        ["Hết hàng"],
-        ["Đã ẩn"],
+        { title: "Thêm sản phẩm", to: "add-product" },
+        { title: "Tất cả sản phẩm", to: "all-products" },
       ],
-      bill_features: [
-        ["Chờ xác nhận"],
-        ["Chờ đóng hàng"],
-        ["Đang giao"],
-        ["Đã giao"],
-        ["Đã hủy"],
-      ],
-      shop_features: [["Đánh giá shop"], ["Thành viên"], ["Xem shop"]],
+      bill_features: [],
     };
   },
 };
@@ -95,7 +50,6 @@ export default {
 .v-col-3 {
   max-width: 349px;
   height: 100vh;
-  overflow-y: scroll;
   position: -webkit-sticky;
   position: sticky;
   top: 0;
