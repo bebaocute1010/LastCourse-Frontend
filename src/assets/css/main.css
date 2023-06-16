@@ -51,3 +51,6 @@
   padding: 0;
   min-height: unset;
 }
+.icon-size-14 .mdi{
+  font-size: 14px;
+}

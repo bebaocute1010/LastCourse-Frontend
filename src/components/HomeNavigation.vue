@@ -29,7 +29,12 @@
           <v-icon v-else>mdi-bell</v-icon>
         </v-list-item>
 
-        <v-list-item value="cart" key="cart" class="user-not-select item-badge">
+        <v-list-item
+          value="cart"
+          key="cart"
+          class="user-not-select item-badge"
+          :to="{ name: 'cart' }"
+        >
           <v-badge v-if="number_cart" :content="number_notify" color="#0074BD">
             <v-icon>mdi-cart</v-icon>
           </v-badge>

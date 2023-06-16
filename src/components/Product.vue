@@ -21,7 +21,9 @@
     </div>
 
     <div class="product__name">
-      <p>{{ name }}</p>
+      <router-link :to="{ name: 'product-detail' }">
+        <p>{{ name }}</p>
+      </router-link>
     </div>
 
     <div class="product__more-info">
@@ -85,6 +87,9 @@ export default {
     },
   },
   methods: {
+    detail() {
+      this.$router.push({ name: "product-detail" });
+    },
     formattedNumber(num) {
       return num.toLocaleString("de-DE");
     },
@@ -136,6 +141,9 @@ export default {
 .product__name {
   font-size: 14px;
 }
+.product__name:hover > a {
+  color: #ec1c24;
+}
 .product__image {
   pointer-events: none;
   border-radius: 4px;
@@ -152,6 +160,8 @@ export default {
   row-gap: 6px;
   user-select: none;
   background: #ffffff;
-  cursor: pointer;
+}
+.product__container:hover {
+  box-shadow: 0 4px 16px rgba(236, 28, 36, 0.7);
 }
 </style>

@@ -13,7 +13,7 @@
       </v-main>
     </div>
 
-    <footer><Footer /></footer>
+    <footer v-if="!hidden_footer ?? true"><Footer /></footer>
   </v-app>
 </template>
 
@@ -34,6 +34,11 @@ export default {
       type: Array,
       required: false,
     },
+    hidden_footer: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
   methods: {
     search(value) {
@@ -55,7 +60,5 @@ export default {
 }
 .v-main {
   padding: 0 !important;
-}
-#app {
 }
 </style>

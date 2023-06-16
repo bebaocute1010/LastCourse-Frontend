@@ -14,7 +14,6 @@
 *:focus-visible {
   outline: none;
 }
-
 body {
   color: var(--text-color-default);
   line-height: 1.5;
@@ -29,4 +28,9 @@ input:focus-visible {
 
 .user-not-select {
   user-select: none;
+}
+
+a {
+  text-decoration: none;
+  color: #000000;
 }

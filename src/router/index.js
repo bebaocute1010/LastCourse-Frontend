@@ -6,7 +6,9 @@ import VerifyOTP from "@/views/Resigter/VerifyOTP.vue";
 import RegisterInformation from "@/views/Resigter/RegisterInformation.vue";
 import AddProduct from "@/views/User/Product/AddProduct.vue";
 import AllProducts from "@/views/User/Product/AllProducts.vue";
-import Search from "@/views/Search.vue"
+import Search from "@/views/Search.vue";
+import ProductDetail from "@/views/ProductDetail.vue";
+import Cart from "@/views/Cart.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,37 +19,47 @@ const router = createRouter({
       component: Home,
     },
     {
-      path: "/search",
+      path: "/tim-kiem-san-pham",
       name: "search",
-      component: Search
+      component: Search,
     },
     {
-      path: "/login",
+      path: "/chi-tiet-san-pham",
+      name: "product-detail",
+      component: ProductDetail,
+    },
+    {
+      path: "/gio-hang",
+      name: "cart",
+      component: Cart,
+    },
+    {
+      path: "/dang-nhap",
       name: "login",
       component: Login,
     },
     {
-      path: "/register",
+      path: "/dang-ky",
       name: "register",
       component: Register,
     },
     {
-      path: "/verify",
+      path: "/xac-thuc",
       name: "verify",
       component: VerifyOTP,
     },
     {
-      path: "/register-information",
+      path: "/dang-ky-thong-tin",
       name: "register-information",
       component: RegisterInformation,
     },
     {
-      path: "/user/product/add",
+      path: "/shop/san-pham/them",
       name: "add-product",
       component: AddProduct,
     },
     {
-      path: "/user/product/all",
+      path: "/shop/san-pham/tat-ca",
       name: "all-products",
       component: AllProducts,
     },

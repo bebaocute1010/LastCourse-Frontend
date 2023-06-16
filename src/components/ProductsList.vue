@@ -24,8 +24,9 @@
       @touchstart="startDrag"
       @touchmove="handleDrag"
       @touchend="endDrag"
+      @click.prevent="handleClick"
     >
-      <v-slide-group v-model="currentSlide" show-arrows="false" class="slide-group">
+      <v-slide-group v-model="currentSlide" show-arrows="false" class="slide-group" style="padding: 20px 0;">
         <v-slide-group-item v-for="(item, i) in items" :key="i">
           <Product
             :image="item.image"
@@ -147,7 +148,7 @@ export default {
 .products-list__headding {
   display: flex;
   justify-content: space-between;
-  padding: 30px 0 26px;
+  padding: 30px 0 6px;
   align-items: center;
 }
 .slide-group-container {
