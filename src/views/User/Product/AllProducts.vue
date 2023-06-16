@@ -90,7 +90,10 @@
                 <v-icon>mdi-pencil-box</v-icon>
                 <span>Sửa</span>
               </div>
-              <div class="user-not-select action-button delete-item-button" @click="showDialog()">
+              <div
+                class="user-not-select action-button delete-item-button"
+                @click="showDialog()"
+              >
                 <v-icon>mdi-delete</v-icon>
                 <span>Xóa</span>
               </div>

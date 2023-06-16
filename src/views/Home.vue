@@ -2,7 +2,32 @@
   <DefaultLayout @search="search" :search_rs="search_rs">
     <section id="banners">
       <div class="container">
-        <BannerSlides />
+        <BannerSlides :items="banners"/>
+
+        <div id="facilities">
+          <div class="facility-item">
+            <v-icon class="facility__icon">mdi-sale</v-icon>
+            <div class="facility__info">
+              <span class="facility__title">ƯU ĐÃI</span>
+              <span class="facility__sub-title">Liên tục cập nhật vô vàn ưu đãi</span>
+            </div>
+          </div>
+          <div class="facility-item">
+            <v-icon class="facility__icon">mdi-truck-fast</v-icon>
+            <div class="facility__info">
+              <span class="facility__title">GIAO HÀNG TẬN TAY</span>
+              <span class="facility__sub-title">Giao hàng tận nơi khi đặt hàng</span>
+            </div>
+          </div>
+          <div class="facility-item">
+            <v-icon class="facility__icon">mdi-phone-in-talk</v-icon>
+            <div class="facility__info">
+              <span class="facility__title">HỖ TRỢ 24/7</span>
+              <span class="facility__sub-title">Hỗ trợ giải đáp 24 giờ trong ngày</span>
+            </div>
+          </div>
+        </div>
+
         <div id="services">
           <div class="service-item" v-for="(item, i) in services" :key="i">
             <div class="service__icon">
@@ -23,7 +48,12 @@
       />
       <ProductsList name="Sản phẩm nổi bật" id="2" :items="products_feature" />
       <ProductsList name="Sản phẩm bán chạy" id="3" :items="products_feature" />
-      <ProductsGrid name="Có thể bạn thích" id="4" :column_number="6" :items="products_grid"></ProductsGrid>
+      <ProductsGrid
+        name="Có thể bạn thích"
+        id="4"
+        :column_number="6"
+        :items="products_grid"
+      ></ProductsGrid>
 
       <div id="button-view-more">
         <button @click="viewMore()">Xem thêm</button>
@@ -511,6 +541,20 @@ export default {
         "Váy sang trọng cho nam ",
       ],
       search_rs: [],
+      banners: [
+        {
+          url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
+        },
+        {
+          url: "https://cdn.vuetifyjs.com/images/carousel/sky.jpg",
+        },
+        {
+          url: "https://cdn.vuetifyjs.com/images/carousel/bird.jpg",
+        },
+        {
+          url: "https://cdn.vuetifyjs.com/images/carousel/planet.jpg",
+        },
+      ],
     };
   },
   methods: {
@@ -523,7 +567,7 @@ export default {
       console.log();
       if (!value) {
         this.search_rs = [];
-        return
+        return;
       }
       let keywords = value.split(" ");
       let d = this.data_search.filter((item) => {
@@ -537,6 +581,37 @@ export default {
 </script>
 
 <style>
+.facility__sub-title {
+  font-size: 14px;
+  color: #555555;
+}
+.facility__title {
+  font-weight: 700;
+  color: #555555;
+}
+.facility__icon {
+  font-size: 28px;
+}
+.facility__info {
+  display: flex;
+  flex-direction: column;
+}
+.facility-item:last-child {
+  border: unset;
+}
+.facility-item {
+  display: flex;
+  column-gap: 24px;
+  align-items: center;
+  width: 33.33%;
+  padding: 0 45px;
+  margin: 16px 0;
+  border-right: 2px solid #7f7f7f;
+}
+#facilities {
+  display: flex;
+  background: #ffffff;
+}
 #button-view-more {
   display: flex;
   justify-content: center;
