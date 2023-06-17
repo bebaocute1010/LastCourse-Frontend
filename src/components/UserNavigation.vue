@@ -10,7 +10,12 @@
       </div>
       <div class="features-list">
         <v-list v-model:opened="open">
-          <v-list-item prepend-icon="mdi-clipboard-text" title="Quản lý đơn hàng" value="Quản lý đơn hàng"></v-list-item>
+          <v-list-item
+            prepend-icon="mdi-clipboard-text"
+            title="Quản lý đơn hàng"
+            value="Quản lý đơn hàng"
+            :to="{name: 'bills-manage'}"
+          ></v-list-item>
           <ListGroup
             prepend_icon="mdi-shopping"
             title="Quản lý sản phẩm"
@@ -48,7 +53,7 @@ export default {
   position: sticky;
 }
 .v-col-3 {
-  max-width: 349px;
+  max-width: 25%;
   height: 100vh;
   position: -webkit-sticky;
   position: sticky;

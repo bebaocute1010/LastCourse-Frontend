@@ -7,7 +7,7 @@
         <Alert />
         <UserNavigation />
 
-        <v-main style="background: #e5e5e5">
+        <v-main style="background: #e5e5e5; max-width: 75%;">
           <div class="main-content">
             <slot></slot>
           </div>

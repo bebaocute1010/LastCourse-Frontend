@@ -11,6 +11,7 @@ import ProductDetail from "@/views/ProductDetail.vue";
 import ShopProfile from "@/views/ShopProfile.vue";
 import Cart from "@/views/Cart.vue";
 import Payment from "@/views/Payment.vue";
+import BillsManage from "@/views/User/BillsManage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -64,6 +65,11 @@ const router = createRouter({
       path: "/dang-ky-thong-tin",
       name: "register-information",
       component: RegisterInformation,
+    },
+    {
+      path: "/shop/don-hang/quan-ly",
+      name: "bills-manage",
+      component: BillsManage,
     },
     {
       path: "/shop/san-pham/them",
