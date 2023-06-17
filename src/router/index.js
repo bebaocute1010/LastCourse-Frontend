@@ -11,6 +11,7 @@ import ProductDetail from "@/views/ProductDetail.vue";
 import ShopProfile from "@/views/ShopProfile.vue";
 import Cart from "@/views/Cart.vue";
 import Payment from "@/views/Payment.vue";
+import Bills from "@/views/Bills.vue";
 import BillsManage from "@/views/User/BillsManage.vue";
 
 const router = createRouter({
@@ -30,6 +31,11 @@ const router = createRouter({
       path: "/chi-tiet-san-pham",
       name: "product-detail",
       component: ProductDetail,
+    },
+    {
+      path: "/don-hang-cua-toi",
+      name: "bills",
+      component: Bills,
     },
     {
       path: "/thanh-toan",

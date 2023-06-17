@@ -1,165 +1,176 @@
 <template>
-  <user-layout>
-    <v-dialog v-model="dialog_detail" max-width="600">
-      <v-card class="dialog_detail">
-        <v-card-title class="dialog_heading">
-          <p>Chi tiết sản phẩm</p>
-          <v-icon @click="dialog_detail = false">mdi-close</v-icon>
-        </v-card-title>
-        <v-card-text>
+  <default-layout>
+    <div class="container">
+      <v-dialog v-model="dialog_detail" max-width="600">
+        <v-card class="dialog_detail">
+          <v-card-title class="dialog_heading">
+            <p>Chi tiết sản phẩm</p>
+            <v-icon @click="dialog_detail = false">mdi-close</v-icon>
+          </v-card-title>
+          <v-card-text>
+            <v-data-table
+              :headers="dialog_detail_header"
+              :items="dialog_detail_data"
+              :items-per-page="5"
+            ></v-data-table>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="dialog_detail = false"> Đóng </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <dialog-delete
+        :dialog="dialog_delete"
+        title="Hủy đơn hàng"
+        text="Bạn chắc chắn muốn hủy đơn hàng này ?"
+        @result="resultDialogDelete(value)"
+      ></dialog-delete>
+      <div id="main-content">
+        <div class="content-heading">
+          <div>
+            <ul class="content-heading__list">
+              <li
+                :class="{
+                  'content-heading__item': true,
+                  'content-heading__active': i === status_selected,
+                }"
+                v-for="(item, i) in heading_items"
+                :key="i"
+                @click="
+                  {
+                    status_selected = i;
+                    selected = [];
+                  }
+                "
+              >
+                <span class="content-heading__item-title">{{ item.title }}</span>
+                <span class="content-heading__item-quantity"
+                  >({{ filterStatus(i).length }})</span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-search">
+          <div class="content-search-box">
+            <input
+              type="text"
+              class="content-search__input"
+              placeholder="Tìm kiếm ..."
+              v-model="search"
+            />
+            <v-icon class="content-search__icon">mdi-magnify</v-icon>
+          </div>
+        </div>
+
+        <div class="content-search-table">
           <v-data-table
-            :headers="dialog_detail_header"
-            :items="dialog_detail_data"
-            :items-per-page="5"
-          ></v-data-table>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn @click="dialog_detail = false"> Đóng </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <dialog-delete
-      :dialog="dialog_delete"
-      title="Hủy đơn hàng"
-      text="Bạn chắc chắn muốn hủy đơn hàng này ?"
-      @result="resultDialogDelete(value)"
-    ></dialog-delete>
-    <div id="main-content">
-      <div class="content-heading">
-        <div>
-          <ul class="content-heading__list">
-            <li
-              :class="{
-                'content-heading__item': true,
-                'content-heading__active': i === status_selected,
-              }"
-              v-for="(item, i) in heading_items"
-              :key="i"
-              @click="
-                {
-                  status_selected = i;
-                  selected = [];
-                }
-              "
-            >
-              <span class="content-heading__item-title">{{ item.title }}</span>
-              <span class="content-heading__item-quantity"
-                >({{ filterStatus(i).length }})</span
+            :headers="table_headers"
+            :items="filterStatus(status_selected)"
+            :search="search"
+            v-model="selected"
+            class="elevation-1"
+            show-select
+            height="500"
+          >
+            <template v-slot:[`item.delivery`]="{ item }">
+              <div class="delivery">
+                <p>{{ item.selectable.phone }}</p>
+                <p>{{ item.selectable.address }}</p>
+              </div>
+            </template>
+
+            <template v-slot:[`item.detail`]="{ item }">
+              <div class="detail">
+                <button @click="viewDetail(item.selectable.id)">
+                  Xem <v-icon>mdi-eye</v-icon>
+                </button>
+              </div>
+            </template>
+
+            <template v-slot:[`item.status`]="{ item }">
+              <span
+                :class="{
+                  confirm: item.selectable.status === 0,
+                  delivering: item.selectable.status === 1,
+                  success: item.selectable.status === 2,
+                  return: item.selectable.status === 3,
+                  cancel: item.selectable.status === -1
+                }"
+                >{{ getStatusString(item.selectable.status) }}</span
               >
-            </li>
-          </ul>
-        </div>
-      </div>
+            </template>
 
-      <div class="content-search">
-        <div class="content-search-box">
-          <input
-            type="text"
-            class="content-search__input"
-            placeholder="Tìm kiếm ..."
-            v-model="search"
-          />
-          <v-icon class="content-search__icon">mdi-magnify</v-icon>
-        </div>
-      </div>
+            <template v-slot:[`item.order_time`]="{ item }">
+              <span>{{ formatTime(item.selectable.created_at) }}</span>
+            </template>
 
-      <div class="content-search-table">
-        <v-data-table
-          :headers="table_headers"
-          :items="filterStatus(status_selected)"
-          :search="search"
-          v-model="selected"
-          class="elevation-1"
-          show-select
-          height="500"
-        >
-          <template v-slot:[`item.delivery`]="{ item }">
-            <div class="delivery">
-              <p>{{ item.selectable.phone }}</p>
-              <p>{{ item.selectable.address }}</p>
-            </div>
-          </template>
-
-          <template v-slot:[`item.detail`]="{ item }">
-            <div class="detail">
-              <button @click="viewDetail(item.selectable.id)">
-                Xem <v-icon>mdi-eye</v-icon>
-              </button>
-            </div>
-          </template>
-
-          <template v-slot:[`item.status`]="{ item }">
-            <span
-              :class="{
-                confirm: item.selectable.status === 0,
-                delivering: item.selectable.status === 1,
-                success: item.selectable.status === 2,
-                return: item.selectable.status === 3,
-                cancel: item.selectable.status === -1,
-              }"
-              >{{ getStatusString(item.selectable.status) }}</span
-            >
-          </template>
-
-          <template v-slot:[`item.order_time`]="{ item }">
-            <span>{{ formatTime(item.selectable.created_at) }}</span>
-          </template>
-
-          <template v-slot:[`item.actions`]="{ item }">
-            <div
-              class="actions-group-button"
-              v-if="[0, 1].includes(item.selectable.status)"
-            >
-              <button class="action-button edit-item-button">
-                {{ item.selectable.status == 0 ? "Xác nhận" : "Giao hàng" }}
-              </button>
-              <button
-                v-if="item.selectable.status === 0"
-                class="action-button delete-item-button"
-                @click="showDialogDelete()"
+            <template v-slot:[`item.actions`]="{ item }">
+              <div
+                class="actions-group-button"
+                v-if="[0, 1].includes(item.selectable.status)"
               >
-                Hủy
-              </button>
-            </div>
-            <span v-else>-</span>
-          </template>
-          <template v-slot:bottom>
-            <div
-              id="table-footer"
-              v-if="selected.length > 0 && status_selected > 0 && status_selected < 4"
-            >
-              <div id="table-footer__number-selected">
-                <span>{{ selected.length }} sản phẩm đã được chọn</span>
-                <div class="table-footer__buttons-group">
-                  <div class="actions-group-button">
-                    <button class="action-button edit-item-button">
-                      {{ status_selected === 1 ? "Xác nhận" : "Giao hàng" }}
-                    </button>
-                    <button
-                      v-if="status_selected === 1"
-                      class="action-button delete-item-button"
-                      @click="showDialogDelete()"
-                    >
-                      Hủy
-                    </button>
+                <button
+                  v-if="item.selectable.status === 0"
+                  class="action-button delete-item-button"
+                  @click="showDialogDelete()"
+                >
+                  Hủy
+                </button>
+
+                <button
+                  v-if="item.selectable.status === 1"
+                  class="action-button delete-item-button"
+                  @click="showDialogDelete()"
+                >
+                  Hoàn hàng
+                </button>
+              </div>
+              <span v-else>-</span>
+            </template>
+            <template v-slot:bottom>
+              <div
+                id="table-footer"
+                v-if="selected.length > 0 && status_selected > 0 && status_selected < 4"
+              >
+                <div id="table-footer__number-selected">
+                  <span>{{ selected.length }} sản phẩm đã được chọn</span>
+                  <div class="table-footer__buttons-group">
+                    <div class="actions-group-button">
+                      <button
+                        v-if="status_selected === 1"
+                        class="action-button delete-item-button"
+                        @click="showDialogDelete()"
+                      >
+                        Hủy
+                      </button>
+                      <button
+                        v-if="status_selected === 2"
+                        class="action-button delete-item-button"
+                        @click="showDialogDelete()"
+                      >
+                        Hoàn hàng
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </template>
-        </v-data-table>
+            </template>
+          </v-data-table>
+        </div>
       </div>
     </div>
-  </user-layout>
+  </default-layout>
 </template>
 
 <script>
-import DialogDelete from "../../components/DialogDelete.vue";
-import UserLayout from "../../Layouts/UserLayout.vue";
+import DialogDelete from "../components/DialogDelete.vue";
+import DefaultLayout from "../Layouts/DefaultLayout.vue";
 export default {
-  components: { UserLayout, DialogDelete },
-  name: "BillsManage",
+  components: { DialogDelete, DefaultLayout },
+  name: "Bills",
   data() {
     return {
       dialog_delete: false,
@@ -220,7 +231,7 @@ export default {
       ],
       table_headers: [
         {
-          title: "Khách hàng",
+          title: "Họ tên",
           sortable: false,
           key: "name",
           width: 150,
@@ -347,7 +358,7 @@ export default {
             },
           ],
           created_at: "2023-09-12 12:31:53",
-          status: -1,
+          status: 3,
         },
         {
           id: 3,
@@ -446,7 +457,7 @@ export default {
         return this.table_rows;
       }
       return this.table_rows.filter((item) => {
-        return item.status == (status == 5 ? -1 : status - 1);
+        return item.status == status - 1;
       });
     },
     getStatusString(status) {
@@ -474,6 +485,9 @@ export default {
   font-size: 14px;
   padding: 8px 0;
 }
+.container {
+  padding-bottom: 32px;
+}
 .dialog_detail {
   padding: 12px;
 }
@@ -482,7 +496,7 @@ export default {
   justify-content: space-between;
 }
 .cancel {
-  color: #ec1c24;
+    color: #e60a32;
 }
 .return {
   color: #8f8f8f;

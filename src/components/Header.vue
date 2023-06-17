@@ -190,8 +190,9 @@ export default {
       items: [
         { id: 0, title: "Thông tin cá nhân", icon: "mdi-account-circle" },
         { id: 1, title: "Đổi mật khẩu", icon: "mdi-lock-outline" },
-        { id: 2, title: "Xem shop của tôi", icon: "mdi-store" },
-        { id: 3, title: "Đăng xuất", icon: "mdi-logout" },
+        { id: 2, title: "Đơn hàng của tôi", icon: "mdi-list-box-outline" },
+        { id: 3, title: "Xem shop của tôi", icon: "mdi-store" },
+        { id: 4, title: "Đăng xuất", icon: "mdi-logout" },
       ],
       user: {
         id: 1,
@@ -249,6 +250,9 @@ export default {
           this.openPasswordDialog();
           break;
         case 2:
+          this.$router.push({ name: "bills" });
+          break;
+        case 3:
           this.$router.push({ name: "all-products" });
           break;
         default:
