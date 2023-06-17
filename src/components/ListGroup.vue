@@ -10,12 +10,12 @@
 
     <v-list-item
       class="sub-feature__item"
-      v-for="([title, to, icon], i) in items"
+      v-for="(item, i) in items"
       :key="i"
-      :title="title"
+      :title="item.title"
       :prepend-icon="icon"
-      :value="title"
-      :to="to"
+      :value="item.title"
+      :to="{name: item.to}"
     ></v-list-item>
   </v-list-group>
 </template>
@@ -34,11 +34,13 @@ export default {
     },
     items: {
       type: Array,
-      required: true,
+      required: false,
     },
     prepend_icon: {
       type: String,
     },
+  },
+  methods: {
   },
 };
 </script>

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from "vue-router";
 import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Resigter/Register.vue";
@@ -6,46 +6,88 @@ import VerifyOTP from "@/views/Resigter/VerifyOTP.vue";
 import RegisterInformation from "@/views/Resigter/RegisterInformation.vue";
 import AddProduct from "@/views/User/Product/AddProduct.vue";
 import AllProducts from "@/views/User/Product/AllProducts.vue";
+import Search from "@/views/Search.vue";
+import ProductDetail from "@/views/ProductDetail.vue";
+import ShopProfile from "@/views/ShopProfile.vue";
+import Cart from "@/views/Cart.vue";
+import Payment from "@/views/Payment.vue";
+import Bills from "@/views/Bills.vue";
+import BillsManage from "@/views/User/BillsManage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component: Home
+      path: "/",
+      name: "home",
+      component: Home,
     },
     {
-      path: '/login',
-      name: 'login',
-      component: Login
+      path: "/tim-kiem-san-pham",
+      name: "search",
+      component: Search,
     },
     {
-      path: '/register',
-      name: 'register',
-      component: Register
+      path: "/chi-tiet-san-pham",
+      name: "product-detail",
+      component: ProductDetail,
     },
     {
-      path: '/verify',
-      name: 'verify',
-      component: VerifyOTP
+      path: "/don-hang-cua-toi",
+      name: "bills",
+      component: Bills,
     },
     {
-      path: '/register-information',
-      name: 'register-information',
-      component: RegisterInformation
+      path: "/thanh-toan",
+      name: "payment",
+      component: Payment,
     },
     {
-      path: '/user/product/add',
-      name: 'add-product',
-      component: AddProduct
+      path: "/chi-tiet-shop",
+      name: "shop-profile",
+      component: ShopProfile,
     },
     {
-      path: '/user/product/all',
-      name: 'all-products',
-      component: AllProducts
-    }
-  ]
-})
+      path: "/gio-hang",
+      name: "cart",
+      component: Cart,
+    },
+    {
+      path: "/dang-nhap",
+      name: "login",
+      component: Login,
+    },
+    {
+      path: "/dang-ky",
+      name: "register",
+      component: Register,
+    },
+    {
+      path: "/xac-thuc",
+      name: "verify",
+      component: VerifyOTP,
+    },
+    {
+      path: "/dang-ky-thong-tin",
+      name: "register-information",
+      component: RegisterInformation,
+    },
+    {
+      path: "/shop/don-hang/quan-ly",
+      name: "bills-manage",
+      component: BillsManage,
+    },
+    {
+      path: "/shop/san-pham/them",
+      name: "add-product",
+      component: AddProduct,
+    },
+    {
+      path: "/shop/san-pham/tat-ca",
+      name: "all-products",
+      component: AllProducts,
+    },
+  ],
+});
 
-export default router
+export default router;

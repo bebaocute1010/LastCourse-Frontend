@@ -8,27 +8,27 @@
     />
     <Breadcrumbs :items="breadcrumbs" />
     <div id="main-content">
-      <div class="content-headding">
+      <div class="content-heading">
         <div>
-          <ul class="content-headding__list">
+          <ul class="content-heading__list">
             <li
               :class="{
-                'content-headding__item': true,
-                'content-headding__active': i === status_selected,
+                'content-heading__item': true,
+                'content-heading__active': i === status_selected,
               }"
-              v-for="(item, i) in headding_items"
+              v-for="(item, i) in heading_items"
               :key="i"
               @click="status_selected = i"
             >
-              <span class="content-headding__item-title">{{ item.title }}</span>
-              <span class="content-headding__item-quantity"
+              <span class="content-heading__item-title">{{ item.title }}</span>
+              <span class="content-heading__item-quantity"
                 >({{ filterStatus(i).length }})</span
               >
             </li>
           </ul>
         </div>
 
-        <div class="content-headding__buttons">
+        <div class="content-heading__buttons">
           <router-link :to="{ name: 'add-product' }">
             <button id="button-add-product">+ Thêm sản phẩm</button></router-link
           >
@@ -90,7 +90,10 @@
                 <v-icon>mdi-pencil-box</v-icon>
                 <span>Sửa</span>
               </div>
-              <div class="user-not-select action-button delete-item-button" @click="showDialog()">
+              <div
+                class="user-not-select action-button delete-item-button"
+                @click="showDialog()"
+              >
                 <v-icon>mdi-delete</v-icon>
                 <span>Xóa</span>
               </div>
@@ -163,7 +166,7 @@ export default {
           title: "Tất cả sản phẩm",
         },
       ],
-      headding_items: [
+      heading_items: [
         {
           title: "Tất cả",
           quantity: 100,
@@ -375,17 +378,17 @@ export default {
   background-color: #ffffff;
   border-radius: 8px;
 }
-.content-headding {
+.content-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 40px;
   border-bottom: 1px solid #f1f1f1;
 }
-.content-headding__list {
+.content-heading__list {
   display: flex;
 }
-.content-headding__item {
+.content-heading__item {
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -395,16 +398,16 @@ export default {
   cursor: pointer;
   user-select: none;
 }
-.content-headding__active {
+.content-heading__active {
   color: #0172cb;
   box-shadow: 0px 3px 0px 0px blue;
   outline-offset: -3px;
 }
 
-.content-headding__active .content-headding__item-title {
+.content-heading__active .content-heading__item-title {
   font-weight: 600;
 }
-.content-headding__item-quantity {
+.content-heading__item-quantity {
   font-size: 12px;
 }
 #button-add-product {
@@ -513,8 +516,6 @@ export default {
   width: 20px;
   border-radius: 8px;
   border: 1.5px solid #0172cb;
-}
-#table-footer__checkbox {
 }
 #table-footer__label {
   user-select: none;

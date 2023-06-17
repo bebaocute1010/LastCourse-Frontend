@@ -43,7 +43,7 @@ export default {
   align-items: center;
 }
 .container {
-  max-width: 1200px;
+  max-width: 1175px;
 }
 
 .center-row .content {

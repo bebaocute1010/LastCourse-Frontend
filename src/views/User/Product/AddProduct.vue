@@ -8,7 +8,7 @@
             <div class="heading-2">
               <h2>Hình ảnh sản phẩm</h2>
             </div>
-            <div class="images">
+            <div class="images user-not-select">
               <div class="image-button" @click="$refs.images.click()">
                 <v-icon>mdi-plus-circle</v-icon>
                 <span>Thêm ảnh</span>
@@ -22,22 +22,14 @@
                   @change="onChangeImages"
                 />
               </div>
-              <div class="images__list">
-                <v-slide-group style="width: 100%; height: 100%">
-                  <v-slide-group-item
-                    v-for="(url, i) in image_urls"
-                    :key="i"
-                    style="width: 144px; height: 144px"
-                  >
-                    <div class="image__item">
-                      <v-icon @click="deleteImage(i)" class="image__item--button-delete"
-                        >mdi-close-circle</v-icon
-                      >
-                      <img :src="url" />
-                    </div>
-                  </v-slide-group-item>
-                </v-slide-group>
-              </div>
+              <SlideImages
+                refe="slideImageProduct"
+                @deleteImage="deleteImage(i)"
+                :items="image_urls"
+                :img_width="'144px'"
+                :show_delete="true"
+                style="height: 144px"
+              ></SlideImages>
             </div>
           </div>
         </section>
@@ -443,12 +435,17 @@ import Breadcrumbs from "@/components/Breadcrumbs.vue";
 import TextFieldWithValidation from "@/components/TextFieldWithValidation.vue";
 import listGroup from "@/components/ListGroup.vue";
 import Alert from "@/components/Alert.vue";
+import SlideImages from "../../../components/SlideImages.vue";
 
 export default {
   name: "AddProducts",
-  components: { Alert, TextFieldWithValidation, Breadcrumbs, UserLayout },
+  components: { Alert, TextFieldWithValidation, Breadcrumbs, UserLayout, SlideImages },
   data() {
     return {
+      currentSlide: 0,
+      startX: 0,
+      currentX: 0,
+      isDragging: false,
       breadcrumbs: [
         {
           title: "Quản lý sản phẩm",
@@ -693,31 +690,7 @@ export default {
 .images {
   padding: 7px 0;
   display: flex;
-}
-
-.images__list {
-  width: 77%;
-  height: 144px;
-  padding-left: 15px;
-}
-
-.image__item {
-  padding: 0 8px;
-  position: relative;
-}
-
-.image__item img {
-  width: 144px;
-  height: 144px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.image__item--button-delete {
-  position: absolute;
-  top: 0;
-  right: 0;
-  color: #595959;
+  column-gap: 16px;
 }
 
 .image-button {
@@ -730,6 +703,11 @@ export default {
   height: 144px;
   color: #0172cb;
   justify-content: center;
+}
+
+.image-button span {
+  width: 144px;
+  text-align: center;
 }
 
 .image-button .v-field__field.v-field__input {
