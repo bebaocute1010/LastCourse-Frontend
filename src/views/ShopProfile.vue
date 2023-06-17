@@ -43,7 +43,7 @@
 
     <div class="shop-profile__body">
       <div class="container">
-        <products-grid :hidden_headding="true" :items="shop.products" :column_number="6">
+        <products-grid :hidden_heading="true" :items="shop.products" :column_number="6">
         </products-grid>
       </div>
     </div>

@@ -45,7 +45,7 @@
     </v-dialog>
     <div class="container">
       <div class="block-info shipping" @click="showDialog()">
-        <p class="headding-text shipping-headding">
+        <p class="heading-text shipping-heading">
           <v-icon size="20">mdi-map-marker</v-icon>Địa chỉ nhận hàng
         </p>
         <div class="shipping-information">
@@ -58,7 +58,7 @@
 
       <div class="block-info shop__item" v-for="(shop, index) in shops" :key="index">
         <div class="shop__item-wraper">
-          <p class="headding-text shop__item-headding">{{ shop.name }}</p>
+          <p class="heading-text shop__item-heading">{{ shop.name }}</p>
           <div
             class="shop__item-product"
             v-for="product in shop.products"
@@ -85,11 +85,11 @@
         <v-row>
           <v-col cols="5">
             <div class="warehouse">
-              <p class="headding-text">Kho hàng</p>
+              <p class="heading-text">Kho hàng</p>
               <p class="after-chevron-right">{{ shop.warehouse }}</p>
             </div>
             <div class="shipping-fee">
-              <p class="headding-text">Chi phí vận chuyển</p>
+              <p class="heading-text">Chi phí vận chuyển</p>
               <p>
                 {{ shop.shipping_carrier }}
                 <span class="after-chevron-right"
@@ -350,7 +350,7 @@ export default {
 .shipping-fee p:last-child {
   font-size: 14px;
 }
-.v-col .headding-text {
+.v-col .heading-text {
   font-weight: 600;
 }
 .v-col:first-child {
@@ -401,7 +401,7 @@ export default {
   justify-content: space-between;
   align-items: center;
 }
-.shop__item-headding {
+.shop__item-heading {
   font-weight: 600;
   margin-bottom: 16px;
 }
@@ -419,12 +419,12 @@ export default {
   display: flex;
   justify-content: space-between;
 }
-.shipping-headding {
+.shipping-heading {
   display: flex;
   column-gap: 12px;
   font-weight: 700;
 }
-.headding-text {
+.heading-text {
   color: #0074bd;
 }
 .block-info {

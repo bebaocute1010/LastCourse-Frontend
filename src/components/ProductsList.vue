@@ -1,6 +1,6 @@
 <template>
   <div class="products-list container">
-    <div class="products-list__headding">
+    <div class="products-list__heading">
       <p class="products-list__title" v-if="!flash_sale">{{ name }}</p>
       <div class="flash-sale user-not-select" v-else>
         <div class="flash-sale__logo">
@@ -145,7 +145,7 @@ export default {
   color: #0074bd;
   text-transform: uppercase;
 }
-.products-list__headding {
+.products-list__heading {
   display: flex;
   justify-content: space-between;
   padding: 30px 0 6px;

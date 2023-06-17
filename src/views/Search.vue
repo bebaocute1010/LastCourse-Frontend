@@ -4,7 +4,7 @@
       <div class="container screen-body">
         <div id="filters">
           <div class="filter-item">
-            <h3 class="filter-item-headding">DANH MỤC SẢN PHẨM</h3>
+            <h3 class="filter-item-heading">DANH MỤC SẢN PHẨM</h3>
             <div class="filter-item-body">
               <v-list class="filter-item__list">
                 <v-list-item
@@ -39,7 +39,7 @@
           </div>
 
           <div class="filter-item">
-            <h3 class="filter-item-headding">KHOẢNG GIÁ</h3>
+            <h3 class="filter-item-heading">KHOẢNG GIÁ</h3>
             <div id="filter-range-price" class="filter-item-body">
               <input class="filter-range-price__input" />
               <v-icon>mdi-minus</v-icon>
@@ -52,7 +52,7 @@
           </div>
 
           <div class="filter-item">
-            <h3 class="filter-item-headding">ĐÁNH GIÁ</h3>
+            <h3 class="filter-item-heading">ĐÁNH GIÁ</h3>
             <div id="filter-rating" class="filter-item-body">
               <v-rating
                 v-model="rating"

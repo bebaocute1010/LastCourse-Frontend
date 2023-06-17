@@ -564,6 +564,37 @@ export default {
     },
   },
   methods: {
+    handleLinkClick(index) {
+      this.isLinkClicked = true;
+      this.activeSection = index;
+      setTimeout(() => {
+        this.isLinkClicked = false;
+      }, 100);
+    },
+    handleScroll() {
+      if (this.isLinkClicked) {
+        return;
+      }
+      const sectionElements = document.getElementsByClassName("section");
+      const scrollPosition = window.scrollY || window.pageYOffset;
+
+      let activeSectionIndex = null;
+      for (let i = 0; i < sectionElements.length; i++) {
+        const sectionElement = sectionElements[i];
+        const sectionOffset = sectionElement.offsetTop;
+        const sectionHeight = sectionElement.offsetHeight;
+
+        if (
+          scrollPosition >= sectionOffset &&
+          scrollPosition < sectionOffset + sectionHeight
+        ) {
+          activeSectionIndex = i;
+          break;
+        }
+      }
+
+      this.activeSection = activeSectionIndex;
+    },
     combination(arr1, arr2) {
       let results = [];
       for (let i = 0; i < arr1.length; i++) {

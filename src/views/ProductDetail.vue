@@ -57,9 +57,9 @@
           </div>
 
           <div id="product__variants">
-            <p class="product__variant__headding">Phân loại</p>
+            <p class="product__variant__heading">Phân loại</p>
             <div class="product__variants__list" v-for="list in variants" :key="list.id">
-              <p class="product__variants__list__name headding-text">{{ list.name }}</p>
+              <p class="product__variants__list__name heading-text">{{ list.name }}</p>
               <div class="product__variants__list__items">
                 <div
                   class="product__variant__item"
@@ -76,7 +76,7 @@
           </div>
 
           <div id="quantity-order">
-            <p class="headding-text">Số lượng:</p>
+            <p class="heading-text">Số lượng:</p>
             <div>
               <div
                 class="quantity-order__button user-not-select"
@@ -99,7 +99,7 @@
           </div>
 
           <div id="inventory">
-            <p class="headding-text">
+            <p class="heading-text">
               Tồn kho: <span>{{ formatNumber(inventory) }}</span>
             </p>
           </div>
@@ -115,7 +115,7 @@
     <section id="product-extend">
       <div class="container">
         <div id="product-extend-content" ref="extendContent">
-          <div id="product-extend__headding" class="user-not-select">
+          <div id="product-extend__heading" class="user-not-select">
             <div id="shop-info">
               <v-avatar id="shop__avatar"
                 ><v-img
@@ -155,7 +155,7 @@
           </div>
 
           <div id="product-extend__describe" class="product-extend__item">
-            <p class="product-extend__item-headding">Mô tả sản phẩm</p>
+            <p class="product-extend__item-heading">Mô tả sản phẩm</p>
             <div class="product-extend__item-body">
               <div class="product-extend__item__grid">
                 <div class="__item__grid__titles">
@@ -173,7 +173,7 @@
           </div>
 
           <div id="product-extend__detail" class="product-extend__item">
-            <p class="product-extend__item-headding">Chi tiết sản phẩm</p>
+            <p class="product-extend__item-heading">Chi tiết sản phẩm</p>
             <div class="product-extend__item-body">
               <p :class="{ 'collapse-content': !expand, 'expand-content': expand }">
                 - Tên sản phẩm: Bộ Ba Lỗ Bé Trai, Bé Gái Minky Mom Vải Thun Lạnh Basic
@@ -191,10 +191,10 @@
           </div>
 
           <div id="product-extend__evaluate" class="product-extend__item">
-            <p class="product-extend__item-headding">Đánh giá sản phẩm</p>
+            <p class="product-extend__item-heading">Đánh giá sản phẩm</p>
             <div class="product-extend__item-body">
               <div class="__item__rating">
-                <div class="__item__rating__headding user-not-select">
+                <div class="__item__rating__heading user-not-select">
                   <p class="__rating-value">
                     <span>{{ rating }}</span
                     >/5
@@ -360,7 +360,7 @@
           </div>
         </div>
         <div id="products-relate" ref="relateProducts">
-          <p class="product-extend__item-headding">Sản phẩm tương tự</p>
+          <p class="product-extend__item-heading">Sản phẩm tương tự</p>
           <product
             v-for="item in products_relate"
             :key="item.id"
@@ -794,7 +794,7 @@ export default {
   display: flex;
   column-gap: 16px;
 }
-#products-relate .product-extend__item-headding {
+#products-relate .product-extend__item-heading {
   margin: 0;
 }
 
@@ -890,7 +890,7 @@ export default {
   font-weight: 600;
   color: #8f8f8f;
 }
-.__item__rating__headding {
+.__item__rating__heading {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -920,11 +920,11 @@ export default {
   display: flex;
   column-gap: 28px;
 }
-.product-extend__item-headding::before {
+.product-extend__item-heading::before {
   content: "•";
   padding-right: 8px;
 }
-.product-extend__item-headding {
+.product-extend__item-heading {
   color: #0074bd;
   font-weight: 600;
   margin-bottom: 16px;
@@ -955,7 +955,7 @@ export default {
   column-gap: 32px;
   align-items: center;
 }
-#product-extend__headding {
+#product-extend__heading {
   display: flex;
   justify-content: space-between;
 }
@@ -1047,17 +1047,17 @@ export default {
   border-radius: 20px;
   cursor: pointer;
 }
-.headding-text {
+.heading-text {
   font-weight: 600;
 }
 .product__variants__list__name {
   margin: 10px 0;
 }
-.product__variant__headding::before {
+.product__variant__heading::before {
   content: "•";
   padding-right: 8px;
 }
-.product__variant__headding {
+.product__variant__heading {
   font-weight: 600;
   color: #0074bd;
 }
