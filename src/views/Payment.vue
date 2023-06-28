@@ -135,7 +135,7 @@
               />
               <label>Zalo pay</label>
               <div class="payment-method-item__image">
-                <img src="src/assets/icons/zalo-pay.svg" />
+                <img src="/src/assets/icons/zalo-pay.svg" />
               </div>
             </div>
           </div>

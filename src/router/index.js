@@ -28,7 +28,7 @@ const router = createRouter({
       component: Search,
     },
     {
-      path: "/chi-tiet-san-pham",
+      path: "/chi-tiet-san-pham/:slug",
       name: "product-detail",
       component: ProductDetail,
     },
@@ -43,7 +43,7 @@ const router = createRouter({
       component: Payment,
     },
     {
-      path: "/chi-tiet-shop",
+      path: "/chi-tiet-shop/:id",
       name: "shop-profile",
       component: ShopProfile,
     },

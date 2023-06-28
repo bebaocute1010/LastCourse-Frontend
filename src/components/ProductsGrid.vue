@@ -17,7 +17,9 @@
           :price="item.price"
           :sold="item?.sold"
           :rate="item?.rate"
-          :flash_sale="item?.flash_sale"
+          :slug="item?.slug"
+          :imageW="imageW"
+          :imageH="imageH"
         ></Product>
       </div>
     </div>
@@ -33,6 +35,14 @@ export default {
     return {};
   },
   props: {
+    imageW: {
+      type: String,
+      required: false,
+    },
+    imageH: {
+      type: String,
+      required: false,
+    },
     id: {
       required: true,
     },
@@ -46,21 +56,21 @@ export default {
     },
     column_number: {
       type: Number,
-      required: false
+      required: false,
     },
     hidden_heading: {
       type: Boolean,
       required: false,
       default: false,
-    }
+    },
   },
   methods: {
     getStyleObject() {
       const objectStyle = {};
       if (this.column_number) {
         return {
-          'grid-template-columns': `repeat(${this.column_number}, 1fr)`
-        }
+          "grid-template-columns": `repeat(${this.column_number}, 1fr)`,
+        };
       }
     },
     startDrag(event) {

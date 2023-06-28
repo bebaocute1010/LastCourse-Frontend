@@ -17,14 +17,17 @@
             <div class="user__avatar">
               <v-avatar size="120">
                 <v-img
-                  :src="avatar_file_choose ? urlImage(avatar_file_choose) : user.avatar"
+                  cover
+                  :src="
+                    avatar_file_choose ? urlImage(avatar_file_choose) : user_infor?.avatar
+                  "
                 ></v-img>
 
                 <div class="user__avatar__overlay" @click="$refs.btnChooseAvatar.click()">
                   <input
                     type="file"
                     ref="btnChooseAvatar"
-                    @change="chooseAvatar"
+                    @change="chooseAvatar()"
                     accept="image/*"
                     style="display: none"
                   />
@@ -37,20 +40,46 @@
                 <v-col cols="12">
                   <v-text-field
                     variant="outlined"
+                    hide-details="true"
                     label="Họ tên"
-                    v-model="user.name"
+                    v-model="user_infor.name"
                   ></v-text-field>
                 </v-col>
 
                 <v-col cols="12">
                   <v-text-field
                     variant="outlined"
+                    hide-details="true"
                     type="date"
                     label="Ngày sinh"
-                    v-model="user.avatar"
+                    v-model="user_infor.birthday"
                   ></v-text-field>
                 </v-col>
               </v-row>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-select
+                :items="['Nam', 'Nữ', 'Không xác định']"
+                variant="outlined"
+                hide-details="true"
+                label="Giới tính"
+                v-model="user_infor.gender"
+              ></v-select>
+            </v-col>
+
+            <v-col cols="6">
+              <v-text-field
+                variant="outlined"
+                label="Mã giới thiệu"
+                hide-details="true"
+                readonly="true"
+                v-model="user_infor.invite_code"
+                append-icon="mdi-content-copy"
+                ref="inviteCode"
+                @click:append="copyText()"
+              ></v-text-field>
             </v-col>
           </v-row>
         </v-card-text>
@@ -143,16 +172,16 @@
         </div>
       </div>
 
-      <div class="header-buttons" v-if="logined">
+      <div class="header-buttons" v-if="!logged_in">
         <v-btn class="header-button__item" :to="{ name: 'login' }">Đăng nhập</v-btn>
       </div>
       <v-menu v-else open-on-hover>
         <template v-slot:activator="{ props }">
           <div class="user-info" v-bind="props">
-            <p class="user__name" v-bind="props">{{ user.name }}</p>
+            <p class="user__name" v-bind="props">{{ user?.name }}</p>
 
             <v-avatar class="user__avatar">
-              <v-img :src="user.avatar"></v-img>
+              <v-img cover :src="user?.avatar"></v-img>
             </v-avatar>
             <v-icon color="#EC1C24">mdi-menu-down</v-icon>
           </div>
@@ -182,6 +211,8 @@ export default {
   components: { SystemBar },
   data() {
     return {
+      user_infor: null,
+      logged_in: false,
       avatar_file_choose: null,
       dialog_profile_show: false,
       dialog_password_show: false,
@@ -194,17 +225,7 @@ export default {
         { id: 3, title: "Xem shop của tôi", icon: "mdi-store" },
         { id: 4, title: "Đăng xuất", icon: "mdi-logout" },
       ],
-      user: {
-        id: 1,
-        name: "Savian Nguyễn",
-        avatar: "https://cdn.vuetifyjs.com/images/john.jpg",
-      },
     };
-  },
-  computed: {
-    logined() {
-      return localStorage.getItem("logined");
-    },
   },
   props: {
     search_rs: {
@@ -212,7 +233,19 @@ export default {
       required: false,
     },
   },
+  created() {
+    this.logged_in = localStorage.getItem("logged_in") === "true";
+    if (this.logged_in && !this.user) {
+      this.getUser();
+    }
+  },
   methods: {
+    copyText() {
+      const element = this.$refs.inviteCode;
+      element.select();
+      element.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+    },
     updatePassword() {},
     savePasswordDialog() {
       this.dialog_password_show = false;
@@ -232,7 +265,13 @@ export default {
     closeProfileDialog() {
       this.dialog_profile_show = false;
     },
-    openProfileDialog() {
+    async openProfileDialog() {
+      try {
+        const response = await axios.get("auth/me");
+        this.user_infor = response.data.data;
+      } catch (error) {
+        console.log(error);
+      }
       this.dialog_profile_show = true;
     },
     chooseAvatar(event) {
@@ -255,6 +294,10 @@ export default {
         case 3:
           this.$router.push({ name: "all-products" });
           break;
+        case 4:
+          this.logout();
+          this.logged_in = false;
+          break;
         default:
           break;
       }
@@ -271,6 +314,12 @@ export default {
 </script>
 
 <style scoped>
+.v-col-12 {
+  padding: 0 0 12px;
+}
+.v-col-9 {
+  padding: 0 12px;
+}
 .dialog-title {
   display: flex;
   justify-content: space-between;

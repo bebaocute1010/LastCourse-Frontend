@@ -18,7 +18,7 @@
           class="user-not-select"
         >
           <div class="v-list-item__image-prepend">
-            <img src="src/assets/logo.svg" />
+            <img src="/src/assets/logo.svg" />
           </div>
         </v-list-item>
 
@@ -54,7 +54,7 @@
           <v-icon v-else>mdi-cart</v-icon>
         </v-list-item>
 
-        <v-list-item key="logout" class="user-not-select">
+        <v-list-item key="logout" @click="this.logout()" class="user-not-select">
           <v-icon>mdi-logout</v-icon>
         </v-list-item>
       </v-list-item-group>
@@ -100,7 +100,7 @@ export default {
 </script>
 
 <style>
-.notify-item .v-list-item{
+.notify-item .v-list-item {
   padding: 12px !important;
   border-bottom: 1px solid #eee;
 }
