@@ -6,7 +6,6 @@
       :text="dialog.text"
       @result="dialogResult"
     />
-    <Breadcrumbs :items="breadcrumbs" />
     <div id="main-content">
       <div class="content-heading">
         <div>
@@ -30,12 +29,8 @@
 
         <div class="content-heading__buttons">
           <router-link :to="{ name: 'add-product' }">
-            <button id="button-add-product">+ Thêm sản phẩm</button></router-link
-          >
-          <button id="button-filter" v-if="selected.length == 0">
-            <span>Bộ lọc</span>
-            <v-icon>mdi-menu-down</v-icon>
-          </button>
+            <button id="button-add-product">+ Thêm sản phẩm</button>
+          </router-link>
         </div>
       </div>
 
@@ -53,6 +48,7 @@
 
       <div class="content-search-table">
         <v-data-table
+          v-model:page="page"
           :headers="table_headers"
           :items="filterStatus(status_selected)"
           :search="search"
@@ -77,11 +73,11 @@
           <template v-slot:[`item.status`]="{ item }">
             <span
               :class="{
-                available: item.selectable.status == 0,
-                unavailable: item.selectable.status == 1,
-                hidden: item.selectable.status == 2,
+                available: item.selectable.status === 'Còn hàng',
+                unavailable: item.selectable.status === 'Hết hàng',
+                hidden: item.selectable.status === 'Đã ẩn',
               }"
-              >{{ getStatusString(item.selectable.status) }}</span
+              >{{ item.selectable.status }}</span
             >
           </template>
           <template v-slot:[`item.actions`]>
@@ -100,6 +96,12 @@
             </div>
           </template>
           <template v-slot:bottom>
+            <v-pagination
+              v-if="pageCount > 1"
+              v-model="page"
+              :length="pageCount"
+              :total-visible="5"
+            ></v-pagination>
             <div id="table-footer" v-if="selected.length > 0">
               <div class="table-footer__checkbox-group">
                 <input
@@ -142,14 +144,14 @@
 
 <script>
 import UserLayout from "@/Layouts/UserLayout.vue";
-import Breadcrumbs from "@/components/Breadcrumbs.vue";
 import DialogDelete from "../../../components/DialogDelete.vue";
 
 export default {
   name: "AllProduct",
-  components: { UserLayout, Breadcrumbs, DialogDelete },
+  components: { UserLayout, DialogDelete },
   data() {
     return {
+      page: 1,
       selected_all: false,
       dialog: {
         show: false,
@@ -158,30 +160,18 @@ export default {
       },
       id_item_editting: null,
       search: "",
-      breadcrumbs: [
-        {
-          title: "Quản lý sản phẩm",
-        },
-        {
-          title: "Tất cả sản phẩm",
-        },
-      ],
       heading_items: [
         {
           title: "Tất cả",
-          quantity: 100,
         },
         {
           title: "Còn hàng",
-          quantity: 90,
         },
         {
           title: "Hết hàng",
-          quantity: 80,
         },
         {
           title: "Đã ẩn",
-          quantity: 70,
         },
       ],
       status_selected: 0,
@@ -213,7 +203,7 @@ export default {
         },
         {
           title: "Còn lại",
-          key: "remaining",
+          key: "inventory",
           align: "center",
         },
         {
@@ -223,99 +213,13 @@ export default {
           align: "center",
         },
       ],
-      table_rows: [
-        {
-          id: 1,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 0,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 2,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 0,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 3,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 2,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 4,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 2,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 5,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 6,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-
-        {
-          id: 7,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-
-        {
-          id: 8,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-      ],
+      table_rows: [],
     };
+  },
+  computed: {
+    pageCount() {
+      return Math.ceil(this.filterStatus(this.status_selected).length / 10);
+    },
   },
   watch: {
     selected() {
@@ -325,7 +229,16 @@ export default {
       this.selected_all = this.isSelectedAll();
     },
   },
+  created() {
+    this.getProducts();
+  },
   methods: {
+    async getProducts() {
+      this.startLoad();
+      const response = await axios.get("shop/products");
+      this.table_rows = response.data.data;
+      this.finishLoad();
+    },
     isSelectedAll() {
       return this.selected.length == this.filterStatus(this.status_selected).length;
     },
@@ -344,15 +257,15 @@ export default {
     formattedNumber(num) {
       return num.toLocaleString("de-DE");
     },
-    getStatusString(status) {
-      return status === 0 ? "Còn hàng" : status === 1 ? "Hết hàng" : "Đã ẩn";
+    getStatusCode(status) {
+      return status === "Còn hàng" ? 0 : status === "Hết hàng" ? 1 : 2;
     },
     filterStatus(status) {
       if (status == 0) {
         return this.table_rows;
       }
       return this.table_rows.filter((item) => {
-        return item.status == status - 1;
+        return this.getStatusCode(item.status) == status - 1;
       });
     },
     footerSelectAll() {
@@ -377,6 +290,7 @@ export default {
   width: 100%;
   background-color: #ffffff;
   border-radius: 8px;
+  margin: 40px 0;
 }
 .content-heading {
   display: flex;
@@ -462,9 +376,18 @@ export default {
   height: 48px;
 }
 .product-image img {
-  width: 100%;
-  height: 100%;
+  width: 48px;
+  height: 48px;
   object-fit: cover;
+}
+.product-name {
+  font-size: 14px;
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 .product-info {
   display: flex;

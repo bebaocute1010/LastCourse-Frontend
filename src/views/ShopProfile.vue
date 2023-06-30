@@ -3,37 +3,39 @@
     <div class="shop-profile__header">
       <div class="container">
         <div class="shop-profile__banner">
-          <v-img cover :src="shop.banner"></v-img>
+          <v-img cover :src="shop?.banner"></v-img>
         </div>
 
         <div class="shop-profile__info">
           <div class="shop-profile__avatar">
-            <v-avatar size="120"><v-img cover :src="shop.avatar"></v-img></v-avatar>
+            <v-avatar size="120"><v-img cover :src="shop?.avatar"></v-img></v-avatar>
             <div class="shop-profile__shop-name">
-              <p>{{ shop.name }}</p>
-              <span>{{ shop.followers }} Người theo dõi</span>
+              <p>{{ shop?.name }}</p>
+              <span>{{ shop?.followers }} Người theo dõi</span>
             </div>
           </div>
 
           <div class="shop-profile__overall">
             <div class="shop-profile__overall__item">
               <p class="__item-name">Đánh giá shop</p>
-              <p class="__item__quantity">{{ shop.rating }}/5.0</p>
+              <p class="__item__quantity">{{ shop?.rating }}/5.0</p>
             </div>
 
             <div class="shop-profile__overall__item">
               <p class="__item-name">Người theo dõi</p>
-              <p class="__item__quantity">{{ shop.followers }}</p>
+              <p class="__item__quantity">{{ shop?.followers }}</p>
             </div>
 
             <div class="shop-profile__overall__item">
               <p class="__item-name">Số sản phẩm</p>
-              <p class="__item__quantity">{{ shop.products_number }}</p>
+              <p class="__item__quantity">{{ shop?.products_count }}</p>
             </div>
           </div>
 
           <div class="shop-profile__actions">
-            <button class="button-follow"><v-icon>mdi-account-plus-outline</v-icon>Theo dõi</button>
+            <button class="button-follow">
+              <v-icon>mdi-account-plus-outline</v-icon>Theo dõi
+            </button>
           </div>
         </div>
 
@@ -43,13 +45,23 @@
 
     <div class="shop-profile__body">
       <div class="container">
-        <products-grid :hidden_heading="true" :items="shop.products" :column_number="6">
+        <products-grid
+          :hidden_heading="true"
+          :items="shop?.products"
+          :column_number="6"
+          imageW="180px"
+          imageH="180px"
+        >
         </products-grid>
       </div>
     </div>
 
-    <div class="paginate-bar">
-      <v-pagination :length="15" :total-visible="5" active-color="#EC1C24"></v-pagination>
+    <div class="paginate-bar" v-if="shop?.num_page > 1">
+      <v-pagination
+        :length="shop?.num_page"
+        :total-visible="5"
+        active-color="#EC1C24"
+      ></v-pagination>
     </div>
   </default-layout>
 </template>
@@ -62,363 +74,26 @@ export default {
   components: { DefaultLayout, ProductsGrid },
   data() {
     return {
-      shop: {
-        id: 1,
-        banner:
-          "https://prbaochi.cdn.vccloud.vn/wp-content/uploads/2021/06/banner-san-pham.jpg",
-        avatar:
-          "https://antimatter.vn/wp-content/uploads/2022/11/hinh-anh-avatar-cute.jpg",
-        name: "Kim Tiểu Thư",
-        followers: 444,
-        rating: 4.6,
-        products_number: 400,
-        products: [
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 1200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 1200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            rate: 5,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            rate: 5,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 1200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 1200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            rate: 5,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            rate: 5,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 1200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 1200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            rate: 5,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            rate: 5,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 1200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 1200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            rate: 5,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            rate: 5,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-          {
-            image:
-              "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-            name: "Áo phông nữ uzzlang chất siêu đẹp",
-            price: 123000,
-            sold: 200,
-          },
-        ],
-      },
+      shop: null,
     };
+  },
+  created() {
+    this.getShop();
+  },
+  methods: {
+    async getShop() {
+      this.startLoad();
+      const response = await axios.get("get/shop/" + this.$route.params.id);
+      this.shop = response.data.data;
+      this.finishLoad();
+    },
   },
 };
 </script>
 
 <style scoped>
 .button-follow {
-  background: #F1F1F1;
+  background: #f1f1f1;
   padding: 14px 22px;
   border-radius: 8px;
 }
@@ -433,7 +108,7 @@ export default {
 }
 .shop-profile__tab {
   text-align: center;
-  color: #0074BD;
+  color: #0074bd;
   padding: 20px 0;
 }
 .paginate-bar {
@@ -442,7 +117,7 @@ export default {
 .shop-profile__body {
   padding: 40px 0;
 }
-.shop-profile__shop-name p{
+.shop-profile__shop-name p {
   font-weight: 700;
   font-size: 18px;
 }
@@ -470,7 +145,7 @@ export default {
   align-items: center;
   column-gap: 132px;
   padding-bottom: 26px;
-  border-bottom: 1px solid #C4C4C4;
+  border-bottom: 1px solid #c4c4c4;
 }
 .shop-profile__banner {
   height: 307px;

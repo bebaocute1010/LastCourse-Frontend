@@ -96,6 +96,7 @@ export default {
     };
   },
   created() {
+    this.finishLoad();
     this.setWindowTitle("Login");
   },
   methods: {

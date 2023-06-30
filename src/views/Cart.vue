@@ -1,8 +1,15 @@
 <template>
   <DefaultLayout :hidden_footer="true">
+    <dialog-delete
+      :dialog="dialog_delete"
+      title="Xóa sản phẩm khỏi giỏ hàng"
+      text="Bạn chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng ?"
+      @result="resultDialogDelete"
+    ></dialog-delete>
     <div class="container">
       <div class="content-search-table user-not-select">
         <v-data-table
+          v-model:page="page"
           :headers="table_headers"
           :items="table_rows"
           v-model="selected"
@@ -37,10 +44,7 @@
             <div class="quantity-order">
               <div
                 class="quantity-order__button user-not-select"
-                @click="
-                  item.selectable.quantity =
-                    item.selectable.quantity > 0 ? item.selectable.quantity - 1 : 0
-                "
+                @click="updateCart(item.selectable.id, item.selectable.quantity - 1)"
               >
                 <v-icon>mdi-minus</v-icon>
               </div>
@@ -48,31 +52,42 @@
                 type="number"
                 class="quantity-order__input"
                 v-model="item.selectable.quantity"
+                @input="startTimer(item.selectable.id, item.selectable.quantity)"
               />
               <div
                 class="quantity-order__button user-not-select"
-                @click="item.selectable.quantity = item.selectable.quantity + 1"
+                @click="updateCart(item.selectable.id, item.selectable.quantity + 1)"
               >
                 <v-icon>mdi-plus</v-icon>
               </div>
             </div>
           </template>
 
-          <template v-slot:[`item.actions`]>
-            <div class="delete-item-button" @click="showDialog()">
+          <template v-slot:[`item.actions`]="{ item }">
+            <div class="delete-item-button" @click="showDialogDelete(item.selectable.id)">
               <v-icon>mdi-delete</v-icon>
               <span>Xóa</span>
             </div>
           </template>
 
           <template v-slot:bottom>
+            <v-pagination
+              v-if="pageCount > 1"
+              v-model="page"
+              :length="pageCount"
+              :total-visible="5"
+            ></v-pagination>
             <div id="table-footer" v-if="selected.length > 0">
               <div class="table-footer__buttons-group">
                 <span>Tổng tiền</span>
                 <span class="sum-money">đ {{ formattedNumber(sumMoney()) }}</span>
-                <button class="table-footer__buttons-item" id="footer__button-show">
+                <router-link
+                  class="table-footer__buttons-item"
+                  id="footer__button-show"
+                  :to="{ name: 'payment' }"
+                >
                   Mua hàng
-                </button>
+                </router-link>
               </div>
             </div>
           </template>
@@ -84,12 +99,17 @@
 
 <script>
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
+import DialogDelete from "../components/DialogDelete.vue";
+import { mapActions } from "vuex";
 export default {
   name: "Cart",
-  components: { DefaultLayout },
+  components: { DefaultLayout, DialogDelete },
   data() {
     return {
+      page: 1,
+      dialog_delete: false,
       selected: [],
+      id_product_edit: null,
       table_headers: [
         {
           title: "Sản phẩm",
@@ -123,101 +143,84 @@ export default {
           align: "center",
         },
       ],
-      table_rows: [
-        {
-          id: 1,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          quantity: 0,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 2,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          quantity: 0,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 3,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          quantity: 2,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 4,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          quantity: 2,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 5,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          quantity: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 6,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          quantity: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-
-        {
-          id: 7,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          quantity: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-
-        {
-          id: 8,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          quantity: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-      ],
+      table_rows: [],
+      timer: null,
     };
   },
+  created() {
+    this.getCarts();
+  },
+  computed: {
+    pageCount() {
+      return Math.ceil(this.table_rows.length / 10);
+    },
+  },
+  watch: {
+    selected() {
+      this.setCartProductsSelected(this.selected);
+    },
+  },
   methods: {
+    ...mapActions(["setCartProductsSelected"]),
+    startTimer(id, quantity) {
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        this.updateCart(id, quantity);
+      }, 100);
+    },
+    async updateCart(id, quantity) {
+      if (quantity <= 0) {
+        this.showDialogDelete(id);
+        return;
+      }
+      this.startLoad();
+      try {
+        const response = await axios.post("cart/update", {
+          id: id,
+          quantity: quantity,
+        });
+        await this.getCarts();
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
+    async deleteCart(id) {
+      this.startLoad();
+      try {
+        const response = await axios.delete("cart/delete?id=" + id);
+        this.getCarts();
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
+    async getCarts() {
+      this.startLoad();
+      try {
+        const reponse = await axios.get("cart/get");
+        this.table_rows = reponse.data.data;
+      } catch (error) {
+        if (error.response.status === 401) {
+          this.$router.push({ name: "login" });
+        } else {
+          throw error;
+        }
+      }
+      this.finishLoad();
+    },
+
+    showDialogDelete(id) {
+      this.dialog_delete = true;
+      this.id_product_edit = id;
+    },
+    resultDialogDelete(value) {
+      this.dialog_delete = false;
+      if (value && this.id_product_edit != null) {
+        this.deleteCart(this.id_product_edit);
+      }
+      this.id_product_edit = null;
+    },
     sumMoney() {
       let sum = 0;
       this.selected.forEach((index) => {
@@ -283,12 +286,21 @@ export default {
   height: 48px;
 }
 .product-image img {
-  width: 100%;
-  height: 100%;
+  width: 48px;
+  height: 48px;
   object-fit: cover;
 }
 .product-into-money {
   color: #e60a32;
+}
+.product-name {
+  font-size: 14px;
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 .product-info {
   display: flex;

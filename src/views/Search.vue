@@ -41,13 +41,21 @@
           <div class="filter-item">
             <h3 class="filter-item-heading">KHOẢNG GIÁ</h3>
             <div id="filter-range-price" class="filter-item-body">
-              <input class="filter-range-price__input" />
+              <input
+                class="filter-range-price__input"
+                type="number"
+                v-model="filter_price_min"
+              />
               <v-icon>mdi-minus</v-icon>
-              <input class="filter-range-price__input" />
+              <input
+                class="filter-range-price__input"
+                type="number"
+                v-model="filter_price_max"
+              />
             </div>
 
             <div class="btn-center">
-              <button>Áp dụng</button>
+              <button @click="getResultsSearch">Áp dụng</button>
             </div>
           </div>
 
@@ -55,15 +63,16 @@
             <h3 class="filter-item-heading">ĐÁNH GIÁ</h3>
             <div id="filter-rating" class="filter-item-body">
               <v-rating
-                v-model="rating"
+                v-model="filter_rating"
                 bg-color="orange-lighten-1"
                 color="#FFB800"
                 size="26"
+                @update:modelValue="getResultsSearch"
               ></v-rating>
 
-              <div class="rating-values">
+              <div class="rating-values" v-if="filter_rating">
                 <span>
-                  {{ rating < 5 ? "Từ " + rating + " sao" : "5 sao" }}
+                  {{ filter_rating < 5 ? "Từ " + filter_rating + " sao" : "5 sao" }}
                 </span>
               </div>
             </div>
@@ -96,7 +105,8 @@
                 @click="
                   {
                     if (filter_option_selected === 3) {
-                      sort_price = !sort_price;
+                      sort_desc_price = !sort_desc_price;
+                      getResultsSearch();
                     } else {
                       filter_option_selected = 3;
                     }
@@ -104,7 +114,9 @@
                 "
               >
                 <span>Giá</span>
-                <v-icon>{{ sort_price ? "mdi-chevron-down" : "mdi-chevron-up" }}</v-icon>
+                <v-icon>{{
+                  sort_desc_price ? "mdi-chevron-down" : "mdi-chevron-up"
+                }}</v-icon>
               </li>
             </ul>
           </div>
@@ -124,13 +136,21 @@
                   :price="item.price"
                   :sold="item?.sold"
                   :rate="item?.rate"
-                  :flash_sale="item?.flash_sale"
+                  :slug="item?.slug"
+                  imageW="200px"
+                  imageH="200px"
                 ></Product>
               </div>
             </div>
 
             <div class="paginate-bar">
-              <v-pagination :length="15" :total-visible="5" active-color="#EC1C24"></v-pagination>
+              <v-pagination
+                v-model="page_active"
+                :length="num_page"
+                total-visible="6"
+                active-color="#EC1C24"
+                @update:modelValue="getResultsSearch()"
+              ></v-pagination>
             </div>
           </div>
         </div>
@@ -155,116 +175,65 @@ export default {
       return this.filter_cats;
     },
   },
+  watch: {
+    filter_option_selected() {
+      if (this.filter_option_selected === 0) {
+        this.sort_desc_price = this.sort_newest = this.sort_sell = null;
+      } else if (this.filter_option_selected === 1) {
+        this.sort_newest = true;
+        this.sort_desc_price = this.sort_sell = null;
+      } else if (this.filter_option_selected === 2) {
+        this.sort_sell = true;
+        this.sort_desc_price = this.sort_newest = null;
+      } else if (this.filter_option_selected === 3) {
+        this.sort_desc_price = false;
+        this.sort_sell = this.sort_newest = null;
+      }
+      this.getResultsSearch();
+    },
+  },
   data() {
     return {
-      sort_price: false,
-      rating: 1,
+      page_active: 1,
+      num_page: 1,
+      filter_rating: null,
       more_filter_cats: false,
       filter_option_selected: 0,
       filter_options: ["Liên quan", "Mới nhất", "Bán chạy"],
-      filter_cats: [
-        "Váy/ Váy ngắn",
-        "Váy/ Váy dáng dài",
-        "Thời trang nữ",
-        "Đồ nữ",
-        "Váy nữ dạ hội",
-        "Phụ kiện thời trang nữ",
-        "Đầm công sở",
-        "Quần âu",
-        "Áo nam thanh lịch",
-      ],
-      products_grid: [
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 1200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 1200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          rate: 5,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          rate: 5,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-      ],
+      filter_cats: [],
+      filter_price_min: null,
+      filter_price_max: null,
+      sort_desc_price: null,
+      sort_newest: null,
+      sort_sell: null,
+      products_grid: [],
       search_keyword: "",
     };
   },
+  created() {
+    this.getResultsSearch();
+  },
   methods: {
+    async getResultsSearch() {
+      this.startLoad();
+      const response = await axios.post("get/search-products", {
+        search: this.search_keyword,
+        page: this.page_active,
+        filter_cats: this.filter_cats,
+        filter_price_min: this.filter_price_min,
+        filter_price_max: this.filter_price_max,
+        filter_rating: this.filter_rating,
+        sort_newest: this.sort_newest,
+        sort_sell: this.sort_sell,
+        sort_desc_price: this.sort_desc_price,
+      });
+      this.products_grid = response.data.data.products;
+      this.num_page = response.data.data.num_page;
+      this.finishLoad();
+    },
     search(value) {
       this.search_keyword = value;
+      this.getResultsSearch();
     },
   },
 };
@@ -290,6 +259,9 @@ export default {
   column-gap: 12px;
   align-items: center;
   color: #555555;
+}
+.btn-center button:hover {
+  background: #8f1111;
 }
 .btn-center button {
   padding: 8px 22px;

@@ -1,6 +1,12 @@
 <template>
   <default-layout :hidden_footer="true">
-    <v-dialog class="dialog" v-model="dialog_show" persistent width="1024" v-if="dialog_show">
+    <v-dialog
+      class="dialog"
+      v-model="dialog_show"
+      persistent
+      width="1024"
+      v-if="dialog_show"
+    >
       <v-card>
         <v-card-title>
           <span class="text-h5">Thông tin nhận hàng</span>
@@ -18,7 +24,7 @@
               <v-text-field
                 variant="outlined"
                 label="Số điện thoại"
-                v-model="dialog_data.phone_number"
+                v-model="dialog_data.phone"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -50,21 +56,27 @@
         </p>
         <div class="shipping-information">
           <p class="shipping-information__customer after-chevron-right">
-            {{ shipping.name }} • {{ shipping.phone_number }}
+            {{ receiver.name ?? "Họ tên người nhận" }} •
+            {{ receiver.phone ?? "Số điện thoại" }}
           </p>
-          <p class="shipping-information__address">{{ shipping.address }}</p>
+          <p class="shipping-information__address">{{ receiver.address ?? "Địa chỉ" }}</p>
         </div>
       </div>
 
       <div class="block-info shop__item" v-for="(shop, index) in shops" :key="index">
         <div class="shop__item-wraper">
-          <p class="heading-text shop__item-heading">{{ shop.name }}</p>
+          <div class="shop__info">
+            <v-avatar>
+              <v-img cover :src="shop.shop_avatar"></v-img>
+            </v-avatar>
+            <p class="heading-text shop__item-heading">{{ shop.shop_name }}</p>
+          </div>
           <div
             class="shop__item-product"
             v-for="product in shop.products"
             :key="product.id"
           >
-            <div>
+            <div class="shop__item-product__info">
               <div class="shop__item-product__image">
                 <img :src="product.image" />
               </div>
@@ -86,15 +98,13 @@
           <v-col cols="5">
             <div class="warehouse">
               <p class="heading-text">Kho hàng</p>
-              <p class="after-chevron-right">{{ shop.warehouse }}</p>
+              <p>{{ shop.warehouse }}</p>
             </div>
             <div class="shipping-fee">
               <p class="heading-text">Chi phí vận chuyển</p>
               <p>
                 {{ shop.shipping_carrier }}
-                <span class="after-chevron-right"
-                  >đ {{ formattedNumber(shop.shipping_fee) }}</span
-                >
+                <span>đ {{ formattedNumber(shop.shipping_fee) }}</span>
               </p>
               <p>(Nhận hàng {{ shop.delivery_time }})</p>
             </div>
@@ -103,6 +113,7 @@
           <v-col class="note-for-shop" cols="5">
             <p>Ghi chú cho shop</p>
             <v-textarea
+              v-model="notes[index]"
               variant="outlined"
               no-resize
               rows="4"
@@ -156,9 +167,7 @@
             </div>
           </div>
 
-          <div>
-            <button>Đặt hàng</button>
-          </div>
+          <button @click="createBills()">Đặt hàng</button>
         </div>
       </div>
     </div>
@@ -166,6 +175,7 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
 export default {
   name: "Payment",
@@ -175,78 +185,66 @@ export default {
       dialog_show: false,
       dialog_data: null,
       payment_method: 0,
-      shipping: {
-        name: "Trần Thị Hồng",
-        phone_number: "0123123123",
-        address: "Lạch Tray, Ngô quyền, Hải Phòng",
+      receiver: {
+        name: null,
+        phone: null,
+        address: null,
       },
-      shops: [
-        {
-          name: "Thế giới thời trang",
-          warehouse: "Phố Thái Hà, Đống Đa, Hà Nội, Việt Nam",
-          shipping_fee: 25000,
-          delivery_time: "18Th3-1Th4",
-          shipping_carrier: "Giao hàng tiết kiệm ",
-          products: [
-            {
-              id: 1,
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              id: 2,
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-              price: 100000,
-              quantity: 4,
-            },
-            {
-              id: 3,
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-              price: 100000,
-              quantity: 3,
-            },
-          ],
-        },
-        {
-          name: "Thế giới thời trang 2",
-          warehouse: "Phố Thái Hà, Đống Đa, Hà Nội, Việt Nam",
-          shipping_fee: 20000,
-          delivery_time: "18Th3-1Th4",
-          shipping_carrier: "Giao hàng tiết kiệm ",
-          products: [
-            {
-              id: 4,
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              id: 7,
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-              price: 100000,
-              quantity: 4,
-            },
-            {
-              id: 9,
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-              price: 100000,
-              quantity: 3,
-            },
-          ],
-        },
-      ],
+      shops: [],
+      notes: [],
     };
   },
+  computed: {
+    ...mapGetters(["cart_products_selected"]),
+  },
+  created() {
+    if (!this.cart_products_selected || this.cart_products_selected.length <= 0) {
+      this.$router.push({ name: "cart" });
+      return;
+    }
+    this.getPreviewOrder();
+  },
   methods: {
+    createBills() {
+      const isReceiverComplete = Object.values(this.receiver).every(
+        (value) => value !== null && value !== ""
+      );
+      if (!isReceiverComplete) {
+        this.showAlert("Lỗi", "Vui lòng nhập đủ thông tin người nhận.", "error", null);
+        return;
+      }
+      try {
+        this.shops.forEach(async (shop, note_index) => {
+          this.startLoad();
+          const response = await axios.post("bill/create", {
+            receiver: this.receiver.name,
+            phone: this.receiver.phone,
+            address: this.receiver.address,
+            cart_ids: shop.cart_ids,
+            payment_method: this.payment_method,
+            note: this.notes[note_index],
+          });
+          this.finishLoad();
+        });
+        this.showAlert("Thành công", "Tạo đơn hàng thành công, hãy theo dõi đơn hàng của bạn nhé.", "success", "bills")
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getPreviewOrder() {
+      this.startLoad();
+      try {
+        const response = await axios.post("cart/preview-order", {
+          selected: this.cart_products_selected,
+        });
+        this.shops = response.data.data;
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
     showDialog() {
-      this.dialog_data = Object.assign({}, this.shipping);
+      this.dialog_data = Object.assign({}, this.receiver);
       this.dialog_show = true;
     },
     closeDialog() {
@@ -255,7 +253,7 @@ export default {
     },
     updateShipping() {
       this.dialog_show = false;
-      this.shipping = Object.assign({}, this.dialog_data);
+      this.receiver = Object.assign({}, this.dialog_data);
     },
     totalShipping() {
       let sum = 0;
@@ -323,6 +321,9 @@ export default {
   background: #ec1c24;
   color: #ffffff;
 }
+.order-summary button:hover {
+  background: #8f1015;
+}
 .fees {
   display: flex;
   column-gap: 120px;
@@ -358,6 +359,12 @@ export default {
   flex-direction: column;
   row-gap: 38px;
 }
+.shop__info {
+  display: flex;
+  column-gap: 24px;
+  align-items: center;
+  padding-bottom: 24px;
+}
 .shop__item-wraper {
   padding: 24px 30px 0;
 }
@@ -383,6 +390,20 @@ export default {
   width: 100%;
   height: 100%;
 }
+.shop__item-product__info {
+  width: 330px;
+}
+.shop__item-product__name {
+  font-size: 14px;
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  display: flex;
+  align-items: center;
+}
 .shop__item-product__image img {
   width: 100%;
   height: 100%;
@@ -396,14 +417,13 @@ export default {
 }
 .shop__item-product {
   display: flex;
-  padding: 30px;
+  padding: 15px;
   border-top: 1px solid #f1f1f1;
   justify-content: space-between;
   align-items: center;
 }
 .shop__item-heading {
   font-weight: 600;
-  margin-bottom: 16px;
 }
 .shipping {
   color: #2a2a2a;
@@ -423,6 +443,7 @@ export default {
   display: flex;
   column-gap: 12px;
   font-weight: 700;
+  margin-bottom: 16px;
 }
 .heading-text {
   color: #0074bd;

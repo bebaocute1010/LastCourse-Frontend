@@ -2,7 +2,7 @@
   <DefaultLayout @search="search" :search_rs="search_rs">
     <section id="banners">
       <div class="container">
-        <BannerSlides :items="banners"/>
+        <BannerSlides :items="banners" />
 
         <div id="facilities">
           <div class="facility-item">
@@ -41,18 +41,19 @@
 
     <section id="products-lists">
       <ProductsList
-        name="Flash sale"
-        id="1"
-        :flash_sale="{ expired_at: Date.now() + 240 * 60 * 1000 }"
-        :items="product_flash_sale"
+        name="Sản phẩm nổi bật"
+        id="2"
+        :items="products_feature"
+        :show_rate="true"
       />
-      <ProductsList name="Sản phẩm nổi bật" id="2" :items="products_feature" />
-      <ProductsList name="Sản phẩm bán chạy" id="3" :items="products_feature" />
+      <ProductsList name="Sản phẩm bán chạy" id="3" :items="products_top_selling" />
       <ProductsGrid
         name="Có thể bạn thích"
         id="4"
         :column_number="6"
-        :items="products_grid"
+        :items="products_recommended"
+        imageW="170px"
+        imageH="170px"
       ></ProductsGrid>
 
       <div id="button-view-more">
@@ -72,6 +73,7 @@ export default {
   name: "Home",
   data() {
     return {
+      page_recommend: 1,
       services: [
         {
           image: "/src/assets/icons/service-cat.svg",
@@ -94,250 +96,9 @@ export default {
           name: "Voucher",
         },
       ],
-      product_flash_sale: [
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          flash_sale: {
-            max: 50,
-            current: 10,
-          },
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          flash_sale: {
-            max: 50,
-            current: 10,
-          },
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          flash_sale: {
-            max: 50,
-            current: 10,
-          },
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          flash_sale: {
-            max: 50,
-            current: 45,
-          },
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          flash_sale: {
-            max: 50,
-            current: 10,
-          },
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          flash_sale: {
-            max: 50,
-            current: 10,
-          },
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          flash_sale: {
-            max: 50,
-            current: 10,
-          },
-        },
-      ],
-      products_feature: [
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 1200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 1200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          rate: 5,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          rate: 5,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-      ],
-      products_grid: [
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 1200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 1200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          rate: 5,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          rate: 5,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-      ],
+      products_feature: [],
+      products_top_selling: [],
+      products_recommended: [],
       data_search: [
         "Áo sơ mi cute dành cho đàn ông ",
         "Áo sơ mi rẻ cho nữ ",
@@ -557,11 +318,34 @@ export default {
       ],
     };
   },
+  created() {
+    this.getProducts("get/featured-products", this.products_feature);
+    this.getProducts("get/top-selling-products", this.products_top_selling);
+    this.getProducts("get/recommended-products", this.products_recommended);
+  },
   methods: {
-    viewMore() {
-      for (var i = 0; i < 12; i++) {
-        this.products_grid.push(this.products_grid[i % this.products_grid.length]);
+    async getProducts(url, array) {
+      this.startLoad();
+      try {
+        const response = await axios.get(url);
+        array.splice(0, array.length, ...response.data.data);
+      } catch (error) {
+        throw error;
       }
+      this.finishLoad();
+    },
+    async viewMore() {
+      this.page_recommend += 1;
+      this.startLoad();
+      try {
+        const response = await axios.get(
+          "get/recommended-products?page=" + this.page_recommend
+        );
+        this.products_recommended.push(...response.data.data);
+      } catch (error) {
+        throw error;
+      }
+      this.finishLoad();
     },
     search(value) {
       console.log();

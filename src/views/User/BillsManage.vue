@@ -27,29 +27,27 @@
     ></dialog-delete>
     <div id="main-content">
       <div class="content-heading">
-        <div>
-          <ul class="content-heading__list">
-            <li
-              :class="{
-                'content-heading__item': true,
-                'content-heading__active': i === status_selected,
-              }"
-              v-for="(item, i) in heading_items"
-              :key="i"
-              @click="
-                {
-                  status_selected = i;
-                  selected = [];
-                }
-              "
+        <ul class="content-heading__list">
+          <li
+            :class="{
+              'content-heading__item': true,
+              'content-heading__active': i === status_selected,
+            }"
+            v-for="(item, i) in heading_items"
+            :key="i"
+            @click="
+              {
+                status_selected = i;
+                selected = [];
+              }
+            "
+          >
+            <span class="content-heading__item-title">{{ item.title }}</span>
+            <span class="content-heading__item-quantity"
+              >({{ filterStatus(i).length }})</span
             >
-              <span class="content-heading__item-title">{{ item.title }}</span>
-              <span class="content-heading__item-quantity"
-                >({{ filterStatus(i).length }})</span
-              >
-            </li>
-          </ul>
-        </div>
+          </li>
+        </ul>
       </div>
 
       <div class="content-search">
@@ -66,6 +64,7 @@
 
       <div class="content-search-table">
         <v-data-table
+          v-model:page="page"
           :headers="table_headers"
           :items="filterStatus(status_selected)"
           :search="search"
@@ -90,16 +89,9 @@
           </template>
 
           <template v-slot:[`item.status`]="{ item }">
-            <span
-              :class="{
-                confirm: item.selectable.status === 0,
-                delivering: item.selectable.status === 1,
-                success: item.selectable.status === 2,
-                return: item.selectable.status === 3,
-                cancel: item.selectable.status === -1,
-              }"
-              >{{ getStatusString(item.selectable.status) }}</span
-            >
+            <v-chip :color="getColor(item.selectable.status)">{{
+              getStatusString(item.selectable.status)
+            }}</v-chip>
           </template>
 
           <template v-slot:[`item.order_time`]="{ item }">
@@ -109,7 +101,7 @@
           <template v-slot:[`item.actions`]="{ item }">
             <div
               class="actions-group-button"
-              v-if="[0, 1].includes(item.selectable.status)"
+              v-if="[0, 1, 2].includes(item.selectable.status)"
             >
               <button class="action-button edit-item-button">
                 {{ item.selectable.status == 0 ? "Xác nhận" : "Giao hàng" }}
@@ -125,12 +117,18 @@
             <span v-else>-</span>
           </template>
           <template v-slot:bottom>
+            <v-pagination
+              v-if="pageCount > 1"
+              v-model="page"
+              :length="pageCount"
+              :total-visible="5"
+            ></v-pagination>
             <div
               id="table-footer"
               v-if="selected.length > 0 && status_selected > 0 && status_selected < 4"
             >
               <div id="table-footer__number-selected">
-                <span>{{ selected.length }} sản phẩm đã được chọn</span>
+                <span>{{ selected.length }} đơn hàng đã được chọn</span>
                 <div class="table-footer__buttons-group">
                   <div class="actions-group-button">
                     <button class="action-button edit-item-button">
@@ -162,6 +160,7 @@ export default {
   name: "BillsManage",
   data() {
     return {
+      page: 1,
       dialog_delete: false,
       dialog_detail_data: [
         {
@@ -206,6 +205,9 @@ export default {
           title: "Chờ xác nhận",
         },
         {
+          title: "Đã xác nhận",
+        },
+        {
           title: "Đang giao",
         },
         {
@@ -222,7 +224,7 @@ export default {
         {
           title: "Khách hàng",
           sortable: false,
-          key: "name",
+          key: "receiver",
           width: 150,
         },
         {
@@ -255,166 +257,32 @@ export default {
           align: "center",
         },
       ],
-      table_rows: [
-        {
-          id: 0,
-          name: "Trần Xuân Đức",
-          address: "Hà Nội - Hà Nội - Hà Nội",
-          phone: "0123123123",
-          products: [
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-          ],
-          created_at: "2023-09-12 12:31:53",
-          status: 0,
-        },
-        {
-          id: 1,
-          name: "Trần Xuân Đức",
-          address: "Hà Nội - Hà Nội - Hà Nội",
-          phone: "0123123123",
-          products: [
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-          ],
-          created_at: "2023-09-12 12:31:53",
-          status: 1,
-        },
-        {
-          id: 2,
-          name: "Trần Xuân Đức",
-          address: "Hà Nội - Hà Nội - Hà Nội",
-          phone: "0123123123",
-          products: [
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-          ],
-          created_at: "2023-09-12 12:31:53",
-          status: -1,
-        },
-        {
-          id: 3,
-          name: "Trần Xuân Đức",
-          address: "Hà Nội - Hà Nội - Hà Nội",
-          phone: "0123123123",
-          products: [
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-          ],
-          created_at: "2023-09-12 12:31:53",
-          status: 2,
-        },
-        {
-          id: 4,
-          name: "Trần Xuân Đức",
-          address: "Hà Nội - Hà Nội - Hà Nội",
-          phone: "0123123123",
-          products: [
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-            {
-              name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-              image:
-                "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-              price: 100000,
-              quantity: 3,
-            },
-          ],
-          created_at: "2023-09-12 12:31:53",
-          status: 2,
-        },
-      ],
+      table_rows: [],
     };
   },
+  computed: {
+    pageCount() {
+      return Math.ceil(this.filterStatus(this.status_selected).length / 10);
+    },
+  },
+  created() {
+    this.getBills();
+  },
   methods: {
+    async getBills() {
+      this.startLoad();
+      try {
+        const response = await axios.get("shop/bills");
+        this.table_rows = response.data.data;
+      } catch (error) {
+        if (error.response.status === 401) {
+          this.$router.push({ name: "login" });
+          return;
+        }
+        console.log(error);
+      }
+      this.finishLoad();
+    },
     showDialogDelete() {
       this.dialog_delete = true;
     },
@@ -446,15 +314,25 @@ export default {
         return this.table_rows;
       }
       return this.table_rows.filter((item) => {
-        return item.status == (status == 5 ? -1 : status - 1);
+        return item.status + 1 == status;
       });
+    },
+    getColor(status) {
+      if (status === 0) return "#ff6600";
+      else if (status === 1) return "#ffbb00";
+      else if (status === 2) return "#0172cb";
+      else if (status === 3) return "#2eb02e";
+      else if (status === 4) return "#8f8f8f";
+      else if (status === 5) return "#e60a32";
+      else return "-";
     },
     getStatusString(status) {
       if (status === 0) return "Chờ xác nhận";
-      else if (status === 1) return "Đang giao";
-      else if (status === 2) return "Thành công";
-      else if (status === 3) return "Đã hoàn";
-      else if (status === -1) return "Đã hủy";
+      else if (status === 1) return "Đã xác nhận";
+      else if (status === 2) return "Đang giao";
+      else if (status === 3) return "Thành công";
+      else if (status === 4) return "Đã hoàn";
+      else if (status === 5) return "Đã hủy";
       else return "-";
     },
   },
@@ -512,6 +390,8 @@ export default {
 }
 .content-heading__list {
   display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 .content-heading__item {
   list-style: none;
@@ -519,7 +399,6 @@ export default {
   flex-direction: column;
   align-items: center;
   padding: 16px 10px;
-  margin-right: 54px;
   cursor: pointer;
   user-select: none;
 }
@@ -606,8 +485,8 @@ export default {
 }
 .actions-group-button {
   display: flex;
-  column-gap: 27px;
-  justify-content: center;
+  column-gap: 8px;
+  justify-content: flex-end;
 }
 .action-button {
   display: flex;
@@ -616,7 +495,7 @@ export default {
   column-gap: 10px;
   font-size: 14px;
 
-  padding: 8px 12px;
+  padding: 8px 16px;
   border-radius: 100px;
 }
 .edit-item-button:hover {
