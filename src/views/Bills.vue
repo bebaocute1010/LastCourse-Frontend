@@ -22,9 +22,9 @@
       </v-dialog>
       <dialog-delete
         :dialog="dialog_delete"
-        title="Hủy đơn hàng"
-        text="Bạn chắc chắn muốn hủy đơn hàng này ?"
-        @result="resultDialogDelete(value)"
+        :title="dialog_delete_title"
+        :text="dialog_delete_text"
+        @emitResultDialog="processResultDialogDelete"
       ></dialog-delete>
       <div id="main-content">
         <div class="content-heading">
@@ -109,21 +109,37 @@
                 <button
                   v-if="[0, 1].includes(item.selectable.status)"
                   class="action-button delete-item-button"
-                  @click="showDialogDelete()"
+                  @click="
+                    showDialogDelete(
+                      'Hủy đơn hàng',
+                      'Bạn có chắc chắn muốn hủy đơn hàng này ?',
+                      5,
+                      false,
+                      item.selectable
+                    )
+                  "
                 >
                   Hủy
                 </button>
                 <button
                   v-if="item.selectable.status === 2"
                   class="action-button edit-item-button"
-                  @click="showDialogDelete()"
+                  @click="receive(false, item.selectable)"
                 >
                   Nhận
                 </button>
                 <button
                   v-if="item.selectable.status === 2"
                   class="action-button delete-item-button"
-                  @click="showDialogDelete()"
+                  @click="
+                    showDialogDelete(
+                      'Hoàn đơn hàng',
+                      'Bạn có chắc chắn muốn hoàn đơn hàng này cho người bán ?',
+                      4,
+                      false,
+                      item.selectable
+                    )
+                  "
                 >
                   Hoàn
                 </button>
@@ -156,21 +172,37 @@
                       <button
                         v-if="status_selected === 2 || status_selected === 1"
                         class="action-button delete-item-button"
-                        @click="showDialogDelete()"
+                        @click="
+                          showDialogDelete(
+                            'Hủy đơn hàng',
+                            'Bạn có chắc chắn muốn hủy những đơn hàng đã chọn ?',
+                            5,
+                            true,
+                            null
+                          )
+                        "
                       >
                         Hủy
                       </button>
                       <button
                         v-if="status_selected === 3"
                         class="action-button edit-item-button"
-                        @click="showDialogDelete()"
+                        @click="receive(true, null)"
                       >
                         Nhận
                       </button>
                       <button
                         v-if="status_selected === 3"
                         class="action-button delete-item-button"
-                        @click="showDialogDelete()"
+                        @click="
+                          showDialogDelete(
+                            'Hoàn đơn hàng',
+                            'Bạn có chắc chắn muốn hoàn những đơn hàng đã chọn cho người bán ?',
+                            4,
+                            true,
+                            null
+                          )
+                        "
                       >
                         Hoàn
                       </button>
@@ -292,6 +324,11 @@ export default {
         },
       ],
       table_rows: [],
+      dialog_delete_title: "",
+      dialog_delete_text: "",
+      cur_dialog_action: null,
+      action_multiple: false,
+      item_edited: null,
     };
   },
   computed: {
@@ -317,11 +354,88 @@ export default {
       }
       this.finishLoad();
     },
-    showDialogDelete() {
+    getIdsEdited() {
+      if (this.action_multiple) {
+        return this.selected;
+      }
+      return [this.item_edited.id];
+    },
+    async receive(multiple = false, item_edited = null) {
+      this.action_multiple = multiple;
+      this.item_edited = item_edited;
+      let title = null;
+      let message = null;
+      let type = null;
+      console.log(this.getIdsEdited());
+      try {
+        this.startLoad();
+        let response = null;
+        response = await axios.post("bill/success", { ids: this.getIdsEdited() });
+        if (response) {
+          title = response.data.title;
+          message = response.data.message;
+          type = "success";
+        }
+      } catch (error) {
+        console.log(error);
+        title = error.response.data.title;
+        message = error.response.data.message;
+        type = "error";
+      }
+      this.finishLoad();
+      if (title && message) {
+        this.showAlert(title, message, type, null);
+        this.getBills();
+        this.status_selected = 0;
+      }
+    },
+    showDialogDelete(title, text, action, multiple = false, item_edited = null) {
+      this.item_edited = item_edited;
+      this.dialog_delete_title = title;
+      this.dialog_delete_text = text;
+      this.cur_dialog_action = action;
+      this.action_multiple = multiple;
       this.dialog_delete = true;
     },
-    resultDialogDelete(value) {
+    async processResultDialogDelete(value) {
       this.dialog_delete = false;
+      const ids = this.getIdsEdited();
+      let title = null;
+      let message = null;
+      let type = null;
+      if (value) {
+        this.startLoad();
+        try {
+          let response = null;
+          if (this.cur_dialog_action === 4) {
+            response = await axios.post("bill/return", { ids: ids });
+          } else if (this.cur_dialog_action === 5) {
+            response = await axios.post("bill/cancel", { ids: ids });
+          }
+          if (response) {
+            title = response.data.title;
+            message = response.data.message;
+            type = "success";
+          }
+        } catch (error) {
+          console.log(error);
+          title = error.response.data.title;
+          message = error.response.data.message;
+          type = "error";
+        }
+        this.finishLoad();
+      }
+      if (title && message) {
+        this.showAlert(title, message, type, null);
+        this.getBills();
+        this.status_selected = 0;
+      }
+      this.resetData();
+    },
+    resetData() {
+      this.cur_dialog_action = null;
+      this.item_edited = null;
+      this.multiple = false;
     },
     isSelectedAll() {
       return this.selected.length == this.filterStatus(this.status_selected).length;

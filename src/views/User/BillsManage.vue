@@ -21,9 +21,9 @@
     </v-dialog>
     <dialog-delete
       :dialog="dialog_delete"
-      title="Hủy đơn hàng"
-      text="Bạn chắc chắn muốn hủy đơn hàng này ?"
-      @result="resultDialogDelete(value)"
+      :title="dialog_delete_title"
+      :text="dialog_delete_text"
+      @emitResultDialog="processResultDialogDelete"
     ></dialog-delete>
     <div id="main-content">
       <div class="content-heading">
@@ -101,15 +101,34 @@
           <template v-slot:[`item.actions`]="{ item }">
             <div
               class="actions-group-button"
-              v-if="[0, 1, 2].includes(item.selectable.status)"
+              v-if="[0, 1].includes(item.selectable.status)"
             >
-              <button class="action-button edit-item-button">
-                {{ item.selectable.status == 0 ? "Xác nhận" : "Giao hàng" }}
+              <button
+                class="action-button edit-item-button"
+                v-if="item.selectable.status == 0"
+                @click="updateStatusBill(1, false, item.selectable)"
+              >
+                Xác nhận
+              </button>
+              <button
+                class="action-button edit-item-button"
+                v-if="item.selectable.status == 1"
+                @click="updateStatusBill(2, false, item.selectable)"
+              >
+                Giao hàng
               </button>
               <button
                 v-if="item.selectable.status === 0"
                 class="action-button delete-item-button"
-                @click="showDialogDelete()"
+                @click="
+                  showDialogDelete(
+                    'Hủy đơn hàng',
+                    'Bạn có chắc chắn muốn hủy đơn hàng này ?',
+                    5,
+                    false,
+                    item.selectable
+                  )
+                "
               >
                 Hủy
               </button>
@@ -125,21 +144,40 @@
             ></v-pagination>
             <div
               id="table-footer"
-              v-if="selected.length > 0 && status_selected > 0 && status_selected < 4"
+              v-if="selected.length > 0 && status_selected > 0 && status_selected < 3"
             >
               <div id="table-footer__number-selected">
                 <span>{{ selected.length }} đơn hàng đã được chọn</span>
                 <div class="table-footer__buttons-group">
                   <div class="actions-group-button">
-                    <button class="action-button edit-item-button">
-                      {{ status_selected === 1 ? "Xác nhận" : "Giao hàng" }}
-                    </button>
                     <button
                       v-if="status_selected === 1"
                       class="action-button delete-item-button"
-                      @click="showDialogDelete()"
+                      @click="
+                        showDialogDelete(
+                          'Hủy đơn hàng',
+                          'Bạn có chắc chắn muốn hủy những đơn hàng này ?',
+                          5,
+                          true,
+                          null
+                        )
+                      "
                     >
                       Hủy
+                    </button>
+                    <button
+                      v-if="status_selected === 1"
+                      class="action-button edit-item-button"
+                      @click="updateStatusBill(1, true, null)"
+                    >
+                      Xác nhận
+                    </button>
+                    <button
+                      class="action-button edit-item-button"
+                      v-else-if="status_selected === 2"
+                      @click="updateStatusBill(2, true, null)"
+                    >
+                      Giao hàng
                     </button>
                   </div>
                 </div>
@@ -258,6 +296,11 @@ export default {
         },
       ],
       table_rows: [],
+      dialog_delete_title: "",
+      dialog_delete_text: "",
+      cur_dialog_action: null,
+      action_multiple: false,
+      item_edited: null,
     };
   },
   computed: {
@@ -283,8 +326,84 @@ export default {
       }
       this.finishLoad();
     },
-    showDialogDelete() {
+    getIdsEdited() {
+      if (this.action_multiple) {
+        return this.selected;
+      }
+      return [this.item_edited.id];
+    },
+    async updateStatusBill(action, multiple = false, item_edited = null) {
+      this.action_multiple = multiple;
+      this.item_edited = item_edited;
+      let title = null;
+      let message = null;
+      let type = null;
+      console.log(this.getIdsEdited());
+      try {
+        this.startLoad();
+        let response = null;
+        let url = "bill/" + (action == 1 ? "confirm" : "delivery");
+        response = await axios.post(url, { ids: this.getIdsEdited() });
+        if (response) {
+          title = response.data.title;
+          message = response.data.message;
+          type = "success";
+        }
+      } catch (error) {
+        console.log(error);
+        title = error.response.data.title;
+        message = error.response.data.message;
+        type = "error";
+      }
+      this.finishLoad();
+      if (title && message) {
+        this.showAlert(title, message, type, null);
+        this.getBills();
+        this.status_selected = 0;
+      }
+    },
+    showDialogDelete(title, text, action, multiple = false, item_edited = null) {
+      this.item_edited = item_edited;
+      this.dialog_delete_title = title;
+      this.dialog_delete_text = text;
+      this.cur_dialog_action = action;
+      this.action_multiple = multiple;
       this.dialog_delete = true;
+    },
+    async processResultDialogDelete(value) {
+      this.dialog_delete = false;
+      const ids = this.getIdsEdited();
+      let title = null;
+      let message = null;
+      let type = null;
+      if (value) {
+        this.startLoad();
+        try {
+          if (this.cur_dialog_action === 5) {
+            const response = await axios.post("bill/cancel", { ids: ids });
+            title = response.data.title;
+            message = response.data.message;
+            type = "success";
+          }
+        } catch (error) {
+          console.log(error);
+          title = error.response.data.title;
+          message = error.response.data.message;
+          type = "error";
+        }
+        this.finishLoad();
+      }
+      if (title && message) {
+        this.showAlert(title, message, type, null);
+        this.getBills();
+        this.status_selected = 0;
+      }
+      this.resetData();
+    },
+    resetData() {
+      this.cur_dialog_action = null;
+      this.item_edited = null;
+      this.multiple = false;
     },
     resultDialogDelete(value) {
       this.dialog_delete = false;
