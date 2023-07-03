@@ -1,22 +1,135 @@
 <template>
   <default-layout>
     <div class="container">
-      <v-dialog v-model="dialog_detail" max-width="600">
+      <v-dialog v-model="dialog_comment" max-width="800">
         <v-card class="dialog_detail">
           <v-card-title class="dialog_heading">
-            <p>Chi tiết sản phẩm</p>
-            <v-icon @click="dialog_detail = false">mdi-close</v-icon>
+            <p>Đánh giá sản phẩm</p>
+            <v-icon @click="closeDialogComment()">mdi-close</v-icon>
           </v-card-title>
           <v-card-text>
-            <v-data-table
-              :headers="dialog_detail_header"
-              :items="dialog_detail_data"
-              :items-per-page="5"
-            ></v-data-table>
+            <div class="dialog-comment">
+              <div class="dialog-comment__flex dialog-comment__product">
+                <div class="dialog-comment__img">
+                  <v-img cover :src="item_edited?.image"></v-img>
+                </div>
+                <div>
+                  <p class="dialog-comment__product-name">{{ item_edited?.name }}</p>
+                  <p
+                    class="dialog-comment__product-variant"
+                    v-if="item_edited?.variant !== '-'"
+                  >
+                    Phân loại: {{ item_edited?.variant }}
+                  </p>
+                </div>
+              </div>
+              <div class="dialog-comment__flex dialog-comment__rating">
+                <label>Chất lượng sản phẩm:</label>
+                <v-rating
+                  v-model="item_comment.rating"
+                  size="24"
+                  color="#FFB800"
+                ></v-rating>
+                <label class="dialog-comment__rating__describe">{{
+                  getRatingString(item_comment.rating)
+                }}</label>
+              </div>
+              <v-textarea
+                variant="outlined"
+                placeholder="Nội dung đánh giá ..."
+                v-model="item_comment.content"
+                no-resize
+              ></v-textarea>
+              <div class="images user-not-select">
+                <div class="image-button" @click="$refs.images.click()">
+                  <v-icon>mdi-plus-circle</v-icon>
+                  <span>Thêm ảnh</span>
+                  <input
+                    hidden
+                    multiple
+                    ref="images"
+                    type="file"
+                    accept="image/*"
+                    @change="onChangeImages"
+                  />
+                </div>
+                <SlideImages
+                  refe="slideImageProduct"
+                  @deleteImage="deleteImage(i)"
+                  :items="image_urls"
+                  :img_width="'70px'"
+                  :show_delete="true"
+                  style="height: 70px"
+                ></SlideImages>
+              </div>
+            </div>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn @click="dialog_detail = false"> Đóng </v-btn>
+            <v-btn @click="closeDialogComment()"> Đóng </v-btn>
+            <v-btn @click="submitComment()"> Hoàn tất </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog v-model="dialog_detail" max-width="1200">
+        <v-card class="dialog_detail">
+          <v-card-title class="dialog_heading">
+            <p>Thông tin sản phẩm</p>
+            <v-icon @click="closeDialogBillDetail()">mdi-close</v-icon>
+          </v-card-title>
+          <v-card-text>
+            <v-data-table
+              items-per-page="5"
+              v-model:page="dialog_detail_page"
+              :headers="dialog_detail_header"
+              :items="dialog_detail_data"
+              height="460"
+            >
+              <template v-slot:[`item.name`]="{ item }">
+                <div class="product">
+                  <div class="product-image">
+                    <v-img cover :src="item.selectable.image"></v-img>
+                  </div>
+                  <p class="product-name">{{ item.selectable.name }}</p>
+                </div>
+              </template>
+
+              <template v-slot:[`item.price`]="{ item }">
+                <p class="product-price">
+                  {{ this.formattedNumber(item.selectable.price) }}
+                </p>
+              </template>
+
+              <template v-slot:[`item.actions`]="{ item }">
+                <div
+                  class="actions-group-button"
+                  v-if="item.selectable.have_evaluated === null"
+                >
+                  <button
+                    class="action-button edit-item-button"
+                    @click="showDialogComment(item.selectable)"
+                  >
+                    Đánh giá
+                  </button>
+                </div>
+                <span v-else-if="item.selectable.have_evaluated">Đã đánh giá</span>
+                <span v-else>-</span>
+              </template>
+
+              <template v-slot:bottom>
+                <v-pagination
+                  v-if="dialogDetailPageCount > 1"
+                  v-model="dialog_detail_page"
+                  :length="dialogDetailPageCount"
+                  :total-visible="5"
+                ></v-pagination>
+              </template>
+            </v-data-table>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="closeDialogBillDetail()"> Đóng </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -67,7 +180,7 @@
 
         <div class="content-search-table">
           <v-data-table
-            v-model:page="page"
+            v-model:page="table_bill_page"
             :headers="table_headers"
             :items="filterStatus(status_selected)"
             :search="search"
@@ -85,7 +198,7 @@
 
             <template v-slot:[`item.detail`]="{ item }">
               <div class="detail">
-                <button @click="viewDetail(item.selectable.id)">
+                <button @click="viewBillDetail(item.selectable.id)">
                   Xem <v-icon>mdi-eye</v-icon>
                 </button>
               </div>
@@ -147,7 +260,7 @@
                 <button
                   v-if="item.selectable.status === 3"
                   class="action-button edit-item-button"
-                  @click="showDialogDelete()"
+                  @click="viewBillDetail(item.selectable.id)"
                 >
                   Đánh giá
                 </button>
@@ -156,9 +269,9 @@
             </template>
             <template v-slot:bottom>
               <v-pagination
-                v-if="pageCount > 1"
-                v-model="page"
-                :length="pageCount"
+                v-if="tableBillsPageCount > 1"
+                v-model="table_bill_page"
+                :length="tableBillsPageCount"
                 :total-visible="5"
               ></v-pagination>
               <div
@@ -221,45 +334,48 @@
 <script>
 import DialogDelete from "../components/DialogDelete.vue";
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
+import SlideImages from "../components/SlideImages.vue";
 export default {
-  components: { DialogDelete, DefaultLayout },
+  components: { DialogDelete, DefaultLayout, SlideImages },
   name: "Bills",
   data() {
     return {
-      page: 1,
+      table_bill_page: 1,
+      dialog_detail_page: 1,
       dialog_delete: false,
-      dialog_detail_data: [
-        {
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          quantity: 3,
-        },
-        {
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          quantity: 3,
-        },
-        {
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          quantity: 3,
-        },
-      ],
+      dialog_detail_data: [],
       dialog_detail_header: [
         {
           title: "Tên sản phẩm",
           key: "name",
+          sortable: false,
         },
         {
           title: "Đơn giá",
           key: "price",
+          sortable: false,
+        },
+        {
+          title: "Phân loại",
+          key: "variant",
+          sortable: false,
+          align: "center",
         },
         {
           title: "Số lượng",
           key: "quantity",
+          sortable: false,
+          align: "center",
+        },
+        {
+          title: "Hành động",
+          key: "actions",
+          sortable: false,
+          align: "center",
         },
       ],
       dialog_detail: false,
+      dialog_comment: false,
       search: "",
       status_selected: 0,
       selected: [],
@@ -329,17 +445,112 @@ export default {
       cur_dialog_action: null,
       action_multiple: false,
       item_edited: null,
+      item_comment: {
+        detail_id: null,
+        rating: 5,
+        content: null,
+        images: [],
+      },
+      image_urls: [],
+      cur_bill_id: null,
     };
   },
   computed: {
-    pageCount() {
+    tableBillsPageCount() {
       return Math.ceil(this.filterStatus(this.status_selected).length / 10);
+    },
+    dialogDetailPageCount() {
+      return Math.ceil(this.dialog_detail_data.length / 5);
     },
   },
   created() {
     this.getBills();
   },
   methods: {
+    async submitComment() {
+      let title = null;
+      let message = null;
+      let type = null;
+      this.startLoad();
+      try {
+        let form_data = new FormData();
+        form_data.append("detail_id", this.item_comment.detail_id);
+        form_data.append("content", this.item_comment.content);
+        form_data.append("rating", this.item_comment.rating);
+        this.item_comment.images.forEach((item, index) => {
+          form_data.append(`images[${index}]`, item);
+        });
+        const response = await axios.post("comment/create", form_data);
+        title = response.data.title;
+        message = response.data.message;
+        type = "success";
+      } catch (error) {
+        console.log(error);
+        title = error.response.data.title;
+        message = error.response.data.message;
+        type = "error";
+      }
+      this.showAlert(title, message, type, null);
+      this.getBillDetails(this.cur_bill_id);
+      this.closeDialogComment();
+      this.finishLoad();
+    },
+    onChangeImages(e) {
+      let files = e.target.files;
+      let fileArray = Array.from(files);
+      this.item_comment.images = fileArray;
+      for (let i = 0; i < files.length; i++) {
+        this.image_urls.push(URL.createObjectURL(files[i]));
+      }
+    },
+    deleteImage(i) {
+      this.item_comment.images.splice(i, 1);
+      this.image_urls.splice(i, 1);
+    },
+    getRatingString(rating) {
+      switch (rating) {
+        case 1:
+          return "Tệ";
+        case 2:
+          return "Không hài lòng";
+        case 3:
+          return "Bình thường";
+        case 4:
+          return "Hài lòng";
+        case 5:
+          return "Tuyệt vời";
+        default:
+          return "-";
+      }
+    },
+    showDialogComment(item) {
+      this.item_edited = item;
+      this.item_comment.detail_id = item.id;
+      this.dialog_comment = true;
+    },
+    closeDialogComment() {
+      this.dialog_comment = false;
+      this.item_edited = null;
+      this.item_comment.detail_id = null;
+      this.item_comment.content = null;
+      this.item_comment.rating = 5;
+      this.item_comment.images = [];
+    },
+    closeDialogBillDetail() {
+      this.dialog_detail = false;
+      this.cur_bill_id = null;
+      this.dialog_detail_data = [];
+    },
+    async getBillDetails(bill_id) {
+      this.startLoad();
+      try {
+        const response = await axios.get(`bill/details?id=${bill_id}`);
+        this.dialog_detail_data = response.data.data;
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
     async getBills() {
       this.startLoad();
       try {
@@ -454,7 +665,9 @@ export default {
 
       return `${formattedTime} ${formattedDate}`;
     },
-    viewDetail(idBill) {
+    viewBillDetail(bill_id) {
+      this.getBillDetails(bill_id);
+      this.cur_bill_id = bill_id;
       this.dialog_detail = true;
     },
     filterStatus(status) {
@@ -496,6 +709,59 @@ export default {
 </script>
 
 <style scoped>
+.dialog-comment__rating__describe {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.8);
+}
+.dialog-comment__product-variant {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.4);
+}
+.dialog-comment__product-name {
+  font-size: 14px;
+  max-height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.dialog-comment__img .v-img {
+  width: 56px;
+  height: 56px;
+  border: 1px solid #eee;
+}
+.dialog-comment__flex {
+  display: flex;
+  column-gap: 10px;
+  align-items: center;
+}
+.dialog-comment {
+  display: flex;
+  flex-direction: column;
+  row-gap: 8px;
+}
+.image-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #0172cb;
+  border-radius: 8px;
+  width: 70px;
+  height: 70px;
+  color: #0172cb;
+  justify-content: center;
+}
+.image-button span {
+  width: 70px;
+  text-align: center;
+  font-size: 12px;
+}
+.images {
+  padding: 7px 0;
+  display: flex;
+  column-gap: 16px;
+}
 .delivery {
   font-size: 14px;
   padding: 8px 0;
@@ -612,9 +878,21 @@ export default {
 
 .product {
   display: flex;
-  padding: 15px 0;
+  column-gap: 16px;
+  padding: 16px 0;
+  align-items: center;
 }
-.product-image {
+.product-name {
+  width: 300px;
+  font-size: 14px;
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+.product-image .v-img {
   width: 48px;
   height: 48px;
 }
@@ -622,12 +900,6 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-.product-info {
-  display: flex;
-  flex-direction: column;
-  margin-left: 17px;
-  text-align: left;
 }
 .product-price {
   font-size: 14px;
