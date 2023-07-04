@@ -69,14 +69,18 @@
               <p class="product__variants__list__name heading-text">Màu sắc</p>
               <div class="product__variants__list__items">
                 <div
-                  class="product__variant__item"
+                  :class="{
+                    product__variant__item: true,
+                    product__variant__item__active: i === color_active,
+                  }"
                   v-for="(variant, i) in details?.colors"
                   :key="i"
+                  @click="chooseVariant(0, i)"
                 >
                   <div class="product__variant__img" v-if="variant.image">
                     <img :src="variant.image" />
                   </div>
-                  <p class="product__variant__name">{{ variant.color }}</p>
+                  <p class="product__variant__name">{{ variant.name }}</p>
                 </div>
               </div>
             </div>
@@ -85,14 +89,18 @@
               <p class="product__variants__list__name heading-text">Kích thước</p>
               <div class="product__variants__list__items">
                 <div
-                  class="product__variant__item"
+                  :class="{
+                    product__variant__item: true,
+                    product__variant__item__active: i === size_active,
+                  }"
                   v-for="(variant, i) in details?.sizes"
                   :key="i"
+                  @click="chooseVariant(1, i)"
                 >
                   <div class="product__variant__img" v-if="variant.image">
                     <img :src="variant.image" />
                   </div>
-                  <p class="product__variant__name">{{ variant.size }}</p>
+                  <p class="product__variant__name">{{ variant.name }}</p>
                 </div>
               </div>
             </div>
@@ -132,7 +140,7 @@
 
           <div id="actions">
             <button id="btn-add-to-cart" @click="addToCart()">Thêm vào giỏ hàng</button>
-            <button id="btn-buy-now">Mua ngay</button>
+            <button id="btn-buy-now" @click="addToCart(true)">Mua ngay</button>
           </div>
         </div>
       </div>
@@ -438,6 +446,8 @@ export default {
   name: "ProductDetail",
   data() {
     return {
+      color_active: null,
+      size_active: null,
       inventory: "...",
       price: "...",
       page_active: 1,
@@ -446,6 +456,7 @@ export default {
       order_quantity: 1,
       comments: [],
       details: null,
+      product_variant_id: null,
     };
   },
   created() {
@@ -463,6 +474,60 @@ export default {
     window.removeEventListener("resize", this.setMaxHeight);
   },
   methods: {
+    async addToCart(buy_now = false) {
+      if (this.details.is_variant && this.product_variant_id === null) {
+        this.showAlert("Cảnh báo", "Vui lòng chọn phân loại hàng", "warning", null);
+        return;
+      }
+      this.startLoad();
+      try {
+        const response = await axios.post("cart/create", {
+          product_id: this.details.id,
+          product_variant_id: this.product_variant_id,
+          quantity: this.order_quantity,
+        });
+        this.showAlert(
+          response.data.title,
+          response.data.message,
+          "success",
+          buy_now ? "payment" : null
+        );
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "errror",
+          buy_now ? "payment" : null
+        );
+        console.log(error);
+      }
+      this.finishLoad();
+    },
+    async chooseVariant(type, index) {
+      this.startLoad();
+      const slug = this.$route.params.slug;
+      if (type == 0) {
+        this.color_active = index;
+      } else if (type == 1) {
+        this.size_active = index;
+      }
+      let url = `product/variant-quantity/${slug}`;
+      let color =
+        this.color_active !== null ? this.details.colors[this.color_active].name : null;
+      let size =
+        this.size_active !== null ? this.details.sizes[this.size_active].name : null;
+      try {
+        const response = await axios.post(url, {
+          color: color,
+          size: size,
+        });
+        this.inventory = response.data.inventory;
+        this.product_variant_id = response.data?.product_variant_id ?? null;
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
     async getComments(page) {
       this.startLoad();
       const slug = this.$route.params.slug;
@@ -754,6 +819,13 @@ export default {
   background: #f0f2f5;
   border-radius: 20px;
   cursor: pointer;
+  border: 1px solid #f0f2f5;
+  min-width: 60px;
+  align-items: center;
+  justify-content: center;
+}
+.product__variant__item__active {
+  border: 1px solid #0074bd;
 }
 .heading-text {
   font-weight: 600;

@@ -4,7 +4,7 @@
       :dialog="dialog_delete"
       title="Xóa sản phẩm khỏi giỏ hàng"
       text="Bạn chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng ?"
-      @result="resultDialogDelete"
+      @emitResultDialog="processResultDialogDelete"
     ></dialog-delete>
     <div class="container">
       <div class="content-search-table user-not-select">
@@ -214,7 +214,7 @@ export default {
       this.dialog_delete = true;
       this.id_product_edit = id;
     },
-    resultDialogDelete(value) {
+    processResultDialogDelete(value) {
       this.dialog_delete = false;
       if (value && this.id_product_edit != null) {
         this.deleteCart(this.id_product_edit);
