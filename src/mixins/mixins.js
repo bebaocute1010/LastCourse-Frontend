@@ -67,7 +67,7 @@ export default {
         .get("auth/me")
         .then((response) => {
           this.setUser({
-            name: response.data.data.name,
+            name: response.data.data.fullname,
             avatar: response.data.data.avatar,
           });
         })
