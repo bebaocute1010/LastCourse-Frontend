@@ -1,7 +1,7 @@
 <template>
   <v-col cols="3">
     <div id="user-navigation">
-      <div class="user-info">
+      <div class="user-info" @click="openDialogUpdateShop">
         <v-avatar class="user-info__avatar">
           <v-img cover :src="shop?.avatar"></v-img>
         </v-avatar>
@@ -58,6 +58,9 @@ export default {
   },
   methods: {
     ...mapActions(["setShop", "unsetShop"]),
+    openDialogUpdateShop() {
+      this.$emit("openDialogShopUpdate")
+    },
     async getShopInfor() {
       this.startLoad();
       const response = await axios.get("shop/infor");
