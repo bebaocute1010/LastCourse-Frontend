@@ -17,7 +17,7 @@
           </div>
           <SlideImages
             :items="details?.images"
-            :ref="'slideImageDetail'"
+            :refe="'slideImageDetail'"
             img_width="87px"
             style="height: 87px"
           >

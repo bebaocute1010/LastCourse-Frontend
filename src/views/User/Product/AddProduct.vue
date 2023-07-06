@@ -170,7 +170,11 @@
                 <span class="table-header__item">Số lượng tối đa</span>
                 <span class="table-header__item">Giá sản phẩm</span>
               </div>
-              <div class="table-rows" v-for="(item, i) in discount_intervals" :key="i">
+              <div
+                class="table-rows"
+                v-for="(item, i) in product.discount_ranges_min"
+                :key="i"
+              >
                 <div class="table-row__item">
                   <v-row>
                     <v-col cols="3">
@@ -373,7 +377,7 @@
               <span class="table-header__item">Số lượng</span>
               <span class="table-header__item">Giá sản phẩm</span>
             </div>
-            <div class="table-rows">
+            <div class="table-rows" v-if="itemsCombination">
               <div class="table-row__item" v-for="(item, i) in itemsCombination" :key="i">
                 <div class="table-row__title">
                   <!-- <span>{{ item?.name?.name ?? "..." }}</span> -->
@@ -472,13 +476,6 @@ export default {
           id: "#classification",
         },
       ],
-      discount_intervals: [
-        {
-          min: "",
-          max: "",
-          price: "",
-        },
-      ],
       variant_groups_count: 1,
       image_urls: [],
       activeSection: null,
@@ -518,6 +515,8 @@ export default {
         discount_ranges_max: [null],
         discount_ranges_amount: [null],
       },
+      product_edit_id: null,
+      checkFile: null,
     };
   },
   computed: {
@@ -565,15 +564,42 @@ export default {
     },
   },
   created() {
-    this.getCategoriesLv1();
-    this.getConditions();
+    if (this.$route.name == "edit-product") {
+      this.product_edit_id = this.$route.params.id;
+      this.getProductEdit();
+    } else {
+      this.getCategoriesLv1();
+      this.getConditions();
+    }
   },
   methods: {
+    async getProductEdit() {
+      this.startLoad();
+      try {
+        this.getCategoriesLv1();
+        this.getConditions();
+        const response = await axios.get(`shop/get-product?id=${this.product_edit_id}`);
+        this.image_urls = Array.from(Object.values({ ...response.data.data.images }));
+        this.product = { ...response.data.data };
+        this.selected_cat_lv1 = this.product.cat_lv1_id;
+        this.selected_cat_lv2 = this.product.cat_lv2_id;
+        this.getCategoriesLv2(this.selected_cat_lv1);
+        if (this.product.variant_names[0].length > 0) {
+          this.group_variant_previous_selected[0] = this.group_variant_selected[0] = 0;
+          this.variant_groups_count = 1;
+        }
+        if (this.product.variant_names[1].length > 0) {
+          this.variant_groups_count = 2;
+          this.group_variant_previous_selected[1] = this.group_variant_selected[1] = 1;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
     appendArrayToFormData(key, arr, form_data = new FormData()) {
       arr.forEach((item, index) => {
-        if (item !== null) {
-          form_data.append(`${key}[${index}]`, item);
-        }
+        form_data.append(`${key}[${index}]`, item);
       });
     },
     getFormData(obj, form_data = new FormData()) {
@@ -608,13 +634,18 @@ export default {
       return form_data;
     },
     async saveProduct() {
+      let url = "product/create";
+      let form_data = this.getFormData(this.product);
+      if (this.product_edit_id !== null) {
+        url = "product/update";
+        form_data.append("id", this.product_edit_id);
+      }
       try {
-        const response = await axios.post(
-          "product/create",
-          this.getFormData(this.product)
-        );
+        const response = await axios.post(url, form_data);
+        this.showAlert(response.data.title, response.data.message, "success", null)
       } catch (error) {
         console.log(error);
+        this.showAlert(error.response.data.title, error.response.data.message, "error", null)
       }
     },
     async getConditions() {
@@ -714,11 +745,15 @@ export default {
       let files = e.target.files;
       let fileArray = Array.from(files);
       this.product.images = fileArray;
+      this.image_urls.length = 0;
       for (let i = 0; i < files.length; i++) {
         this.image_urls.push(URL.createObjectURL(files[i]));
       }
     },
     getObjURL(file) {
+      if (typeof file == "string") {
+        return file;
+      }
       return URL.createObjectURL(file) ?? "#";
     },
     changeImage(event, i, j) {
@@ -736,8 +771,10 @@ export default {
       this.image_urls.splice(i, 1);
     },
     addDiscountInterval() {
-      if (this.discount_intervals.length < 5) {
-        this.discount_intervals.push({ min: "", max: "", price: "" });
+      if (this.product.discount_ranges_min.length < 5) {
+        this.product.discount_ranges_min.push(null);
+        this.product.discount_ranges_max.push(null);
+        this.product.discount_ranges_amount.push(null);
         return;
       }
       this.showAlert("Thất bại", "Bạn đã thêm tối đa khoảng ", "error", null);

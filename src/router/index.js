@@ -83,6 +83,11 @@ const router = createRouter({
       component: AddProduct,
     },
     {
+      path: "/shop/san-pham/sua/:id",
+      name: "edit-product",
+      component: AddProduct,
+    },
+    {
       path: "/shop/san-pham/tat-ca",
       name: "all-products",
       component: AllProducts,

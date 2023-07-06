@@ -4,7 +4,7 @@
       :dialog="dialog.show"
       :title="dialog.title"
       :text="dialog.text"
-      @result="dialogResult"
+      @emitResultDialog="processResultDialogDelete"
     />
     <div id="main-content">
       <div class="content-heading">
@@ -80,15 +80,18 @@
               >{{ item.selectable.status }}</span
             >
           </template>
-          <template v-slot:[`item.actions`]>
+          <template v-slot:[`item.actions`]="{ item }">
             <div class="actions-group-button">
-              <div class="user-not-select action-button edit-item-button">
+              <div
+                class="user-not-select action-button edit-item-button"
+                @click="editeProduct(item.selectable.id)"
+              >
                 <v-icon>mdi-pencil-box</v-icon>
                 <span>Sửa</span>
               </div>
               <div
                 class="user-not-select action-button delete-item-button"
-                @click="showDialog()"
+                @click="showDialog(item.selectable.id)"
               >
                 <v-icon>mdi-delete</v-icon>
                 <span>Xóa</span>
@@ -122,6 +125,7 @@
                     class="table-footer__buttons-item"
                     id="footer__button-hidden"
                     v-if="status_selected < 3"
+                    @click="updateProductStatuses(0)"
                   >
                     Ẩn
                   </button>
@@ -129,6 +133,7 @@
                     class="table-footer__buttons-item"
                     id="footer__button-show"
                     v-if="status_selected == 0 || status_selected == 3"
+                    @click="updateProductStatuses(1)"
                   >
                     Hiển thị
                   </button>
@@ -214,6 +219,7 @@ export default {
         },
       ],
       table_rows: [],
+      product_edited_id: null,
     };
   },
   computed: {
@@ -233,6 +239,38 @@ export default {
     this.getProducts();
   },
   methods: {
+    editeProduct(id) {
+      this.$router.push({ name: "edit-product", params: { id: id } });
+    },
+    async updateProductStatuses(type = null) {
+      let url = null;
+      if (type === 0) {
+        url = "product/hidden";
+      } else if (type === 1) {
+        url = "product/show";
+      }
+      if (!url) {
+        return;
+      }
+      this.startLoad();
+      try {
+        const response = await axios.post(url, {
+          ids: this.selected,
+        });
+        this.getProducts();
+        this.showAlert(response.data.title, response.data.message, "success", null);
+      } catch (error) {
+        console.log(error);
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          null
+        );
+      }
+      this.finishLoad();
+    },
+    async showProducts() {},
     async getProducts() {
       this.startLoad();
       const response = await axios.get("shop/products");
@@ -246,12 +284,32 @@ export default {
       this.dialog.show = false;
       this.dialog.title = this.dialog.text = "";
     },
-    showDialog() {
+    showDialog(product_id) {
+      this.product_edited_id = product_id;
       this.dialog.title = "Xóa sản phẩm";
       this.dialog.text = "Sau khi xóa sản phẩm bạn sẽ không thể hoàn tác";
       this.dialog.show = true;
     },
-    dialogResult(value) {
+    async processResultDialogDelete(value) {
+      if (value) {
+        this.startLoad();
+        try {
+          const response = await axios.delete(
+            `product/delete?id=${this.product_edited_id}`
+          );
+          this.getProducts();
+          this.showAlert(response.data.title, response.data.message, "success", null);
+        } catch (error) {
+          console.log(error);
+          this.showAlert(
+            error.response.data.title,
+            error.response.data.message,
+            "error",
+            null
+          );
+        }
+        this.finishLoad();
+      }
       this.hideDialog();
     },
     formattedNumber(num) {

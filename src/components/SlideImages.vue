@@ -133,6 +133,7 @@ img {
   overflow: hidden;
   white-space: nowrap;
   width: 100%;
+  max-width: 480px;
 }
 .image__item--button-delete {
   position: absolute;
