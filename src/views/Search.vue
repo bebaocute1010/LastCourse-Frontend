@@ -137,13 +137,13 @@
                   :sold="item?.sold"
                   :rate="item?.rate"
                   :slug="item?.slug"
-                  imageW="200px"
-                  imageH="200px"
+                  imageW="184px"
+                  imageH="184px"
                 ></Product>
               </div>
             </div>
 
-            <div class="paginate-bar">
+            <div class="paginate-bar" v-if="num_page > 1">
               <v-pagination
                 v-model="page_active"
                 :length="num_page"
@@ -253,6 +253,7 @@ export default {
 }
 #results-filter {
   background-color: #ffffff;
+  width: 100%;
 }
 #filter-rating {
   display: flex;
@@ -307,19 +308,21 @@ export default {
   padding: 16px;
   border-bottom: 2px solid #e5e5e5;
   border-right: 2px solid #e5e5e5;
+  width: 100%;
 }
 #filters {
   display: flex;
+  max-width: 286px;
   flex-direction: column;
-  position: sticky;
-  position: -webkit-sticky;
-  height: 100%;
 }
 .producst-grid__grid {
   display: grid;
   gap: 13px;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: repeat(4, 1fr);
   padding: 25px;
+}
+.products-grid__item {
+  max-width: 200px;
 }
 .screen-body {
   display: flex;

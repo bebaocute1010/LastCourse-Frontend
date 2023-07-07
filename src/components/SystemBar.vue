@@ -10,7 +10,9 @@
       >
         <v-card>
           <v-card-title class="dialog-title">
-            <span class="text-h5">{{ form_shop.id ? "Cập nhật Shop" : "Đăng ký Shop" }}</span>
+            <span class="text-h5">{{
+              form_shop.id ? "Cập nhật Shop" : "Đăng ký Shop"
+            }}</span>
             <v-icon size="24" @click="closeDialog()">mdi-close</v-icon>
           </v-card-title>
           <v-card-text>
@@ -86,6 +88,17 @@
                   v-model="form_shop.locate"
                 ></v-text-field>
               </v-col>
+
+              <v-col cols="12">
+                <v-text-field
+                  variant="outlined"
+                  hide-details="true"
+                  type="text"
+                  label="Email"
+                  v-model="form_shop.email"
+                ></v-text-field>
+              </v-col>
+
               <v-col cols="6">
                 <v-select
                   :items="carriers"
@@ -163,6 +176,7 @@ export default {
       dialog_show: false,
       form_shop: {
         name: null,
+        email: null,
         carrier_id: null,
         avatar: null,
         banner: null,
@@ -224,6 +238,7 @@ export default {
         let url = this.form_shop.id ? "shop/update" : "shop/create";
         const response = await axios.post(url, form_data);
         this.showAlert(response.data.title, response.data.message, "success", null);
+        this.closeDialog();
       } catch (error) {
         console.log(error);
         this.showAlert(
@@ -239,6 +254,7 @@ export default {
       this.$emit("closeDialogShopUpdate");
       this.dialog_show = false;
       this.form_shop.name = null;
+      this.form_shop.email = null;
       this.form_shop.carrier_id = null;
       this.form_shop.avatar = null;
       this.form_shop.banner = null;
