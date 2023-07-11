@@ -11,13 +11,16 @@
                   class="filter-item__list__item"
                   v-for="(item, i) in filterCats"
                   :key="i"
-                  :title="item"
                 >
                   <template v-slot:prepend="{ isActive }">
                     <v-list-item-action start>
                       <v-checkbox-btn
                         color="#EC1C24"
                         :model-value="isActive"
+                        :ref="`checkboxCatsFilter[${i}]`"
+                        :label="item.name"
+                        v-model="filter_cats_selected[i]"
+                        @update:modelValue="getResultsSearch"
                       ></v-checkbox-btn>
                     </v-list-item-action>
                   </template>
@@ -44,13 +47,13 @@
               <input
                 class="filter-range-price__input"
                 type="number"
-                v-model="filter_price_min"
+                v-model="filters_search_result.filter_price_min"
               />
               <v-icon>mdi-minus</v-icon>
               <input
                 class="filter-range-price__input"
                 type="number"
-                v-model="filter_price_max"
+                v-model="filters_search_result.filter_price_max"
               />
             </div>
 
@@ -63,16 +66,20 @@
             <h3 class="filter-item-heading">ĐÁNH GIÁ</h3>
             <div id="filter-rating" class="filter-item-body">
               <v-rating
-                v-model="filter_rating"
+                v-model="filters_search_result.filter_rating"
                 bg-color="orange-lighten-1"
                 color="#FFB800"
                 size="26"
                 @update:modelValue="getResultsSearch"
               ></v-rating>
 
-              <div class="rating-values" v-if="filter_rating">
+              <div class="rating-values" v-if="filters_search_result.filter_rating">
                 <span>
-                  {{ filter_rating < 5 ? "Từ " + filter_rating + " sao" : "5 sao" }}
+                  {{
+                    filters_search_result.filter_rating < 5
+                      ? "Từ " + filters_search_result.filter_rating + " sao"
+                      : "5 sao"
+                  }}
                 </span>
               </div>
             </div>
@@ -80,8 +87,8 @@
         </div>
 
         <div id="results-filter">
-          <div class="results__title" v-if="search_keyword">
-            <p>Kết quả tìm kiếm cho ‘ {{ search_keyword }} ‘</p>
+          <div class="results__title" v-if="filters_search_result.search">
+            <p>Kết quả tìm kiếm cho ‘ {{ filters_search_result.search }} ‘</p>
           </div>
 
           <div class="results__filter-options">
@@ -105,7 +112,7 @@
                 @click="
                   {
                     if (filter_option_selected === 3) {
-                      sort_desc_price = !sort_desc_price;
+                      filters_search_result.sort_desc_price = !filters_search_result.sort_desc_price;
                       getResultsSearch();
                     } else {
                       filter_option_selected = 3;
@@ -115,7 +122,9 @@
               >
                 <span>Giá</span>
                 <v-icon>{{
-                  sort_desc_price ? "mdi-chevron-down" : "mdi-chevron-up"
+                  filters_search_result.sort_desc_price
+                    ? "mdi-chevron-down"
+                    : "mdi-chevron-up"
                 }}</v-icon>
               </li>
             </ul>
@@ -145,7 +154,7 @@
 
             <div class="paginate-bar">
               <v-pagination
-                v-model="page_active"
+                v-model="filters_search_result.page"
                 :length="num_page"
                 total-visible="6"
                 active-color="#EC1C24"
@@ -178,61 +187,73 @@ export default {
   watch: {
     filter_option_selected() {
       if (this.filter_option_selected === 0) {
-        this.sort_desc_price = this.sort_newest = this.sort_sell = null;
+        this.filters_search_result.sort_desc_price = this.filters_search_result.sort_newest = this.filters_search_result.sort_sell = null;
       } else if (this.filter_option_selected === 1) {
-        this.sort_newest = true;
-        this.sort_desc_price = this.sort_sell = null;
+        this.filters_search_result.sort_newest = true;
+        this.filters_search_result.sort_desc_price = this.filters_search_result.sort_sell = null;
       } else if (this.filter_option_selected === 2) {
-        this.sort_sell = true;
-        this.sort_desc_price = this.sort_newest = null;
+        this.filters_search_result.sort_sell = true;
+        this.filters_search_result.sort_desc_price = this.filters_search_result.sort_newest = null;
       } else if (this.filter_option_selected === 3) {
-        this.sort_desc_price = false;
-        this.sort_sell = this.sort_newest = null;
+        this.filters_search_result.sort_desc_price = false;
+        this.filters_search_result.sort_sell = this.filters_search_result.sort_newest = null;
       }
       this.getResultsSearch();
     },
   },
   data() {
     return {
-      page_active: 1,
       num_page: 1,
-      filter_rating: null,
       more_filter_cats: false,
       filter_option_selected: 0,
       filter_options: ["Liên quan", "Mới nhất", "Bán chạy"],
       filter_cats: [],
-      filter_price_min: null,
-      filter_price_max: null,
-      sort_desc_price: null,
-      sort_newest: null,
-      sort_sell: null,
+      filter_cats_selected: [],
+      filters_search_result: {
+        search: "",
+        page: 1,
+        filter_cats: [],
+        filter_price_min: null,
+        filter_price_max: null,
+        filter_rating: null,
+        sort_desc_price: null,
+        sort_newest: null,
+        sort_sell: null,
+      },
       products_grid: [],
-      search_keyword: "",
     };
   },
   created() {
     this.getResultsSearch();
   },
   methods: {
+    getFormData() {},
     async getResultsSearch() {
       this.startLoad();
-      const response = await axios.post("get/search-products", {
-        search: this.search_keyword,
-        page: this.page_active,
-        filter_cats: this.filter_cats,
-        filter_price_min: this.filter_price_min,
-        filter_price_max: this.filter_price_max,
-        filter_rating: this.filter_rating,
-        sort_newest: this.sort_newest,
-        sort_sell: this.sort_sell,
-        sort_desc_price: this.sort_desc_price,
+      const form_data = new FormData();
+      this.filter_cats_selected.forEach((item, index) => {
+        if (item) {
+          this.filters_search_result.filter_cats.push(this.filter_cats[index].id);
+        }
       });
+      for (let key in this.filters_search_result) {
+        if (key == "filter_cats" && this.filters_search_result[key].length > 0) {
+          for (let k in this.filters_search_result.filter_cats) {
+            form_data.append(`filter_cats[${k}]`, this.filters_search_result[key][k]);
+          }
+        } else if (this.filters_search_result[key] !== null) {
+          form_data.append(key, this.filters_search_result[key]);
+        }
+      }
+      const response = await axios.post("get/search-products", form_data);
       this.products_grid = response.data.data.products;
       this.num_page = response.data.data.num_page;
+      this.filter_cats = response.data.data.categories;
       this.finishLoad();
     },
     search(value) {
-      this.search_keyword = value;
+      this.filters_search_result.search = value;
+      this.filter_cats_selected.length = 0;
       this.getResultsSearch();
     },
   },
