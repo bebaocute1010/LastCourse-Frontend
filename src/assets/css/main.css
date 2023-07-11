@@ -69,3 +69,11 @@
 footer {
   z-index: 1005;
 }
+
+.filter-item__list__item .v-label {
+  opacity: 1 !important;
+}
+.filter-item__list__item .mdi-checkbox-blank-outline {
+  color: #ec1c24;
+  opacity: 1;
+}
