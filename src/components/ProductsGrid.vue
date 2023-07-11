@@ -18,8 +18,8 @@
           :sold="item?.sold"
           :rate="item?.rate"
           :slug="item?.slug"
-          :imageW="imageW"
-          :imageH="imageH"
+          :image_w="image_w"
+          :image_h="image_h"
         ></Product>
       </div>
     </div>
@@ -35,11 +35,11 @@ export default {
     return {};
   },
   props: {
-    imageW: {
+    image_w: {
       type: String,
       required: false,
     },
-    imageH: {
+    image_h: {
       type: String,
       required: false,
     },

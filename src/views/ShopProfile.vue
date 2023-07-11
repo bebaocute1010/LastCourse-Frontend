@@ -49,8 +49,8 @@
           :hidden_heading="true"
           :items="shop?.products"
           :column_number="6"
-          imageW="180px"
-          imageH="180px"
+          image_w="180px"
+          image_h="180px"
         >
         </products-grid>
       </div>

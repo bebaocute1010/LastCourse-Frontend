@@ -30,9 +30,9 @@
                 </div>
               </v-avatar>
             </div>
-            <v-col cols="9">
+            <v-col cols="9" class="v-col-9-custom">
               <v-row>
-                <v-col cols="12">
+                <v-col cols="12" class="v-col-12-custom">
                   <v-text-field
                     variant="outlined"
                     hide-details="true"
@@ -41,7 +41,7 @@
                   ></v-text-field>
                 </v-col>
 
-                <v-col cols="12">
+                <v-col cols="12" class="v-col-12-custom">
                   <v-text-field
                     variant="outlined"
                     hide-details="true"
@@ -382,11 +382,11 @@ export default {
 </script>
 
 <style scoped>
-.v-col-12 {
-  padding: 0 0 12px;
-}
-.v-col-9 {
+.v-col-9-custom {
   padding: 0 12px;
+}
+.v-col-12-custom {
+  padding: 0 0 12px;
 }
 .dialog-title {
   display: flex;
