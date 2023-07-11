@@ -63,7 +63,7 @@ export default {
 
 <style scoped>
 .main-content {
-  padding: 24px 0 0;
+  padding: 24px 0 24px;
   width: 100vw;
   background: #e5e5e5;
 }

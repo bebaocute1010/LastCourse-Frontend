@@ -30,7 +30,6 @@
         v-model="currentSlide"
         show-arrows="false"
         class="slide-group"
-        style="padding: 20px 0"
       >
         <v-slide-group-item v-for="(item, i) in items" :key="i">
           <Product

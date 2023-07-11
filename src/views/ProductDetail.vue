@@ -558,9 +558,13 @@ export default {
 </script>
 
 <style scoped>
+#product-extend {
+  height: 2097px;
+}
 .container {
   display: flex;
   column-gap: 16px;
+  max-height: 100%;
 }
 #products-relate .product-extend__item-heading {
   margin: 0;
@@ -570,18 +574,23 @@ export default {
   display: flex;
   flex-direction: column;
   row-gap: 22px;
-  width: 1150px;
+  width: 1212px;
 }
 #products-relate {
   margin-top: 16px;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   row-gap: 16px;
   padding: 16px;
-  width: 266px;
+  width: 244px;
   background: #ffffff;
   overflow-y: scroll;
   overflow-x: hidden;
+  overflow: -moz-scrollbars-none;
+}
+#products-relate::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
 }
 .__comment__image__last-item {
   width: 100%;
@@ -607,6 +616,11 @@ export default {
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
+}
+.__comment__content {
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .__comment__images {
   display: flex;
@@ -685,6 +699,9 @@ export default {
 .__item__grid__titles {
   color: #6f6f6f;
 }
+#product-extend__evaluate {
+  height: 100%;
+}
 .product-extend__item__grid {
   display: flex;
   column-gap: 28px;
@@ -751,9 +768,17 @@ export default {
   margin-top: 16px;
   padding: 17px 19px;
 }
+#btn-buy-now:hover {
+  background: #6c0d10;
+  color: #ffffff;
+}
 #btn-buy-now {
   background: #ec1c24;
   color: #ffffff;
+}
+#btn-add-to-cart:hover {
+  background: #ff1a1e;
+  color: #ede4e4;
 }
 #btn-add-to-cart {
   background: #fbd2d3;
