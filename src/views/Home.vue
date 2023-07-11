@@ -52,8 +52,8 @@
         id="4"
         :column_number="6"
         :items="products_recommended"
-        imageW="170px"
-        imageH="170px"
+        image_w="170px"
+        image_h="170px"
       ></ProductsGrid>
 
       <div id="button-view-more">

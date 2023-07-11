@@ -137,8 +137,8 @@
                   :sold="item?.sold"
                   :rate="item?.rate"
                   :slug="item?.slug"
-                  imageW="200px"
-                  imageH="200px"
+                  image_w="200px"
+                  image_h="200px"
                 ></Product>
               </div>
             </div>

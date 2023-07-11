@@ -1,5 +1,5 @@
 <template>
-  <v-overlay :model-value="overlay" class="align-center justify-center">
+  <v-overlay :model-value="is_loading" class="align-center justify-center">
     <v-progress-circular color="primary" indeterminate size="64"></v-progress-circular>
   </v-overlay>
 </template>
@@ -12,11 +12,6 @@ export default {
       required: false,
       default: false,
     },
-  },
-  computed: {
-    overlay() {
-        return this.is_loading;
-    }
   },
 };
 </script>
