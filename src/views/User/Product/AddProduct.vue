@@ -1,6 +1,5 @@
 <template>
   <UserLayout>
-    <Breadcrumbs :items="breadcrumbs" />
     <div id="main-content">
       <div id="sections">
         <section id="product-images" class="section">
@@ -18,7 +17,6 @@
                   ref="images"
                   type="file"
                   accept="image/*"
-                  :model-value="images"
                   @change="onChangeImages"
                 />
               </div>
@@ -42,17 +40,27 @@
             <div class="form-group">
               <span class="form-group__label">Danh mục cấp 1</span>
               <v-select
+                :items="categories_lv1"
+                v-model="selected_cat_lv1"
+                item-title="name"
+                item-value="id"
                 class="form-group__select"
                 variant="outlined"
                 placeholder="Chọn danh mục sản phẩm"
+                @update:modelValue="getCategoriesLv2()"
               ></v-select>
             </div>
             <div class="form-group">
               <span class="form-group__label">Danh mục cấp 2</span>
               <v-select
+                v-model="selected_cat_lv2"
+                :items="categories_lv2"
+                item-title="name"
+                item-value="id"
                 class="form-group__select"
                 variant="outlined"
                 placeholder="Chọn danh mục sản phẩm"
+                @update:modelValue="product.cat_id = selected_cat_lv2"
               ></v-select>
             </div>
           </div>
@@ -66,6 +74,7 @@
             <div class="form-group">
               <span class="form-group__label">Tên sản phẩm</span>
               <v-text-field
+                v-model="product.name"
                 class="form-group__input"
                 variant="outlined"
                 placeholder="Nhập tên sản phẩm"
@@ -74,6 +83,7 @@
             <div class="form-group">
               <span class="form-group__label">Mô tả chi tiết sản phẩm</span>
               <v-textarea
+                v-model="product.detail"
                 class="form-group__input input--textarea"
                 variant="outlined"
                 auto-grow
@@ -88,19 +98,10 @@
                 <div class="form-group">
                   <span class="form-group__label">Thương hiệu</span>
                   <v-text-field
+                    v-model="product.brand"
                     class="form-group__input"
                     variant="outlined"
                     placeholder="Nhập thương hiệu"
-                  ></v-text-field>
-                </div>
-              </v-col>
-              <v-col cols="6">
-                <div class="form-group">
-                  <span class="form-group__label">Kho hàng</span>
-                  <v-text-field
-                    class="form-group__input"
-                    variant="outlined"
-                    placeholder="Nhập kho hàng"
                   ></v-text-field>
                 </div>
               </v-col>
@@ -110,6 +111,7 @@
                 <div class="form-group">
                   <span class="form-group__label">Giá niêm yết</span>
                   <v-text-field
+                    v-model="product.price"
                     class="form-group__input"
                     variant="outlined"
                     placeholder="Giá niêm yết của sản phẩm"
@@ -120,6 +122,7 @@
                 <div class="form-group">
                   <span class="form-group__label">Giá khuyến mại</span>
                   <v-text-field
+                    v-model="product.promotional_price"
                     class="form-group__input"
                     variant="outlined"
                     placeholder="Giá khuyến mại của sản phẩm"
@@ -127,22 +130,13 @@
                 </div>
               </v-col>
             </v-row>
-            <v-row>
-              <v-col cols="12">
-                <div class="form-group">
-                  <span class="form-group__label">Chi phí vận chuyển</span>
-                  <v-text-field
-                    class="form-group__input"
-                    variant="outlined"
-                    disabled
-                    placeholder="Phí vận chuyển dựa theo cân nặng"
-                  ></v-text-field>
-                </div>
-              </v-col>
-            </v-row>
             <div class="form-group">
               <span class="form-group__label">Tình trạng</span>
               <v-select
+                v-model="product.condition_id"
+                :items="conditions"
+                item-title="name"
+                item-value="id"
                 class="form-group__select"
                 variant="outlined"
                 placeholder="Chọn tình trạng sản phẩm"
@@ -150,7 +144,12 @@
               </v-select>
             </div>
             <div class="checkbox-group">
-              <input class="checkbox-group__checkbox" type="checkbox" id="order" />
+              <input
+                class="checkbox-group__checkbox"
+                type="checkbox"
+                v-model="product.is_pre_order"
+                id="order"
+              />
               <label class="checkbox-group__label" for="order">Hàng đặt trước</label>
             </div>
             <div class="checkbox-group">
@@ -158,20 +157,24 @@
                 class="checkbox-group__checkbox"
                 type="checkbox"
                 id="discount"
-                v-model="buy_more_discount"
+                v-model="product.is_buy_more_discount"
               />
               <label class="checkbox-group__label" for="discount"
                 >Mua nhiều giảm giá</label
               >
             </div>
 
-            <div id="discount-detail" v-if="buy_more_discount">
+            <div id="discount-detail" v-if="product.is_buy_more_discount">
               <div class="table-headers">
                 <span class="table-header__item">Số lượng tối thiểu</span>
                 <span class="table-header__item">Số lượng tối đa</span>
                 <span class="table-header__item">Giá sản phẩm</span>
               </div>
-              <div class="table-rows" v-for="(item, i) in discount_intervals" :key="i">
+              <div
+                class="table-rows"
+                v-for="(item, i) in product.discount_ranges_min"
+                :key="i"
+              >
                 <div class="table-row__item">
                   <v-row>
                     <v-col cols="3">
@@ -179,7 +182,7 @@
                         type="number"
                         class="table-row__item__input"
                         placeholder="Tối thiểu"
-                        v-model="item.min"
+                        v-model="product.discount_ranges_min[i]"
                       />
                     </v-col>
                     <v-col cols="4">
@@ -187,7 +190,7 @@
                         type="number"
                         class="table-row__item__input"
                         placeholder="Tối đa"
-                        v-model="item.max"
+                        v-model="product.discount_ranges_max[i]"
                       />
                     </v-col>
                     <v-col cols="5">
@@ -195,7 +198,7 @@
                         type="number"
                         class="table-row__item__input"
                         placeholder="Giá sản phẩm"
-                        v-model="item.price"
+                        v-model="product.discount_ranges_amount[i]"
                       />
                     </v-col>
                   </v-row>
@@ -224,6 +227,7 @@
             <div class="form-group">
               <label class="form-group__label">Cân nặng</label>
               <v-text-field
+                v-model="product.weight"
                 class="form-group__input"
                 variant="outlined"
                 placeholder="Cân nặng sản phẩm"
@@ -234,6 +238,7 @@
               <div class="form-group">
                 <label class="form-group__label">Chiều rộng</label>
                 <v-text-field
+                  v-model="product.width"
                   class="form-group__input"
                   variant="outlined"
                   placeholder="Chiều rộng"
@@ -242,6 +247,7 @@
               <div class="form-group">
                 <label class="form-group__label">Chiều cao</label>
                 <v-text-field
+                  v-model="product.height"
                   class="form-group__input"
                   variant="outlined"
                   placeholder="Chiều cao"
@@ -250,6 +256,7 @@
               <div class="form-group">
                 <label class="form-group__label">Chiều dài</label>
                 <v-text-field
+                  v-model="product.length"
                   class="form-group__input"
                   variant="outlined"
                   placeholder="Chiều dài"
@@ -269,17 +276,17 @@
                 class="checkbox-group__checkbox"
                 type="checkbox"
                 id="classification__checkbox"
-                v-model="classification"
+                v-model="product.is_variant"
               />
               <label class="checkbox-group__label" for="classification__checkbox"
                 >Sản phẩm này có các phân loại và tùy chọn khác</label
               >
             </div>
 
-            <div id="classification-detail" v-if="classification">
+            <div id="classification-detail" v-if="product.is_variant">
               <div
                 class="classification--group"
-                v-for="(group, i) in classification_groups"
+                v-for="(item, i) in variantsCount"
                 :key="i"
               >
                 <label class="classification--group__label"
@@ -291,9 +298,15 @@
                       >mdi-forwardburger</v-icon
                     >
                     <v-col cols="12">
-                      <input
-                        class="classification--group__input input-group-name"
-                        v-model="group.name"
+                      <v-select
+                        clearable=""
+                        variant="outlined"
+                        placeholder="Chọn tên nhóm phân loại"
+                        :items="group_variant_names"
+                        item-title="name"
+                        item-value="id"
+                        v-model="group_variant_selected[i]"
+                        @update:modelValue="checkDoubleSelectVariant(i)"
                       />
                     </v-col>
                     <v-icon
@@ -309,29 +322,28 @@
                   <label class="classification--group__label">Phân loại hàng</label>
                   <div
                     class="classification--group__item"
-                    v-for="(item, j) in group.items"
+                    v-for="(item, j) in product.variant_images[getIndexVariant(i)]"
                     :key="j"
                   >
                     <div class="classification--group__item-name">
                       <input
                         class="classification--group__input input-class-name"
-                        v-model="item.name"
+                        v-model="product.variant_names[getIndexVariant(i)][j]"
                       />
                     </div>
                     <div
                       class="classification--group__add-image"
                       @click="clickItem(i, j)"
                     >
-                      <v-icon v-if="!item.image_url">mdi-plus-circle</v-icon>
+                      <v-icon v-if="!item">mdi-plus-circle</v-icon>
                       <div v-else class="classification--group__item-image">
-                        <img :src="item.image_url" />
+                        <img :src="getObjURL(item)" />
                       </div>
                       <input
                         type="file"
                         :ref="'item[' + i + '][' + j + ']'"
                         accept="image/*"
                         hidden
-                        :model-value="item.image"
                         @change="(event) => changeImage(event, i, j)"
                       />
                     </div>
@@ -359,15 +371,16 @@
               </div>
             </div>
           </div>
-          <div v-if="classification" id="product-variants-info" class="block-info">
+          <div v-if="product.is_variant" id="product-variants-info" class="block-info">
             <div class="table-headers">
               <span class="table-header__item">Phân loại</span>
               <span class="table-header__item">Số lượng</span>
               <span class="table-header__item">Giá sản phẩm</span>
             </div>
-            <div class="table-rows">
+            <div class="table-rows" v-if="itemsCombination">
               <div class="table-row__item" v-for="(item, i) in itemsCombination" :key="i">
                 <div class="table-row__title">
+                  <!-- <span>{{ item?.name?.name ?? "..." }}</span> -->
                   <span>{{ item.name }}</span>
                 </div>
                 <v-row v-for="(val, j) in item.items" :key="j">
@@ -384,7 +397,7 @@
                       type="number"
                       class="table-row__item__input"
                       placeholder="Số lượng"
-                      v-model="val.quantity"
+                      v-model="product.variants_item_quantity[i][j]"
                     />
                   </v-col>
                   <v-col cols="5">
@@ -392,7 +405,7 @@
                       type="number"
                       class="table-row__item__input"
                       placeholder="Giá sản phẩm"
-                      v-model="val.price"
+                      v-model="product.variants_item_price[i][j]"
                     />
                   </v-col>
                 </v-row>
@@ -401,7 +414,7 @@
           </div>
         </section>
         <div class="submit-btn">
-          <button class="button-submit">Lưu</button>
+          <button class="button-submit" @click="saveProduct()">Lưu</button>
         </div>
       </div>
 
@@ -433,7 +446,6 @@
 import UserLayout from "@/Layouts/UserLayout.vue";
 import Breadcrumbs from "@/components/Breadcrumbs.vue";
 import TextFieldWithValidation from "@/components/TextFieldWithValidation.vue";
-import listGroup from "@/components/ListGroup.vue";
 import Alert from "@/components/Alert.vue";
 import SlideImages from "../../../components/SlideImages.vue";
 
@@ -442,18 +454,6 @@ export default {
   components: { Alert, TextFieldWithValidation, Breadcrumbs, UserLayout, SlideImages },
   data() {
     return {
-      currentSlide: 0,
-      startX: 0,
-      currentX: 0,
-      isDragging: false,
-      breadcrumbs: [
-        {
-          title: "Quản lý sản phẩm",
-        },
-        {
-          title: "Thêm sản phẩm",
-        },
-      ],
       sections: [
         {
           name: "Hình ảnh sản phẩm",
@@ -476,124 +476,260 @@ export default {
           id: "#classification",
         },
       ],
-      classification: false,
-      buy_more_discount: false,
-      discount_intervals: [
-        {
-          min: "",
-          max: "",
-          price: "",
-        },
-      ],
-      classification_groups: [
-        {
-          name: "",
-          items: [
-            {
-              name: "",
-              image: "",
-              image_url: "",
-            },
-          ],
-        },
-      ],
-      images: [],
+      variant_groups_count: 1,
       image_urls: [],
       activeSection: null,
       isLinkClicked: false,
+      categories_lv1: [],
+      categories_lv2: [],
+      conditions: [],
+      selected_cat_lv1: null,
+      selected_cat_lv2: null,
+      group_variant_names: [
+        { id: 0, name: "Màu sắc" },
+        { id: 1, name: "Kích thước" },
+      ],
+      group_variant_selected: [],
+      group_variant_previous_selected: [],
+      product: {
+        images: [],
+        cat_id: null,
+        condition_id: null,
+        is_variant: false,
+        is_buy_more_discount: false,
+        is_pre_order: false,
+        name: null,
+        detail: null,
+        brand: null,
+        price: null,
+        promotional_price: null,
+        weight: null,
+        length: null,
+        width: null,
+        height: null,
+        variant_names: [[null], [null]],
+        variant_images: [[null]],
+        variants_item_quantity: [[null]],
+        variants_item_price: [[null]],
+        discount_ranges_min: [null],
+        discount_ranges_max: [null],
+        discount_ranges_amount: [null],
+      },
+      product_edit_id: null,
+      checkFile: null,
     };
   },
-  mounted() {
-    window.addEventListener("scroll", this.handleScroll);
-  },
-  destroyed() {
-    window.removeEventListener("scroll", this.handleScroll);
-  },
   computed: {
+    variantsCount() {
+      return Array.from({ length: this.variant_groups_count }, (_, index) => index);
+    },
     itemsCombination() {
-      let l = this.classification_groups.length;
+      let l = this.variant_groups_count;
       let big_rs = [];
       let rs = [];
-      if (l < 2) {
-        rs = this.classification_groups[0].items;
-        big_rs.push({
-          name: this.classification_groups[0].name,
-          items: rs,
-        });
-      } else if (l == 2) {
-        for (let i = 0; i < this.classification_groups[0].items.length; i++) {
-          rs = [];
-          for (let j = 0; j < this.classification_groups[1].items.length; j++) {
-            rs.push({
-              name:
-                this.classification_groups[0].items[i].name +
-                "/" +
-                this.classification_groups[1].items[j].name,
-            });
-          }
+      if (l == 1) {
+        let index = this.group_variant_selected[0];
+        if (this.product.variant_names[index]?.length == 0) {
           big_rs.push({
-            name: this.classification_groups[0].items[i].name,
+            name: this.group_variant_names[index]?.name ?? "...",
+            item: [],
+          });
+        } else {
+          rs = this.product.variant_names[index]?.map((item) => ({
+            name: item ?? "...",
+          }));
+          big_rs.push({
+            name: this.group_variant_names[index]?.name ?? "...",
             items: rs,
           });
         }
-      } else {
-        rs = this.combination(
-          this.classification_groups[l - 2].items,
-          this.classification_groups[l - 1].items
-        );
-        let index = l - 3;
-        while (index >= 1) {
-          rs = this.combination(this.classification_groups[index], rs);
-          index--;
-        }
-        for (let i = 0; i < this.classification_groups[0].items.length; i++) {
-          let mrs = [];
-          for (let j = 0; j < rs.length; j++) {
-            mrs.push({
-              name: this.classification_groups[0].items[i] + "/" + rs[j],
+      } else if (l == 2) {
+        for (let i = 0; i < this.product.variant_names[0].length; i++) {
+          rs = [];
+          for (let j = 0; j < this.product.variant_names[1].length; j++) {
+            rs.push({
+              name:
+                (this.product.variant_names[0][i] ?? "?") +
+                "/" +
+                (this.product.variant_names[1][j] ?? "?"),
             });
           }
           big_rs.push({
-            name: this.classification_groups[0].items[i].name,
-            items: mrs,
+            name: this.product.variant_names[0][i] ?? "...",
+            items: rs,
           });
         }
       }
-
       return big_rs;
     },
   },
+  created() {
+    if (this.$route.name == "edit-product") {
+      this.product_edit_id = this.$route.params.id;
+      this.getProductEdit();
+    } else {
+      this.getCategoriesLv1();
+      this.getConditions();
+    }
+  },
   methods: {
+    async getProductEdit() {
+      this.startLoad();
+      try {
+        this.getCategoriesLv1();
+        this.getConditions();
+        const response = await axios.get(`shop/get-product?id=${this.product_edit_id}`);
+        this.image_urls = Array.from(Object.values({ ...response.data.data.images }));
+        this.product = { ...response.data.data };
+        this.selected_cat_lv1 = this.product.cat_lv1_id;
+        this.selected_cat_lv2 = this.product.cat_lv2_id;
+        this.getCategoriesLv2(this.selected_cat_lv1);
+        if (this.product.variant_names[0].length > 0) {
+          this.group_variant_previous_selected[0] = this.group_variant_selected[0] = 0;
+          this.variant_groups_count = 1;
+        }
+        if (this.product.variant_names[1].length > 0) {
+          this.variant_groups_count = 2;
+          this.group_variant_previous_selected[1] = this.group_variant_selected[1] = 1;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
+    appendArrayToFormData(key, arr, form_data = new FormData()) {
+      arr.forEach((item, index) => {
+        form_data.append(`${key}[${index}]`, item);
+      });
+    },
+    getFormData(obj, form_data = new FormData()) {
+      for (let key in obj) {
+        if (
+          [
+            "images",
+            "discount_ranges_min",
+            "discount_ranges_max",
+            "discount_ranges_amount",
+          ].includes(key)
+        ) {
+          this.appendArrayToFormData(key, obj[key], form_data);
+        } else if (
+          [
+            "variant_names",
+            "variant_images",
+            "variants_item_images",
+            "variants_item_quantity",
+            "variants_item_price",
+          ].includes(key)
+        ) {
+          for (let i in obj[key]) {
+            this.appendArrayToFormData(`${key}[${i}]`, obj[key][i], form_data);
+          }
+        } else if (["is_variant", "is_buy_more_discount", "is_pre_order"].includes(key)) {
+          form_data.append(key, obj[key] ? 1 : 0);
+        } else {
+          form_data.append(key, obj[key]);
+        }
+      }
+      return form_data;
+    },
+    async saveProduct() {
+      let url = "product/create";
+      let form_data = this.getFormData(this.product);
+      if (this.product_edit_id !== null) {
+        url = "product/update";
+        form_data.append("id", this.product_edit_id);
+      }
+      try {
+        const response = await axios.post(url, form_data);
+        this.showAlert(response.data.title, response.data.message, "success", null)
+      } catch (error) {
+        console.log(error);
+        this.showAlert(error.response.data.title, error.response.data.message, "error", null)
+      }
+    },
+    async getConditions() {
+      try {
+        this.startLoad();
+        const response = await axios.get("get/conditions");
+        this.conditions = response.data.data;
+        this.finishLoad();
+      } catch (error) {}
+    },
+    async getCategoriesLv2() {
+      try {
+        this.product.cat_id = this.selected_cat_lv1;
+        this.startLoad();
+        const response = await axios.get(
+          "get/category/level2?parent_id=" + this.selected_cat_lv1
+        );
+        this.categories_lv2 = response.data.data;
+        this.finishLoad();
+      } catch (error) {}
+    },
+    async getCategoriesLv1() {
+      try {
+        this.startLoad();
+        const response = await axios.get("get/category/level1");
+        this.categories_lv1 = response.data.data;
+        this.finishLoad();
+      } catch (error) {}
+    },
+    getIndexVariant(selected_index) {
+      return this.group_variant_selected[selected_index] ?? selected_index;
+    },
+    swapArray(array_1, array_2) {
+      const temp = [...array_1];
+      array_1.length = 0;
+      array_1.push(...array_2);
+      array_2.length = 0;
+      array_2.push(...temp);
+    },
+    checkDoubleSelectVariant(index) {
+      if (
+        this.group_variant_selected.length == 2 &&
+        this.group_variant_selected[0] == this.group_variant_selected[1]
+      ) {
+        this.group_variant_selected[index] = null;
+        this.group_variant_previous_selected[index] = null;
+        this.showAlert(
+          "Lỗi",
+          "Không thể chọn 2 nhóm phân loại trùng nhau",
+          "error",
+          null
+        );
+        return;
+      }
+      if (
+        this.group_variant_previous_selected[index] != null &&
+        this.group_variant_previous_selected[index] != null &&
+        this.group_variant_selected[index] != this.group_variant_previous_selected[index]
+      ) {
+        this.swapArray(
+          this.product.variant_names[index],
+          this.product.variant_names[1 - index]
+        );
+        this.swapArray(
+          this.product.variant_images[index],
+          this.product.variant_images[1 - index]
+        );
+        this.swapArray(
+          this.product.variants_item_price[index],
+          this.product.variants_item_price[1 - index]
+        );
+        this.swapArray(
+          this.product.variants_item_quantity[index],
+          this.product.variants_item_quantity[1 - index]
+        );
+      }
+      this.group_variant_previous_selected[index] = this.group_variant_selected[index];
+    },
     handleLinkClick(index) {
       this.isLinkClicked = true;
       this.activeSection = index;
       setTimeout(() => {
         this.isLinkClicked = false;
       }, 100);
-    },
-    handleScroll() {
-      if (this.isLinkClicked) {
-        return;
-      }
-      const sectionElements = document.getElementsByClassName("section");
-      const scrollPosition = window.scrollY || window.pageYOffset;
-
-      let activeSectionIndex = null;
-      for (let i = 0; i < sectionElements.length; i++) {
-        const sectionElement = sectionElements[i];
-        const sectionOffset = sectionElement.offsetTop;
-        const sectionHeight = sectionElement.offsetHeight;
-
-        if (
-          scrollPosition >= sectionOffset &&
-          scrollPosition < sectionOffset + sectionHeight
-        ) {
-          activeSectionIndex = i;
-          break;
-        }
-      }
-
-      this.activeSection = activeSectionIndex;
     },
     combination(arr1, arr2) {
       let results = [];
@@ -607,59 +743,82 @@ export default {
     },
     onChangeImages(e) {
       let files = e.target.files;
+      let fileArray = Array.from(files);
+      this.product.images = fileArray;
+      this.image_urls.length = 0;
       for (let i = 0; i < files.length; i++) {
         this.image_urls.push(URL.createObjectURL(files[i]));
       }
     },
+    getObjURL(file) {
+      if (typeof file == "string") {
+        return file;
+      }
+      return URL.createObjectURL(file) ?? "#";
+    },
     changeImage(event, i, j) {
       let file = event.target.files[0];
-      if (file) {
-        this.classification_groups[i].items[j].image_url = URL.createObjectURL(file);
-      }
+      this.product.variant_images[this.getIndexVariant(i)][j] = file;
+    },
+    removeFileFromList(fileList, indexToRemove) {
+      const files = Array.from(fileList);
+      files.splice(indexToRemove, 1);
+      const newFileList = new FileList(files);
+      return newFileList;
     },
     deleteImage(i) {
-      this.images.splice(i, 1);
+      this.product.images.splice(i, 1);
       this.image_urls.splice(i, 1);
     },
     addDiscountInterval() {
-      if (this.discount_intervals.length < 5) {
-        this.discount_intervals.push({ min: "", max: "", price: "" });
+      if (this.product.discount_ranges_min.length < 5) {
+        this.product.discount_ranges_min.push(null);
+        this.product.discount_ranges_max.push(null);
+        this.product.discount_ranges_amount.push(null);
         return;
       }
       this.showAlert("Thất bại", "Bạn đã thêm tối đa khoảng ", "error", null);
     },
     addGroup() {
-      if (this.classification_groups.length >= 2) {
+      if (this.variant_groups_count >= 2) {
         this.showAlert("Thất bại", "Đã đạt giới hạn", "error", null);
         return;
       }
-      this.classification_groups.push({
-        name: "",
-        items: [
-          {
-            name: "",
-            image: "",
-            image_url: "",
-          },
-        ],
-      });
+      this.product.variant_images.push([null]);
+      this.variant_groups_count += 1;
     },
     addGroupItem(i) {
-      this.classification_groups[i].items.push({
-        name: "",
-        image: "",
-        image_url: "",
-      });
+      if (i == 1) {
+        this.product.variants_item_price.forEach((item) => {
+          item.push(null);
+        });
+        this.product.variants_item_quantity.forEach((item) => {
+          item.push(null);
+        });
+      } else {
+        this.product.variants_item_price.push([null]);
+        this.product.variants_item_quantity.push([null]);
+      }
+      this.product.variant_names[i].push(null);
+      this.product.variant_images[i].push(null);
     },
     clickItem(i, j) {
       const ref = this.$refs["item[" + i + "][" + j + "]"];
       ref[0].click();
     },
     deleteGroup(i) {
-      this.classification_groups.splice(i, 1);
+      this.group_variant_selected[i] = null;
+      this.product.variant_names[i] = [null];
+      this.product.variant_images[i] = [null];
+      this.product.variants_item_price[i] = [null];
+      this.product.variants_item_quantity[i] = [null];
+      this.variant_groups_count -= 1;
     },
     deleteGroupItem(i, j) {
-      this.classification_groups[i].items.splice(j, 1);
+      this.product.variant_names[i].splice(j, 1);
+      this.product.variant_images[i].splice(j, 1);
+      this.product.variants_item_price[i].splice(j, 1);
+      this.product.variants_item_quantity[i].splice(j, 1);
     },
   },
 };
@@ -669,6 +828,7 @@ export default {
 #main-content {
   display: flex;
   column-gap: 50px;
+  margin: 40px 0;
 }
 #sections {
   width: 65%;
@@ -837,6 +997,7 @@ export default {
   justify-content: center;
   color: #0172cb;
   margin-left: 16px;
+  overflow: hidden;
 }
 
 .classification--group__item-image {

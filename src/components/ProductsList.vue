@@ -26,15 +26,20 @@
       @touchend="endDrag"
       @click.prevent="handleClick"
     >
-      <v-slide-group v-model="currentSlide" show-arrows="false" class="slide-group" style="padding: 20px 0;">
+      <v-slide-group
+        v-model="currentSlide"
+        show-arrows="false"
+        class="slide-group"
+      >
         <v-slide-group-item v-for="(item, i) in items" :key="i">
           <Product
             :image="item.image"
             :name="item.name"
             :price="item.price"
             :sold="item?.sold"
-            :rate="item?.rate"
-            :flash_sale="item?.flash_sale"
+            :rate="item?.rating"
+            :show_rate="show_rate"
+            :slug="item?.slug"
           ></Product>
         </v-slide-group-item>
       </v-slide-group>
@@ -73,12 +78,10 @@ export default {
       type: Array,
       required: true,
     },
-    flash_sale: {
-      expired_at: {
-        type: Date,
-        required: true,
-      },
+    show_rate: {
+      type: Boolean,
       required: false,
+      default: false,
     },
   },
   methods: {

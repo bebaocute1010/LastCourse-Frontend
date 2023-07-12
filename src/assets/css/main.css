@@ -51,9 +51,29 @@
   padding: 0;
   min-height: unset;
 }
-.icon-size-14 .mdi{
+.icon-size-14 .mdi {
   font-size: 14px;
 }
 .shop-profile__avatar .v-avatar {
   border: 2px solid #ffffff;
+}
+
+.slide-group .v-slide-group__container {
+  padding: 16px;
+}
+
+#product .slide-group .v-slide-group__container {
+  padding: 0;
+}
+
+footer {
+  z-index: 1005;
+}
+
+.filter-item__list__item .v-label {
+  opacity: 1 !important;
+}
+.filter-item__list__item .mdi-checkbox-blank-outline {
+  color: #ec1c24;
+  opacity: 1;
 }

@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <loading :is_loading="loading"></loading>
     <v-row class="content">
       <v-col class="banner" cols="7">
         <div class="banner-img">
@@ -30,8 +31,11 @@
 </template>
 
 <script>
+import Loading from "../components/Loading.vue";
+
 export default {
   name: "AccountLayout",
+  components: { Loading },
 };
 </script>
 
@@ -87,9 +91,6 @@ export default {
   text-align: center;
 }
 
-.form-heading {
-}
-
 .form-heading-title {
   font-weight: 600;
   font-size: 1.5rem;
@@ -128,8 +129,6 @@ export default {
 }
 
 /*Custom vuetify*/
-.my-input .v-text-field input {
-}
 
 .my-input .v-field__field {
   width: 381px;
@@ -158,15 +157,15 @@ export default {
 }
 
 .my-input .v-field__outline__start {
-  padding-right: 24px;
-  border-top-left-radius: 100px;
-  border-bottom-left-radius: 100px;
+  padding-right: 24px !important;
+  border-top-left-radius: 100px !important;
+  border-bottom-left-radius: 100px !important;
 }
 
 .my-input .v-field__outline__end {
-  border-top-right-radius: 100px;
-  border-bottom-right-radius: 100px;
-  padding-left: 24px;
+  border-top-right-radius: 100px !important;
+  border-bottom-right-radius: 100px !important;
+  padding-left: 24px !important;
 }
 
 .my-input .v-btn__content {

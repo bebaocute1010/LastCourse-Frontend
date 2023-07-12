@@ -1,11 +1,11 @@
 <template>
   <v-col cols="3">
     <div id="user-navigation">
-      <div class="user-info">
+      <div class="user-info" @click="openDialogUpdateShop">
         <v-avatar class="user-info__avatar">
-          <v-img src="https://www.studytienganh.vn/upload/2022/05/112275.jpg"></v-img>
+          <v-img cover :src="shop?.avatar"></v-img>
         </v-avatar>
-        <span class="user-info__name">Meokio</span>
+        <span class="user-info__name">{{ shop?.name }}</span>
         <span class="user-info__type">Shop</span>
       </div>
       <div class="features-list">
@@ -14,7 +14,7 @@
             prepend-icon="mdi-clipboard-text"
             title="Quản lý đơn hàng"
             value="Quản lý đơn hàng"
-            :to="{name: 'bills-manage'}"
+            :to="{ name: 'bills-manage' }"
           ></v-list-item>
           <ListGroup
             prepend_icon="mdi-shopping"
@@ -22,7 +22,7 @@
             :items="product_features"
             value="Quản lý sản phẩm"
           />
-          <v-list-item prepend-icon="mdi-logout" value="Đăng xuất">Đăng xuất</v-list-item>
+          <v-list-item prepend-icon="mdi-logout" @click="logout()">Đăng xuất</v-list-item>
         </v-list>
       </div>
     </div>
@@ -31,10 +31,14 @@
 
 <script>
 import ListGroup from "@/components/ListGroup.vue";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "UserNavigation",
   components: { ListGroup },
+  computed: {
+    ...mapGetters(["shop"]),
+  },
   data() {
     return {
       open: [],
@@ -45,12 +49,32 @@ export default {
       bill_features: [],
     };
   },
+  created() {
+    if (localStorage.getItem("logged_in") === null) {
+      this.$router.push({ name: "login" });
+    } else if (!this.shop) {
+      this.getShopInfor();
+    }
+  },
+  methods: {
+    ...mapActions(["setShop", "unsetShop"]),
+    openDialogUpdateShop() {
+      this.$emit("openDialogShopUpdate")
+    },
+    async getShopInfor() {
+      this.startLoad();
+      const response = await axios.get("shop/infor");
+      this.setShop(response.data.data);
+      this.finishLoad();
+    },
+  },
 };
 </script>
 
 <style scoped>
 #user-navigation {
   position: sticky;
+  height: 100%;
 }
 .v-col-3 {
   max-width: 25%;

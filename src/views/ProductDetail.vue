@@ -3,7 +3,11 @@
     <section id="product">
       <div class="container">
         <div id="product-images">
-          <BannerSlides :height="480" :items="items" style="width: 480px"></BannerSlides>
+          <BannerSlides
+            :height="480"
+            :items="details?.images"
+            style="width: 480px"
+          ></BannerSlides>
           <div id="images__arrow">
             <p style="font-weight: 600">Hình ảnh sản phẩm</p>
             <div class="image__arrow-btn">
@@ -12,8 +16,8 @@
             </div>
           </div>
           <SlideImages
-            :items="items"
-            :ref="'slideImageDetail'"
+            :items="details?.images"
+            :refe="'slideImageDetail'"
             img_width="87px"
             style="height: 87px"
           >
@@ -21,50 +25,77 @@
           <div id="shares">
             <p>Chia sẻ:</p>
             <div class="share__social__image">
-              <v-img contain src="src/assets/icons/facebook.svg"></v-img>
+              <v-img contain src="/src/assets/icons/facebook.svg"></v-img>
             </div>
 
             <div class="share__social__image">
-              <v-img contain src="src/assets/icons/messenger.svg"></v-img>
+              <v-img contain src="/src/assets/icons/messenger.svg"></v-img>
             </div>
 
             <div class="share__social__image">
-              <v-img contain src="src/assets/icons/twiter.svg"></v-img>
+              <v-img contain src="/src/assets/icons/twiter.svg"></v-img>
             </div>
 
             <div class="share__social__image">
-              <v-img contain src="src/assets/icons/share.svg"></v-img>
+              <v-img contain src="/src/assets/icons/share.svg"></v-img>
             </div>
           </div>
         </div>
 
         <div id="product-info">
-          <p class="product__name">
-            Tai Nghe Không Dây Bluetooth Chụp Tai Mèo Wireless HXZ Đèn LED Cao Cấp - DT075
-          </p>
+          <p class="product__name">{{ details?.name ?? "..." }}</p>
 
-          <div class="product__evaluates">
+          <div class="product__evaluates" v-if="details">
             <v-rating
-              v-model="rating"
+              v-model="details.rating"
               class="icon-size-14"
               size="14"
               color="#FFB800"
               readonly
               half-increments
             ></v-rating>
-            <p>{{ rating }}/5</p>
-            <p class="product__evaluate__sold">Đã bán {{ formatNumber(sold) }}</p>
+            <p>{{ details.rating }}/5</p>
+            <p class="product__evaluate__sold">
+              Đã bán {{ prefixSymbolsNumber(details?.sold) }}
+            </p>
           </div>
 
-          <div id="product__variants">
+          <div
+            id="product__variants"
+            v-if="details && (details.sizes !== null || details.colors !== null)"
+          >
             <p class="product__variant__heading">Phân loại</p>
-            <div class="product__variants__list" v-for="list in variants" :key="list.id">
-              <p class="product__variants__list__name heading-text">{{ list.name }}</p>
+            <div class="product__variants__list" v-if="details?.colors">
+              <p class="product__variants__list__name heading-text">Màu sắc</p>
               <div class="product__variants__list__items">
                 <div
-                  class="product__variant__item"
-                  v-for="variant in list.items"
-                  :key="variant.id"
+                  :class="{
+                    product__variant__item: true,
+                    product__variant__item__active: i === color_active,
+                  }"
+                  v-for="(variant, i) in details?.colors"
+                  :key="i"
+                  @click="chooseVariant(0, i)"
+                >
+                  <div class="product__variant__img" v-if="variant.image">
+                    <img :src="variant.image" />
+                  </div>
+                  <p class="product__variant__name">{{ variant.name }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="product__variants__list" v-if="details?.sizes">
+              <p class="product__variants__list__name heading-text">Kích thước</p>
+              <div class="product__variants__list__items">
+                <div
+                  :class="{
+                    product__variant__item: true,
+                    product__variant__item__active: i === size_active,
+                  }"
+                  v-for="(variant, i) in details?.sizes"
+                  :key="i"
+                  @click="chooseVariant(1, i)"
                 >
                   <div class="product__variant__img" v-if="variant.image">
                     <img :src="variant.image" />
@@ -100,13 +131,16 @@
 
           <div id="inventory">
             <p class="heading-text">
-              Tồn kho: <span>{{ formatNumber(inventory) }}</span>
+              Tồn kho: <span>{{ inventory }}</span>
+            </p>
+            <p class="heading-text">
+              Giá: <span>{{ price }} đ</span>
             </p>
           </div>
 
           <div id="actions">
-            <button id="btn-add-to-cart">Thêm vào giỏ hàng</button>
-            <button id="btn-buy-now">Mua ngay</button>
+            <button id="btn-add-to-cart" @click="addToCart()">Thêm vào giỏ hàng</button>
+            <button id="btn-buy-now" @click="addToCart(true)">Mua ngay</button>
           </div>
         </div>
       </div>
@@ -118,38 +152,49 @@
           <div id="product-extend__heading" class="user-not-select">
             <div id="shop-info">
               <v-avatar id="shop__avatar"
-                ><v-img
-                  cover
-                  src="https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg"
-                ></v-img
+                ><v-img cover :src="details?.shop.avatar"></v-img
               ></v-avatar>
               <div id="shop__name">
-                <p>Shop thời trang nam nữ</p>
+                <p>{{ details?.shop.name ?? "..." }}</p>
                 <div id="shop__location">
                   <v-icon color="#0074BD">mdi-map-marker</v-icon>
-                  <p>Hà Nội</p>
+                  <p>{{ details?.shop.locate ?? "..." }}</p>
                 </div>
               </div>
             </div>
 
             <div id="shop-overall">
               <div class="shop-overall__item">
-                <p class="shop-overall__item__quantiy">379</p>
+                <p class="shop-overall__item__quantiy">
+                  {{ details?.shop.product_count ?? "..." }}
+                </p>
                 <p class="shop-overall__item__name">Sản phẩm</p>
               </div>
 
               <div class="shop-overall__item">
-                <p class="shop-overall__item__quantiy">4.7</p>
+                <p class="shop-overall__item__quantiy">
+                  {{ details?.shop.rating_count ?? "..." }}
+                </p>
                 <p class="shop-overall__item__name">Đánh giá</p>
               </div>
 
               <div class="shop-overall__item">
-                <p class="shop-overall__item__quantiy">1.5k</p>
+                <p class="shop-overall__item__quantiy">
+                  {{ prefixSymbolsNumber(details?.shop.followers) }}
+                </p>
                 <p class="shop-overall__item__name">Follow</p>
               </div>
 
               <div>
-                <button id="btn-view-shop">Xem shop</button>
+                <router-link
+                  id="btn-view-shop"
+                  :to="
+                    details?.shop.id
+                      ? { name: 'shop-profile', params: { id: details.shop.id } }
+                      : '#'
+                  "
+                  >Xem shop</router-link
+                >
               </div>
             </div>
           </div>
@@ -164,9 +209,9 @@
                   <p>Địa chỉ gửi</p>
                 </div>
                 <div class="__item__grid__contents">
-                  <p>Thời trang nữ</p>
-                  <p>125489</p>
-                  <p>124 Hàng kênh, Hồng Bàng, Hải Phòng</p>
+                  <p>{{ details?.category }}</p>
+                  <p>{{ details?.inventory }}</p>
+                  <p>{{ details?.address }}</p>
                 </div>
               </div>
             </div>
@@ -176,12 +221,7 @@
             <p class="product-extend__item-heading">Chi tiết sản phẩm</p>
             <div class="product-extend__item-body">
               <p :class="{ 'collapse-content': !expand, 'expand-content': expand }">
-                - Tên sản phẩm: Bộ Ba Lỗ Bé Trai, Bé Gái Minky Mom Vải Thun Lạnh Basic
-                Nhiều Màu, Bộ Quần Áo Cho Bé 3 Lỗ Mặc Hè Thoáng Mát MKM3LO2109 <br />
-                Chất liệu: cotton thun lạnh <br />
-                - Tên sản phẩm: Bộ Ba Lỗ Bé Trai, Bé Gái Minky Mom Vải Thun Lạnh Basic
-                Nhiều Màu, Bộ Quần Áo Cho Bé 3 Lỗ Mặc Hè Thoáng Mát MKM3LO2109 <br />
-                Chất liệu: cotton thun lạnh <br />
+                {{ details?.detail }}
               </p>
               <button class="btn-expand-content" @click="expand = !expand">
                 {{ !expand ? "Mở rộng" : "Thu gọn" }}
@@ -190,17 +230,21 @@
             </div>
           </div>
 
-          <div id="product-extend__evaluate" class="product-extend__item">
+          <div
+            id="product-extend__evaluate"
+            ref="extendContent1"
+            class="product-extend__item"
+          >
             <p class="product-extend__item-heading">Đánh giá sản phẩm</p>
             <div class="product-extend__item-body">
               <div class="__item__rating">
-                <div class="__item__rating__heading user-not-select">
+                <div class="__item__rating__heading user-not-select" v-if="details">
                   <p class="__rating-value">
-                    <span>{{ rating }}</span
+                    <span>{{ details?.rating }}</span
                     >/5
                   </p>
                   <v-rating
-                    v-model="rating"
+                    v-model="details.rating"
                     half-increments
                     color="#FFB800"
                     size="24"
@@ -215,7 +259,9 @@
                       }"
                     >
                       <p>Tất cả</p>
-                      <p class="____quantity">({{ formatNumber(1234) }})</p>
+                      <p class="____quantity">
+                        ({{ prefixSymbolsNumber(details?.rating_count.all) }})
+                      </p>
                     </div>
 
                     <div
@@ -233,7 +279,9 @@
                         readonly
                         model-value="5"
                       ></v-rating>
-                      <p class="____quantity">({{ formatNumber(1234) }})</p>
+                      <p class="____quantity">
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_5) }})
+                      </p>
                     </div>
 
                     <div
@@ -251,7 +299,9 @@
                         size="14"
                         readonly
                       ></v-rating>
-                      <p class="____quantity">({{ formatNumber(1234) }})</p>
+                      <p class="____quantity">
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_4) }})
+                      </p>
                     </div>
 
                     <div
@@ -269,7 +319,9 @@
                         size="14"
                         readonly
                       ></v-rating>
-                      <p class="____quantity">({{ formatNumber(1234) }})</p>
+                      <p class="____quantity">
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_3) }})
+                      </p>
                     </div>
 
                     <div
@@ -287,7 +339,9 @@
                         size="14"
                         readonly
                       ></v-rating>
-                      <p class="____quantity">({{ formatNumber(1234) }})</p>
+                      <p class="____quantity">
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_2) }})
+                      </p>
                     </div>
 
                     <div
@@ -305,7 +359,9 @@
                         size="14"
                         readonly
                       ></v-rating>
-                      <p class="____quantity">({{ formatNumber(1234) }})</p>
+                      <p class="____quantity">
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_1) }})
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -321,7 +377,7 @@
                     </v-avatar>
 
                     <div class="__comment__body">
-                      <p class="__comment__username">{{ comment.user.username }}</p>
+                      <p class="__comment__username">{{ comment.user.name }}</p>
                       <v-rating
                         v-model="comment.rating"
                         readonly
@@ -334,9 +390,9 @@
                         <div
                           class="__comment__image__item"
                           v-for="(image, index) in comment.images.slice(0, 3)"
-                          :key="image.id"
+                          :key="index"
                         >
-                          <img :src="image.url" />
+                          <img :src="image" />
 
                           <div
                             v-if="index === 2 && comment.images.length > 3"
@@ -353,22 +409,25 @@
             </div>
 
             <v-pagination
-              :length="15"
+              v-model="page_active"
+              :length="details?.comments.num_page"
               :total-visible="5"
               active-color="#EC1C24"
+              @update:modelValue="getComments(page_active)"
             ></v-pagination>
           </div>
         </div>
         <div id="products-relate" ref="relateProducts">
           <p class="product-extend__item-heading">Sản phẩm tương tự</p>
           <product
-            v-for="item in products_relate"
-            :key="item.id"
+            v-for="(item, i) in details?.relate_products"
+            :key="i"
             :name="item.name"
             :image="item.image"
             :price="item.price"
             :sold="item.sold"
             :rate="item.rate"
+            :slug="item.slug"
           >
           </product>
         </div>
@@ -387,412 +446,125 @@ export default {
   name: "ProductDetail",
   data() {
     return {
+      color_active: null,
+      size_active: null,
+      inventory: "...",
+      price: "...",
+      page_active: 1,
       rating_filter_select: 1,
       expand: false,
       order_quantity: 1,
-      rating: 3.6,
-      sold: 1234,
-      inventory: 123,
-      items: [
-        {
-          url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-        },
-        {
-          url: "https://cdn.vuetifyjs.com/images/carousel/sky.jpg",
-        },
-        {
-          url: "https://cdn.vuetifyjs.com/images/carousel/bird.jpg",
-        },
-        {
-          url: "https://cdn.vuetifyjs.com/images/carousel/planet.jpg",
-        },
-      ],
-      variants: [
-        {
-          id: 1,
-          name: "Màu sắc",
-          items: [
-            {
-              id: 1,
-              name: "Đỏ mận",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 2,
-              name: "Đỏ mận",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 3,
-              name: "Đỏ mận",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 4,
-              name: "Đỏ mận",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 5,
-              name: "Đỏ mận",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 6,
-              name: "Đỏ mận",
-              image: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: "Kích thước",
-          items: [
-            {
-              id: 1,
-              name: "Size S",
-            },
-            {
-              id: 2,
-              name: "Size S",
-            },
-            {
-              id: 3,
-              name: "Size S",
-            },
-            {
-              id: 4,
-              name: "Size S",
-            },
-          ],
-        },
-      ],
-      comments: [
-        {
-          id: 1,
-          user: {
-            avatar: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            username: "Trần Hồng",
-          },
-          rating: 5,
-          content:
-            "Giao hàng nhanh, chất vải đẹp. Chất mát, mịn. Lần sau sẽ ủng hộ shop tiếp. Chúc shop buôn may bán đắt.",
-          images: [
-            {
-              id: 1,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 2,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 3,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 4,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-          ],
-        },
-        {
-          id: 2,
-          user: {
-            avatar: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            username: "Trần Hồng",
-          },
-          rating: 5,
-          content:
-            "Giao hàng nhanh, chất vải đẹp. Chất mát, mịn. Lần sau sẽ ủng hộ shop tiếp. Chúc shop buôn may bán đắt.",
-          images: [
-            {
-              id: 1,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 2,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 3,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 4,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-          ],
-        },
-        {
-          id: 3,
-          user: {
-            avatar: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            username: "Trần Hồng",
-          },
-          rating: 5,
-          content:
-            "Giao hàng nhanh, chất vải đẹp. Chất mát, mịn. Lần sau sẽ ủng hộ shop tiếp. Chúc shop buôn may bán đắt.",
-          images: [
-            {
-              id: 1,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 2,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 3,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 4,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-          ],
-        },
-        {
-          id: 4,
-          user: {
-            avatar: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            username: "Trần Hồng",
-          },
-          rating: 5,
-          content:
-            "Giao hàng nhanh, chất vải đẹp. Chất mát, mịn. Lần sau sẽ ủng hộ shop tiếp. Chúc shop buôn may bán đắt.",
-          images: [
-            {
-              id: 1,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 2,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 3,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 4,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-          ],
-        },
-        {
-          id: 5,
-          user: {
-            avatar: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            username: "Trần Hồng",
-          },
-          rating: 5,
-          content:
-            "Giao hàng nhanh, chất vải đẹp. Chất mát, mịn. Lần sau sẽ ủng hộ shop tiếp. Chúc shop buôn may bán đắt.",
-          images: [
-            {
-              id: 1,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 2,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 3,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-          ],
-        },
-        {
-          id: 6,
-          user: {
-            avatar: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            username: "Trần Hồng",
-          },
-          rating: 5,
-          content:
-            "Giao hàng nhanh, chất vải đẹp. Chất mát, mịn. Lần sau sẽ ủng hộ shop tiếp. Chúc shop buôn may bán đắt.",
-          images: [
-            {
-              id: 1,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 2,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 3,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 4,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-          ],
-        },
-        {
-          id: 7,
-          user: {
-            avatar: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            username: "Trần Hồng",
-          },
-          rating: 5,
-          content:
-            "Giao hàng nhanh, chất vải đẹp. Chất mát, mịn. Lần sau sẽ ủng hộ shop tiếp. Chúc shop buôn may bán đắt.",
-          images: [
-            {
-              id: 1,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 2,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 3,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-            {
-              id: 4,
-              url: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-            },
-          ],
-        },
-      ],
-      products_relate: [
-        {
-          id: 1,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 1200,
-        },
-        {
-          id: 2,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 1200,
-        },
-        {
-          id: 3,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          id: 4,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          id: 5,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          id: 6,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          rate: 5,
-        },
-        {
-          id: 7,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          rate: 5,
-        },
-        {
-          id: 8,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          id: 9,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          id: 10,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          id: 11,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-        {
-          id: 12,
-          image:
-            "https://i.pinimg.com/736x/31/27/8a/31278a62a26ffd7d8408b9e41a8c1afc.jpg",
-          name: "Áo phông nữ uzzlang chất siêu đẹp",
-          price: 123000,
-          sold: 200,
-        },
-      ],
+      comments: [],
+      details: null,
+      product_variant_id: null,
     };
   },
-  mounted() {
-    this.setMaxHeight();
-    window.addEventListener("resize", this.setMaxHeight);
+  created() {
+    this.getProductDetails();
   },
+  watch: {
+    $route(to, from) {
+      if (to.params.slug !== from.params.slug) {
+        this.getProductDetails();
+      }
+    },
+  },
+  mounted() {},
   beforeDestroy() {
     window.removeEventListener("resize", this.setMaxHeight);
   },
   methods: {
-    formatNumber(number) {
-      if (number >= 1000) {
-        const suffixes = ["", "k", "M", "B", "T"];
-        const suffixIndex = Math.floor(Math.log10(number) / 3);
-        const formattedNumber = (number / Math.pow(1000, suffixIndex))
-          .toFixed(1)
-          .replace(".", ",");
-        return formattedNumber + suffixes[suffixIndex];
+    async addToCart(buy_now = false) {
+      if (this.details.is_variant && this.product_variant_id === null) {
+        this.showAlert("Cảnh báo", "Vui lòng chọn phân loại hàng", "warning", null);
+        return;
       }
-
-      return number.toString();
+      this.startLoad();
+      try {
+        const response = await axios.post("cart/create", {
+          product_id: this.details.id,
+          product_variant_id: this.product_variant_id,
+          quantity: this.order_quantity,
+        });
+        this.showAlert(
+          response.data.title,
+          response.data.message,
+          "success",
+          buy_now ? "payment" : null
+        );
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "errror",
+          buy_now ? "payment" : null
+        );
+        console.log(error);
+      }
+      this.finishLoad();
+    },
+    async chooseVariant(type, index) {
+      this.startLoad();
+      const slug = this.$route.params.slug;
+      if (type == 0) {
+        this.color_active = index;
+      } else if (type == 1) {
+        this.size_active = index;
+      }
+      let url = `product/variant-quantity/${slug}`;
+      let color =
+        this.color_active !== null ? this.details.colors[this.color_active].name : null;
+      let size =
+        this.size_active !== null ? this.details.sizes[this.size_active].name : null;
+      try {
+        const response = await axios.post(url, {
+          color: color,
+          size: size,
+        });
+        this.inventory = response.data.inventory;
+        this.product_variant_id = response.data?.product_variant_id ?? null;
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
+    async getComments(page) {
+      this.startLoad();
+      const slug = this.$route.params.slug;
+      const response = await axios.get(`product/comments/${slug}?page=${page}`);
+      this.comments = response.data.data;
+      this.finishLoad();
+      this.setMaxHeight();
+    },
+    async getProductDetails() {
+      this.startLoad();
+      const slug = this.$route.params.slug;
+      const response = await axios.get("product/details/" + slug);
+      this.details = response.data.data;
+      this.comments = this.details.comments.comments;
+      this.inventory = this.getLocaleStringNumber(this.details.inventory);
+      this.price = this.getLocaleStringNumber(this.details.price);
+      this.finishLoad();
+      this.setMaxHeight();
     },
     setMaxHeight() {
-      const extendContentHeight = this.$refs.extendContent.offsetHeight;
-      this.$refs.relateProducts.style.maxHeight = extendContentHeight + "px";
+      setTimeout(() => {
+        const extendContentHeight = this.$refs.extendContent.offsetHeight;
+        this.$refs.relateProducts.style.maxHeight = extendContentHeight + "px";
+      }, 1000);
     },
   },
 };
 </script>
 
 <style scoped>
+#product-extend {
+  height: 2097px;
+}
 .container {
   display: flex;
   column-gap: 16px;
+  max-height: 100%;
 }
 #products-relate .product-extend__item-heading {
   margin: 0;
@@ -802,17 +574,23 @@ export default {
   display: flex;
   flex-direction: column;
   row-gap: 22px;
+  width: 1212px;
 }
 #products-relate {
   margin-top: 16px;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   row-gap: 16px;
   padding: 16px;
-  width: 266px;
+  width: 244px;
   background: #ffffff;
   overflow-y: scroll;
   overflow-x: hidden;
+  overflow: -moz-scrollbars-none;
+}
+#products-relate::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
 }
 .__comment__image__last-item {
   width: 100%;
@@ -838,6 +616,11 @@ export default {
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
+}
+.__comment__content {
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .__comment__images {
   display: flex;
@@ -916,6 +699,9 @@ export default {
 .__item__grid__titles {
   color: #6f6f6f;
 }
+#product-extend__evaluate {
+  height: 100%;
+}
 .product-extend__item__grid {
   display: flex;
   column-gap: 28px;
@@ -939,6 +725,10 @@ export default {
   border: 1px solid #0074bd;
   border-radius: 100px;
   color: #0074bd;
+}
+#btn-view-shop:hover {
+  background: #0074bd;
+  color: #ffffff;
 }
 .shop-overall__item__name {
   font-size: 14px;
@@ -978,9 +768,17 @@ export default {
   margin-top: 16px;
   padding: 17px 19px;
 }
+#btn-buy-now:hover {
+  background: #6c0d10;
+  color: #ffffff;
+}
 #btn-buy-now {
   background: #ec1c24;
   color: #ffffff;
+}
+#btn-add-to-cart:hover {
+  background: #ff1a1e;
+  color: #ede4e4;
 }
 #btn-add-to-cart {
   background: #fbd2d3;
@@ -1046,6 +844,13 @@ export default {
   background: #f0f2f5;
   border-radius: 20px;
   cursor: pointer;
+  border: 1px solid #f0f2f5;
+  min-width: 60px;
+  align-items: center;
+  justify-content: center;
+}
+.product__variant__item__active {
+  border: 1px solid #0074bd;
 }
 .heading-text {
   font-weight: 600;
@@ -1082,6 +887,7 @@ export default {
   display: flex;
   flex-direction: column;
   row-gap: 18px;
+  width: 100%;
 }
 .share__social__image {
   width: 24px;

@@ -57,15 +57,6 @@
               >Đăng ký</router-link
             >
           </p>
-          <div class="countries-select">
-            <v-select
-              :items="countries"
-              v-model="country_selected"
-              single-line
-              hide-selected
-              variant="plain"
-            ></v-select>
-          </div>
         </div>
       </div>
     </AccountLayout>
@@ -102,11 +93,10 @@ export default {
   data() {
     return {
       show_password: false,
-      countries: ["Việt Nam", "Mỹ"],
-      country_selected: "Việt Nam",
     };
   },
   created() {
+    this.finishLoad();
     this.setWindowTitle("Login");
   },
   methods: {
@@ -114,7 +104,8 @@ export default {
       axios
         .post("auth/login", values)
         .then((response) => {
-          this.showAlert(response.data.title, response.data.message, "success", "all-products");
+          this.login();
+          this.showAlert(response.data.title, response.data.message, "success", "home");
         })
         .catch((error) => {
           this.showAlert(

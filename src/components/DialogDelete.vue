@@ -1,14 +1,16 @@
 <template>
-  <v-dialog id="dialog" v-model="show" @close="result(false)">
+  <v-dialog id="dialog" v-model="show" @close="emitResultDialog(false)">
     <v-card>
       <v-card-title class="dialog__title">{{ title }}</v-card-title>
       <v-card-text class="dialog__text">{{ text }}</v-card-text>
       <v-card-actions id="dialog__buttons-group">
         <v-card-item>
-          <button id="dialog__button-cancel" block @click="result(false)">Cancel</button>
+          <button id="dialog__button-cancel" block @click="emitResultDialog(false)">
+            Cancel
+          </button>
         </v-card-item>
         <v-card-item>
-          <button id="dialog__button-ok" block @click="result(true)">OK</button>
+          <button id="dialog__button-ok" block @click="emitResultDialog(true)">OK</button>
         </v-card-item>
       </v-card-actions>
     </v-card>
@@ -41,10 +43,10 @@ export default {
     },
   },
   methods: {
-    result(value) {
-      this.$emit("result", value)
-    }
-  }
+    emitResultDialog(value) {
+      this.$emit("emitResultDialog", value);
+    },
+  },
 };
 </script>
 
@@ -58,7 +60,7 @@ export default {
   font-size: 16px;
 }
 .dialog__text {
-  color: #6F6F6F;
+  color: #6f6f6f;
 }
 #dialog__buttons-group {
   justify-content: center;
@@ -66,9 +68,9 @@ export default {
   font-weight: 700;
 }
 #dialog__button-ok {
-  color: #EC1C24;
+  color: #ec1c24;
 }
 #dialog__button-cancel {
-  color: #8F8F8F;
+  color: #8f8f8f;
 }
 </style>

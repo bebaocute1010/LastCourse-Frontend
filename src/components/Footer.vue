@@ -42,7 +42,7 @@
         <div class="footer__row">
           <div class="footer__block">
             <div class="footer__logo">
-              <v-img contain src="src/assets/logo.svg"></v-img>
+              <v-img contain src="/src/assets/logo.svg"></v-img>
             </div>
             <p>
               Sàn thương mại điện tử uy tín, chất lượng. Tất cả các sản phẩm trên M
@@ -51,7 +51,7 @@
             </p>
 
             <div class="footer__verified">
-              <v-img contain src="src/assets/da-xac-minh.svg"></v-img>
+              <v-img contain src="/src/assets/da-xac-minh.svg"></v-img>
             </div>
           </div>
 
@@ -78,13 +78,13 @@
               <h3 class="footer-h3">KẾT NỐI VỚI CHÚNG TÔI</h3>
               <div class="footer-list-icon">
                 <div class="footer-list-icon__item">
-                  <v-img contain src="src/assets/icons/facebook.svg"></v-img>
+                  <v-img contain src="/src/assets/icons/facebook.svg"></v-img>
                 </div>
                 <div class="footer-list-icon__item">
-                  <v-img contain src="src/assets/icons/instagram.svg"></v-img>
+                  <v-img contain src="/src/assets/icons/instagram.svg"></v-img>
                 </div>
                 <div class="footer-list-icon__item">
-                  <v-img contain src="src/assets/icons/zalo.svg"></v-img>
+                  <v-img contain src="/src/assets/icons/zalo.svg"></v-img>
                 </div>
               </div>
             </div>
@@ -92,10 +92,10 @@
               <h3 class="footer-h3">TẢI ỨNG DỤNG M Clothing MOBILE</h3>
               <div class="footer-list-icon">
                 <div class="footer-list-icon__item">
-                  <v-img contain src="src/assets/icons/download-apple-store.svg"></v-img>
+                  <v-img contain src="/src/assets/icons/download-apple-store.svg"></v-img>
                 </div>
                 <div class="footer-list-icon__item">
-                  <v-img contain src="src/assets/icons/download-ch-play.svg"></v-img>
+                  <v-img contain src="/src/assets/icons/download-ch-play.svg"></v-img>
                 </div>
               </div>
             </div>

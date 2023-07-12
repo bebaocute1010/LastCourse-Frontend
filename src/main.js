@@ -4,7 +4,7 @@ import router from "./router";
 import { createStore } from "vuex";
 import storeConfig from "@/store";
 import Vuetify from "@/flugins/vuetify";
-import axios from "@/flugins/axios";
+import { instance } from "@/flugins/axios";
 import { Field, Form } from "vee-validate";
 import TextFieldWithValidation from "@/components/TextFieldWithValidation.vue";
 import Alert from "@/components/Alert.vue";
@@ -16,7 +16,7 @@ import "@/assets/css/main.css";
 const store = createStore(storeConfig);
 const app = createApp(App);
 
-window.axios = axios;
+window.axios = instance;
 
 app.use(router).use(store).use(Vuetify);
 app

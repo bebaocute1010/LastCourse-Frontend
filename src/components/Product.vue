@@ -1,37 +1,19 @@
 <template>
-  <div class="product__container" :style="getStyleObject()">
-    <div class="flash-sale" v-if="flash_sale">
-      <v-progress-linear
-        v-model="flash_sale.current"
-        :max="flash_sale.max"
-        height="14"
-        rounded="100"
-        color="#E60A32"
-        bg-color="#E0E0E0"
-        bg-opacity="1"
-      >
-        <template v-slot:default>
-          <strong class="flash-sale__sold">Đã bán {{ flash_sale.current }}</strong>
-        </template>
-      </v-progress-linear>
-    </div>
-
-    <div class="product__image">
+  <div class="product__container" :style="getStyleObject(width, height)">
+    <div class="product__image" :style="getStyleObject(image_w, image_h)">
       <v-img cover :src="image"></v-img>
     </div>
 
     <div class="product__name">
-      <router-link :to="{ name: 'product-detail' }">
+      <router-link :to="{ name: 'product-detail', params: { slug: slug } }">
         <p>{{ name }}</p>
       </router-link>
     </div>
 
     <div class="product__more-info">
-      <p class="product__price">{{ formattedNumber(price) }}</p>
-      <p class="product__sold" v-if="sold || sold === 0">
-        (Đã bán {{ formattedNumber(sold) }})
-      </p>
-      <div class="product__rate" v-if="rate || rate === 0">
+      <p class="product__price">{{ getLocaleStringNumber(price) }}</p>
+      <p class="product__sold" v-if="!show_rate">(Đã bán {{ getLocaleStringNumber(sold) }})</p>
+      <div class="product__rate" v-else>
         <v-icon color="#FFB800">mdi-star</v-icon>
         <span>({{ rate }})</span>
       </div>
@@ -46,16 +28,17 @@ export default {
     return {};
   },
   props: {
-    flash_sale: {
-      max: {
-        type: Number,
-        required: true,
-      },
-      current: {
-        type: Number,
-        required: true,
-      },
+    image_w: {
+      type: String,
       required: false,
+    },
+    image_h: {
+      type: String,
+      required: false,
+    },
+    slug: {
+      type: String,
+      required: true,
     },
     width: {
       type: String,
@@ -85,21 +68,23 @@ export default {
       type: Number,
       required: false,
     },
+    show_rate: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   methods: {
     detail() {
       this.$router.push({ name: "product-detail" });
     },
-    formattedNumber(num) {
-      return num.toLocaleString("de-DE");
-    },
-    getStyleObject() {
+    getStyleObject(width, height) {
       const objectStyle = {};
       if (this.width) {
-        objectStyle.width = this.width;
+        objectStyle.width = width;
       }
       if (this.height) {
-        objectStyle.height = this.height;
+        objectStyle.height = height;
       }
       return objectStyle;
     },
@@ -140,17 +125,35 @@ export default {
 }
 .product__name {
   font-size: 14px;
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 .product__name:hover > a {
   color: #ec1c24;
 }
+.product__image .v-img {
+  width: 100%;
+  height: 100%;
+}
 .product__image {
+  height: 152px;
+  width: 152px;
   pointer-events: none;
   border-radius: 4px;
   overflow: hidden;
+  border: 1px solid #d4d4d4;
+  transition: transform 0.5s ease;
+}
+.product__container:hover .product__image {
+  transform: scale(1.04);
 }
 .product__container {
   width: 168px;
+  height: 246px;
   padding: 8px;
   border-radius: 8px;
   border: 1px solid #d4d4d4;
@@ -160,6 +163,7 @@ export default {
   row-gap: 6px;
   user-select: none;
   background: #ffffff;
+  overflow: hidden;
 }
 .product__container:hover {
   box-shadow: 0 4px 16px rgba(236, 28, 36, 0.7);

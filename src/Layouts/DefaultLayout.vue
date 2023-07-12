@@ -1,5 +1,6 @@
 <template>
   <v-app style="position: relative">
+    <loading :is_loading="loading"></loading>
     <SystemBar />
     <header><Header @search="search" :search_rs="search_rs" /></header>
 
@@ -29,8 +30,9 @@ import Footer from "../components/Footer.vue";
 import Header from "../components/Header.vue";
 import HomeNavigation from "../components/HomeNavigation.vue";
 import SystemBar from "../components/SystemBar.vue";
+import Loading from "../components/Loading.vue";
 export default {
-  components: { SystemBar, Header, Alert, HomeNavigation, Footer },
+  components: { SystemBar, Header, Alert, HomeNavigation, Footer, Loading },
   name: "DefaultLayout",
   data() {
     return {};
@@ -61,7 +63,7 @@ export default {
 
 <style scoped>
 .main-content {
-  padding: 24px 0 0;
+  padding: 24px 0 24px;
   width: 100vw;
   background: #e5e5e5;
 }

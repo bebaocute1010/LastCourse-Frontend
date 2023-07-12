@@ -4,9 +4,8 @@
       :dialog="dialog.show"
       :title="dialog.title"
       :text="dialog.text"
-      @result="dialogResult"
+      @emitResultDialog="processResultDialogDelete"
     />
-    <Breadcrumbs :items="breadcrumbs" />
     <div id="main-content">
       <div class="content-heading">
         <div>
@@ -30,12 +29,8 @@
 
         <div class="content-heading__buttons">
           <router-link :to="{ name: 'add-product' }">
-            <button id="button-add-product">+ Thêm sản phẩm</button></router-link
-          >
-          <button id="button-filter" v-if="selected.length == 0">
-            <span>Bộ lọc</span>
-            <v-icon>mdi-menu-down</v-icon>
-          </button>
+            <button id="button-add-product">+ Thêm sản phẩm</button>
+          </router-link>
         </div>
       </div>
 
@@ -53,6 +48,7 @@
 
       <div class="content-search-table">
         <v-data-table
+          v-model:page="page"
           :headers="table_headers"
           :items="filterStatus(status_selected)"
           :search="search"
@@ -69,7 +65,7 @@
               <div class="product-info">
                 <span class="product-name">{{ item.selectable.name }}</span>
                 <span class="product-price">
-                  {{ formattedNumber(item.selectable.price) }}
+                  {{ getLocaleStringNumber(item.selectable.price) }}
                 </span>
               </div>
             </div>
@@ -77,22 +73,25 @@
           <template v-slot:[`item.status`]="{ item }">
             <span
               :class="{
-                available: item.selectable.status == 0,
-                unavailable: item.selectable.status == 1,
-                hidden: item.selectable.status == 2,
+                available: item.selectable.status === 'Còn hàng',
+                unavailable: item.selectable.status === 'Hết hàng',
+                hidden: item.selectable.status === 'Đã ẩn',
               }"
-              >{{ getStatusString(item.selectable.status) }}</span
+              >{{ item.selectable.status }}</span
             >
           </template>
-          <template v-slot:[`item.actions`]>
+          <template v-slot:[`item.actions`]="{ item }">
             <div class="actions-group-button">
-              <div class="user-not-select action-button edit-item-button">
+              <div
+                class="user-not-select action-button edit-item-button"
+                @click="editeProduct(item.selectable.id)"
+              >
                 <v-icon>mdi-pencil-box</v-icon>
                 <span>Sửa</span>
               </div>
               <div
                 class="user-not-select action-button delete-item-button"
-                @click="showDialog()"
+                @click="showDialog(item.selectable.id)"
               >
                 <v-icon>mdi-delete</v-icon>
                 <span>Xóa</span>
@@ -100,6 +99,12 @@
             </div>
           </template>
           <template v-slot:bottom>
+            <v-pagination
+              v-if="pageCount > 1"
+              v-model="page"
+              :length="pageCount"
+              :total-visible="5"
+            ></v-pagination>
             <div id="table-footer" v-if="selected.length > 0">
               <div class="table-footer__checkbox-group">
                 <input
@@ -120,6 +125,7 @@
                     class="table-footer__buttons-item"
                     id="footer__button-hidden"
                     v-if="status_selected < 3"
+                    @click="updateProductStatuses(0)"
                   >
                     Ẩn
                   </button>
@@ -127,6 +133,7 @@
                     class="table-footer__buttons-item"
                     id="footer__button-show"
                     v-if="status_selected == 0 || status_selected == 3"
+                    @click="updateProductStatuses(1)"
                   >
                     Hiển thị
                   </button>
@@ -142,14 +149,14 @@
 
 <script>
 import UserLayout from "@/Layouts/UserLayout.vue";
-import Breadcrumbs from "@/components/Breadcrumbs.vue";
 import DialogDelete from "../../../components/DialogDelete.vue";
 
 export default {
   name: "AllProduct",
-  components: { UserLayout, Breadcrumbs, DialogDelete },
+  components: { UserLayout, DialogDelete },
   data() {
     return {
+      page: 1,
       selected_all: false,
       dialog: {
         show: false,
@@ -158,30 +165,18 @@ export default {
       },
       id_item_editting: null,
       search: "",
-      breadcrumbs: [
-        {
-          title: "Quản lý sản phẩm",
-        },
-        {
-          title: "Tất cả sản phẩm",
-        },
-      ],
       heading_items: [
         {
           title: "Tất cả",
-          quantity: 100,
         },
         {
           title: "Còn hàng",
-          quantity: 90,
         },
         {
           title: "Hết hàng",
-          quantity: 80,
         },
         {
           title: "Đã ẩn",
-          quantity: 70,
         },
       ],
       status_selected: 0,
@@ -213,7 +208,7 @@ export default {
         },
         {
           title: "Còn lại",
-          key: "remaining",
+          key: "inventory",
           align: "center",
         },
         {
@@ -223,99 +218,14 @@ export default {
           align: "center",
         },
       ],
-      table_rows: [
-        {
-          id: 1,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 0,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 2,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 0,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 3,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 2,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 4,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 2,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 5,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-        {
-          id: 6,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-
-        {
-          id: 7,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-
-        {
-          id: 8,
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          image:
-            "https://i0.wp.com/thatnhucuocsong.com.vn/wp-content/uploads/2023/02/Hinh-anh-avatar-cute.jpg?ssl=1",
-          status: 1,
-          warehouse: "Hà nội",
-          sold: 30,
-          remaining: 10,
-        },
-      ],
+      table_rows: [],
+      product_edited_id: null,
     };
+  },
+  computed: {
+    pageCount() {
+      return Math.ceil(this.filterStatus(this.status_selected).length / 10);
+    },
   },
   watch: {
     selected() {
@@ -325,7 +235,48 @@ export default {
       this.selected_all = this.isSelectedAll();
     },
   },
+  created() {
+    this.getProducts();
+  },
   methods: {
+    editeProduct(id) {
+      this.$router.push({ name: "edit-product", params: { id: id } });
+    },
+    async updateProductStatuses(type = null) {
+      let url = null;
+      if (type === 0) {
+        url = "product/hidden";
+      } else if (type === 1) {
+        url = "product/show";
+      }
+      if (!url) {
+        return;
+      }
+      this.startLoad();
+      try {
+        const response = await axios.post(url, {
+          ids: this.selected,
+        });
+        this.getProducts();
+        this.showAlert(response.data.title, response.data.message, "success", null);
+      } catch (error) {
+        console.log(error);
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          null
+        );
+      }
+      this.finishLoad();
+    },
+    async showProducts() {},
+    async getProducts() {
+      this.startLoad();
+      const response = await axios.get("shop/products");
+      this.table_rows = response.data.data;
+      this.finishLoad();
+    },
     isSelectedAll() {
       return this.selected.length == this.filterStatus(this.status_selected).length;
     },
@@ -333,26 +284,46 @@ export default {
       this.dialog.show = false;
       this.dialog.title = this.dialog.text = "";
     },
-    showDialog() {
+    showDialog(product_id) {
+      this.product_edited_id = product_id;
       this.dialog.title = "Xóa sản phẩm";
       this.dialog.text = "Sau khi xóa sản phẩm bạn sẽ không thể hoàn tác";
       this.dialog.show = true;
     },
-    dialogResult(value) {
+    async processResultDialogDelete(value) {
+      if (value) {
+        this.startLoad();
+        try {
+          const response = await axios.delete(
+            `product/delete?id=${this.product_edited_id}`
+          );
+          this.getProducts();
+          this.showAlert(response.data.title, response.data.message, "success", null);
+        } catch (error) {
+          console.log(error);
+          this.showAlert(
+            error.response.data.title,
+            error.response.data.message,
+            "error",
+            null
+          );
+        }
+        this.finishLoad();
+      }
       this.hideDialog();
     },
-    formattedNumber(num) {
+    getLocaleStringNumber(num) {
       return num.toLocaleString("de-DE");
     },
-    getStatusString(status) {
-      return status === 0 ? "Còn hàng" : status === 1 ? "Hết hàng" : "Đã ẩn";
+    getStatusCode(status) {
+      return status === "Còn hàng" ? 0 : status === "Hết hàng" ? 1 : 2;
     },
     filterStatus(status) {
       if (status == 0) {
         return this.table_rows;
       }
       return this.table_rows.filter((item) => {
-        return item.status == status - 1;
+        return this.getStatusCode(item.status) == status - 1;
       });
     },
     footerSelectAll() {
@@ -377,6 +348,7 @@ export default {
   width: 100%;
   background-color: #ffffff;
   border-radius: 8px;
+  margin: 40px 0;
 }
 .content-heading {
   display: flex;
@@ -462,9 +434,18 @@ export default {
   height: 48px;
 }
 .product-image img {
-  width: 100%;
-  height: 100%;
+  width: 48px;
+  height: 48px;
   object-fit: cover;
+}
+.product-name {
+  font-size: 14px;
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 .product-info {
   display: flex;
