@@ -30,13 +30,13 @@
 
           <template v-slot:[`item.price`]="{ item }">
             <span class="product-price">{{
-              formattedNumber(item.selectable.price)
+              getLocaleStringNumber(item.selectable.price)
             }}</span>
           </template>
 
           <template v-slot:[`item.into_money`]="{ item }">
             <span class="product-price product-into-money">{{
-              formattedNumber(item.selectable.price * item.selectable.quantity)
+              getLocaleStringNumber(item.selectable.price * item.selectable.quantity)
             }}</span>
           </template>
 
@@ -80,7 +80,7 @@
             <div id="table-footer" v-if="selected.length > 0">
               <div class="table-footer__buttons-group">
                 <span>Tổng tiền</span>
-                <span class="sum-money">đ {{ formattedNumber(sumMoney()) }}</span>
+                <span class="sum-money">đ {{ getLocaleStringNumber(sumMoney()) }}</span>
                 <router-link
                   class="table-footer__buttons-item"
                   id="footer__button-show"
@@ -229,7 +229,7 @@ export default {
       });
       return sum;
     },
-    formattedNumber(num) {
+    getLocaleStringNumber(num) {
       return num.toLocaleString("de-DE");
     },
   },

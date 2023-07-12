@@ -11,8 +11,8 @@
     </div>
 
     <div class="product__more-info">
-      <p class="product__price">{{ formattedNumber(price) }}</p>
-      <p class="product__sold" v-if="!show_rate">(Đã bán {{ formattedNumber(sold) }})</p>
+      <p class="product__price">{{ getLocaleStringNumber(price) }}</p>
+      <p class="product__sold" v-if="!show_rate">(Đã bán {{ getLocaleStringNumber(sold) }})</p>
       <div class="product__rate" v-else>
         <v-icon color="#FFB800">mdi-star</v-icon>
         <span>({{ rate }})</span>

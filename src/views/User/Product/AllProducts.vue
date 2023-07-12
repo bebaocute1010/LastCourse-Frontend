@@ -65,7 +65,7 @@
               <div class="product-info">
                 <span class="product-name">{{ item.selectable.name }}</span>
                 <span class="product-price">
-                  {{ formattedNumber(item.selectable.price) }}
+                  {{ getLocaleStringNumber(item.selectable.price) }}
                 </span>
               </div>
             </div>
@@ -312,7 +312,7 @@ export default {
       }
       this.hideDialog();
     },
-    formattedNumber(num) {
+    getLocaleStringNumber(num) {
       return num.toLocaleString("de-DE");
     },
     getStatusCode(status) {

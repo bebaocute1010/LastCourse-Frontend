@@ -6,17 +6,17 @@ export default {
     ...mapGetters(["alert", "user", "loading"]),
   },
   methods: {
-    formattedNumber(num) {
+    getLocaleStringNumber(num) {
       return num.toLocaleString("de-DE");
     },
-    formatNumber2(number) {
+    prefixSymbolsNumber(number) {
       if (number >= 1000) {
         const suffixes = ["", "k", "M", "B", "T"];
-        const suffixIndex = Math.floor(Math.log10(number) / 3);
-        const formattedNumber = (number / Math.pow(1000, suffixIndex))
+        const suffix_index = Math.floor(Math.log10(number) / 3);
+        const formatted_number = (number / Math.pow(1000, suffix_index))
           .toFixed(1)
           .replace(".", ",");
-        return formattedNumber + suffixes[suffixIndex];
+        return formatted_number + suffixes[suffix_index];
       }
 
       return number;

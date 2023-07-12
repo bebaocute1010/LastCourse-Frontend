@@ -56,7 +56,7 @@
             ></v-rating>
             <p>{{ details.rating }}/5</p>
             <p class="product__evaluate__sold">
-              Đã bán {{ formatNumber2(details?.sold) }}
+              Đã bán {{ prefixSymbolsNumber(details?.sold) }}
             </p>
           </div>
 
@@ -180,7 +180,7 @@
 
               <div class="shop-overall__item">
                 <p class="shop-overall__item__quantiy">
-                  {{ formatNumber2(details?.shop.followers) }}
+                  {{ prefixSymbolsNumber(details?.shop.followers) }}
                 </p>
                 <p class="shop-overall__item__name">Follow</p>
               </div>
@@ -260,7 +260,7 @@
                     >
                       <p>Tất cả</p>
                       <p class="____quantity">
-                        ({{ formatNumber2(details?.rating_count.all) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count.all) }})
                       </p>
                     </div>
 
@@ -280,7 +280,7 @@
                         model-value="5"
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ formatNumber2(details?.rating_count.star_5) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_5) }})
                       </p>
                     </div>
 
@@ -300,7 +300,7 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ formatNumber2(details?.rating_count.star_4) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_4) }})
                       </p>
                     </div>
 
@@ -320,7 +320,7 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ formatNumber2(details?.rating_count.star_3) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_3) }})
                       </p>
                     </div>
 
@@ -340,7 +340,7 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ formatNumber2(details?.rating_count.star_2) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_2) }})
                       </p>
                     </div>
 
@@ -360,7 +360,7 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ formatNumber2(details?.rating_count.star_1) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count.star_1) }})
                       </p>
                     </div>
                   </div>
@@ -542,8 +542,8 @@ export default {
       const response = await axios.get("product/details/" + slug);
       this.details = response.data.data;
       this.comments = this.details.comments.comments;
-      this.inventory = this.formattedNumber(this.details.inventory);
-      this.price = this.formattedNumber(this.details.price);
+      this.inventory = this.getLocaleStringNumber(this.details.inventory);
+      this.price = this.getLocaleStringNumber(this.details.price);
       this.finishLoad();
       this.setMaxHeight();
     },

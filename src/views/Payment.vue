@@ -84,12 +84,12 @@
             </div>
             <div>
               <p class="shop__item-product__price">
-                đ {{ formattedNumber(product.price) }}
+                đ {{ getLocaleStringNumber(product.price) }}
               </p>
               <p class="shop__item-product__quantity">x{{ product.quantity }}</p>
             </div>
             <p class="shop__item-product__into-money">
-              đ {{ formattedNumber(product.quantity * product.price) }}
+              đ {{ getLocaleStringNumber(product.quantity * product.price) }}
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@
               <p class="heading-text">Chi phí vận chuyển</p>
               <p>
                 {{ shop.shipping_carrier }}
-                <span>đ {{ formattedNumber(shop.shipping_fee) }}</span>
+                <span>đ {{ getLocaleStringNumber(shop.shipping_fee) }}</span>
               </p>
               <p>(Nhận hàng {{ shop.delivery_time }})</p>
             </div>
@@ -161,9 +161,9 @@
             </div>
 
             <div class="fees-sum">
-              <p>đ {{ formattedNumber(subTotal()) }}</p>
-              <p>đ {{ formattedNumber(totalShipping()) }}</p>
-              <p>đ {{ formattedNumber(subTotal() + totalShipping()) }}</p>
+              <p>đ {{ getLocaleStringNumber(subTotal()) }}</p>
+              <p>đ {{ getLocaleStringNumber(totalShipping()) }}</p>
+              <p>đ {{ getLocaleStringNumber(subTotal() + totalShipping()) }}</p>
             </div>
           </div>
 
@@ -271,7 +271,7 @@ export default {
       });
       return sum;
     },
-    formattedNumber(num) {
+    getLocaleStringNumber(num) {
       return num.toLocaleString("de-DE");
     },
   },

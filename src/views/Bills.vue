@@ -97,7 +97,7 @@
 
               <template v-slot:[`item.price`]="{ item }">
                 <p class="product-price">
-                  {{ this.formattedNumber(item.selectable.price) }}
+                  {{ this.getLocaleStringNumber(item.selectable.price) }}
                 </p>
               </template>
 
