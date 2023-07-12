@@ -3,6 +3,8 @@ import Home from "@/views/Home.vue";
 import Login from "@/views/Login.vue";
 import Register from "@/views/Resigter/Register.vue";
 import VerifyOTP from "@/views/Resigter/VerifyOTP.vue";
+import ForgotPassword from "@/views/Resigter/ForgotPassword.vue";
+import ResetPassword from "@/views/Resigter/ResetPassword.vue";
 import RegisterInformation from "@/views/Resigter/RegisterInformation.vue";
 import AddProduct from "@/views/User/Product/AddProduct.vue";
 import AllProducts from "@/views/User/Product/AllProducts.vue";
@@ -61,6 +63,16 @@ const router = createRouter({
       path: "/dang-ky",
       name: "register",
       component: Register,
+    },
+    {
+      path: "/quen-mat-khau",
+      name: "forgot-password",
+      component: ForgotPassword,
+    },
+    {
+      path: "/dat-lai-mat-khau",
+      name: "reset-password",
+      component: ResetPassword,
     },
     {
       path: "/xac-thuc",

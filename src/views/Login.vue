@@ -117,11 +117,7 @@ export default {
         });
     },
     forgotPasswordShow() {
-      this.showAlert(
-        "Bạn quên mật khẩu rồi à ?",
-        "Quên thì tạo account mới đi nhé =))",
-        "success"
-      );
+      this.$router.push({ name: "forgot-password" });
     },
   },
 };

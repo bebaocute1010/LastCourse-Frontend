@@ -33,4 +33,7 @@ export default {
   setCartProductsSelected(state, selected) {
     state.cart_products_selected = selected;
   },
+  setRouteVerified(state, route_name) {
+    state.route_verified = route_name;
+  },
 };

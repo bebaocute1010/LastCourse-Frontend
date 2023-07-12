@@ -4,20 +4,13 @@
     <AccountLayout class="hide-logo">
       <div class="form-content">
         <div class="form-heading">
-          <p class="form-heading-title">Hoàn tất đăng ký</p>
+          <p class="form-heading-title">Đặt lại mật khẩu</p>
         </div>
         <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
           <TextFieldWithValidation
             class="my-input"
-            name="username"
-            label="Tên đăng nhập"
-            variant="outlined"
-            color="red"
-          />
-          <TextFieldWithValidation
-            class="my-input"
             name="password"
-            label="Mật khẩu"
+            label="Mật khẩu mới"
             :type="show_password ? 'text' : 'password'"
             :append-inner-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append-inner="show_password = !show_password"
@@ -27,47 +20,13 @@
           <TextFieldWithValidation
             class="my-input"
             name="password_confirmation"
-            label="Nhập lại mật khẩu"
+            label="Xác nhận mật khẩu mới"
             :type="show_password_2 ? 'text' : 'password'"
             :append-inner-icon="show_password_2 ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append-inner="show_password_2 = !show_password_2"
             variant="outlined"
             color="red"
           />
-          <TextFieldWithValidation
-            class="my-input"
-            name="introduced_code"
-            label="Mã giới thiệu"
-            variant="outlined"
-            color="red"
-          />
-          <TextFieldWithValidation
-            class="my-input"
-            name="fullname"
-            label="Họ và tên"
-            variant="outlined"
-            color="red"
-          />
-          <TextFieldWithValidation
-            class="my-input"
-            name="birthday"
-            label="Ngày sinh"
-            type="date"
-            variant="outlined"
-            color="red"
-          />
-          <Field name="gender" type="combobox" v-slot="{ value, handleChange, errors }">
-            <v-combobox
-              :model-value="value"
-              @update:modelValue="handleChange"
-              :error-messages="errors"
-              class="my-input"
-              label="Giới tính"
-              variant="outlined"
-              color="red"
-              :items="['Nam', 'Nữ', 'Khác']"
-            />
-          </Field>
           <v-btn type="submit" class="base-button button-finish">Xong</v-btn>
         </Form>
       </div>
@@ -96,13 +55,6 @@ export default {
   setup() {
     const password = ref("");
     const schema = {
-      username: (value) => {
-        if (!value) return "Vui lòng điền tên đăng nhập.";
-        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value))
-          return "Tên đăng nhập không hợp lệ.";
-        if (value?.length < 8) return "Tên đăng nhập phải nhiều hơn 8 ký tự.";
-        return true;
-      },
       password: (value) => {
         if (value?.length > 8) {
           password.value = value;
@@ -116,37 +68,20 @@ export default {
         }
         return true;
       },
-      introduced_code: (value) => {
-        return true;
-      },
-      fullname: (value) => {
-        if (!value) {
-          return "Vui lòng nhập họ và tên.";
-        }
-        return true;
-      },
-      gender: (value) => {
-        if (!value) {
-          return "Vui lòng chọn giới tính.";
-        }
-        return true;
-      },
     };
     return { schema };
   },
   created() {
-    this.setWindowTitle("Fill Information");
+    this.setWindowTitle("Đặt lại mật khẩu");
     if (!this.email_register) {
-      router.push({ name: "register" });
+      //   router.push({ name: "forgot-password" });
     }
   },
   methods: {
     onSubmit(values) {
       values.email = this.email_register;
-      values.gender = values.gender == "Nam" ? 0 : values.gender == "Nữ" ? 1 : -1;
-      console.log(values.gender);
       axios
-        .post("auth/register-information", values)
+        .post("auth/reset-password", values)
         .then((response) => {
           this.showAlert(response.data.title, response.data.message, "success", "login");
         })

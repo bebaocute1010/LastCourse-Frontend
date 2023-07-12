@@ -74,7 +74,7 @@ export default {
       }
       return true;
     },
-    ...mapGetters(["email_register"]),
+    ...mapGetters(["email_register", "route_verified"]),
   },
   created() {
     this.setWindowTitle("Verify OTP");
@@ -99,7 +99,7 @@ export default {
             response.data.title,
             response.data.message,
             "success",
-            "register-information"
+            this.route_verified
           );
         })
         .catch((error) => {
@@ -166,9 +166,6 @@ export default {
 </script>
 
 <style scoped>
-.form-content {
-}
-
 .otp-container:focus-within .otp-input {
   border: 1px solid #ec1c24;
   outline: none;
