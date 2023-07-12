@@ -32,9 +32,13 @@
             </div>
           </div>
 
-          <div class="shop-profile__actions">
-            <button class="button-follow">
+          <div class="shop-profile__actions" v-if="shop">
+            <button v-if="!shop?.is_followed" class="button-follow" @click="followShop">
               <v-icon>mdi-account-plus-outline</v-icon>Theo dõi
+            </button>
+
+            <button v-else class="button-unfollow" @click="unFollowShop">
+              <v-icon>mdi-account-minus-outline</v-icon>Bỏ theo dõi
             </button>
           </div>
         </div>
@@ -81,6 +85,26 @@ export default {
     this.getShop();
   },
   methods: {
+    async unFollowShop() {
+      this.startLoad();
+      try {
+        const response = await axios.get(`shop/unfollow/${this.shop.id}`);
+        this.getShop();
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
+    async followShop() {
+      this.startLoad();
+      try {
+        const response = await axios.get(`shop/follow/${this.shop.id}`);
+        this.getShop();
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
     async getShop() {
       this.startLoad();
       const response = await axios.get("get/shop/" + this.$route.params.id);
@@ -92,10 +116,29 @@ export default {
 </script>
 
 <style scoped>
+.button-unfollow:hover {
+  background: #620000;
+}
+.button-unfollow {
+  background: #ec0202;
+  color: #ffffff;
+}
+.button-follow:hover {
+  background: #6a6a6a;
+  color: #ffffff;
+}
 .button-follow {
-  background: #f1f1f1;
+  background: #c1c1c1;
+}
+.shop-profile__actions button {
   padding: 14px 22px;
   border-radius: 8px;
+  width: 168px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 8px;
 }
 .__item__quantity {
   font-weight: 600;

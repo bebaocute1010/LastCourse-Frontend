@@ -37,7 +37,11 @@
           </template>
 
           <v-list class="notifications-list" max-height="440">
-            <div class="notify-item">
+            <v-list-item v-if="!notifications?.length">
+              <v-list-item-title>Bạn không có thông báo nào.</v-list-item-title>
+            </v-list-item>
+
+            <div v-else class="notify-item">
               <v-list-item v-for="notify in notifications" :key="notify.id">
                 <v-list-item-title
                   :class="{ 'notify-item__unread': notify.read_at == null }"
@@ -94,6 +98,9 @@ export default {
   },
   methods: {
     markReadAll() {
+      if (!this.notifications.length) {
+        return;
+      }
       axios
         .put("get/notifications/mark-read-all")
         .then((response) => {
