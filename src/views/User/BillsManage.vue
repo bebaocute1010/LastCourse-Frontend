@@ -1,21 +1,48 @@
 <template>
   <user-layout>
-    <v-dialog v-model="dialog_detail" max-width="600">
+    <v-dialog v-model="dialog_detail" max-width="1200">
       <v-card class="dialog_detail">
         <v-card-title class="dialog_heading">
-          <p>Chi tiết sản phẩm</p>
-          <v-icon @click="dialog_detail = false">mdi-close</v-icon>
+          <p>Thông tin sản phẩm</p>
+          <v-icon @click="closeDialogBillDetail()">mdi-close</v-icon>
         </v-card-title>
         <v-card-text>
           <v-data-table
+            items-per-page="5"
+            v-model:page="dialog_detail_page"
             :headers="dialog_detail_header"
             :items="dialog_detail_data"
-            :items-per-page="5"
-          ></v-data-table>
+            height="460"
+          >
+            <template v-slot:[`item.name`]="{ item }">
+              <div class="product">
+                <div class="product-image">
+                  <v-img cover :src="item.selectable.image"></v-img>
+                </div>
+                <p class="product-name">{{ item.selectable.name }}</p>
+              </div>
+            </template>
+
+            <template v-slot:[`item.price`]="{ item }">
+              <p class="product-price">
+                {{ this.getLocaleStringNumber(item.selectable.price) }}
+              </p>
+            </template>
+
+            <template v-slot:bottom>
+              <v-pagination
+                class="pagination-bar"
+                v-if="dialogDetailPageCount > 1"
+                v-model="dialog_detail_page"
+                :length="dialogDetailPageCount"
+                :total-visible="5"
+              ></v-pagination>
+            </template>
+          </v-data-table>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="dialog_detail = false"> Đóng </v-btn>
+          <v-btn @click="closeDialogBillDetail()"> Đóng </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -201,35 +228,30 @@ export default {
     return {
       page: 1,
       dialog_delete: false,
-      dialog_detail_data: [
-        {
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          quantity: 3,
-        },
-        {
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          quantity: 3,
-        },
-        {
-          name: "Áo phông nữ siêu sale mua 2 giảm 5k",
-          price: 100000,
-          quantity: 3,
-        },
-      ],
+      dialog_detail_data: [],
+      dialog_detail_page: 1,
       dialog_detail_header: [
         {
           title: "Tên sản phẩm",
           key: "name",
+          sortable: false,
         },
         {
           title: "Đơn giá",
           key: "price",
+          sortable: false,
+        },
+        {
+          title: "Phân loại",
+          key: "variant",
+          sortable: false,
+          align: "center",
         },
         {
           title: "Số lượng",
           key: "quantity",
+          sortable: false,
+          align: "center",
         },
       ],
       dialog_detail: false,
@@ -302,11 +324,15 @@ export default {
       cur_dialog_action: null,
       action_multiple: false,
       item_edited: null,
+      cur_bill_id: null,
     };
   },
   computed: {
     pageCount() {
       return Math.ceil(this.filterStatus(this.status_selected).length / 10);
+    },
+    dialogDetailPageCount() {
+      return Math.ceil(this.dialog_detail_data.length / 5);
     },
   },
   created() {
@@ -314,6 +340,21 @@ export default {
     this.getBills();
   },
   methods: {
+    closeDialogBillDetail() {
+      this.dialog_detail = false;
+      this.cur_bill_id = null;
+      this.dialog_detail_data = [];
+    },
+    async getBillDetails(bill_id) {
+      this.startLoad();
+      try {
+        const response = await axios.get(`bill/details?id=${bill_id}`);
+        this.dialog_detail_data = response.data.data;
+      } catch (error) {
+        console.log(error);
+      }
+      this.finishLoad();
+    },
     async getBills() {
       this.startLoad();
       try {
@@ -427,7 +468,9 @@ export default {
 
       return `${formattedTime} ${formattedDate}`;
     },
-    viewDetail(idBill) {
+    viewDetail(bill_id) {
+      this.getBillDetails(bill_id);
+      this.cur_bill_id = bill_id;
       this.dialog_detail = true;
     },
     filterStatus(status) {
@@ -469,6 +512,16 @@ export default {
 </script>
 
 <style scoped>
+.product-name {
+  width: 300px;
+  font-size: 14px;
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
 .pagination-bar {
   padding-bottom: 20px;
 }
@@ -596,7 +649,9 @@ export default {
 
 .product {
   display: flex;
-  padding: 15px 0;
+  column-gap: 16px;
+  padding: 16px 0;
+  align-items: center;
 }
 .product-image {
   width: 48px;
