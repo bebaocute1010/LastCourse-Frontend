@@ -638,11 +638,17 @@ export default {
         this.selected_cat_lv1 = this.product.cat_lv1_id;
         this.selected_cat_lv2 = this.product.cat_lv2_id;
         this.getCategoriesLv2(this.selected_cat_lv1);
-        if (this.product.variant_names[0].length > 0) {
+        if (
+          this.product.variant_names[0].length > 0 &&
+          this.product.variant_names[0][0] != null
+        ) {
           this.group_variant_previous_selected[0] = this.group_variant_selected[0] = 0;
           this.variant_groups_count = 1;
         }
-        if (this.product.variant_names[1].length > 0) {
+        if (
+          this.product.variant_names[1].length > 0 &&
+          this.product.variant_names[1][0] != null
+        ) {
           this.variant_groups_count = 2;
           this.group_variant_previous_selected[1] = this.group_variant_selected[1] = 1;
         }
@@ -785,14 +791,14 @@ export default {
           this.product.variant_images[index],
           this.product.variant_images[1 - index]
         );
-        this.swapArray(
-          this.product.variants_item_price[index],
-          this.product.variants_item_price[1 - index]
-        );
-        this.swapArray(
-          this.product.variants_item_quantity[index],
-          this.product.variants_item_quantity[1 - index]
-        );
+        // this.swapArray(
+        //   this.product.variants_item_price[index],
+        //   this.product.variants_item_price[1 - index]
+        // );
+        // this.swapArray(
+        //   this.product.variants_item_quantity[index],
+        //   this.product.variants_item_quantity[1 - index]
+        // );
       }
       this.group_variant_previous_selected[index] = this.group_variant_selected[index];
     },
@@ -856,7 +862,9 @@ export default {
         this.showAlert("Thất bại", "Đã đạt giới hạn", "error", null);
         return;
       }
-      this.product.variant_images.push([null]);
+      if (this.product.variant_images.length < 2) {
+        this.product.variant_images.push([null]);
+      }
       this.variant_groups_count += 1;
     },
     addGroupItem(i) {

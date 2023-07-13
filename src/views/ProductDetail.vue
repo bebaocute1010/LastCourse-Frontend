@@ -76,10 +76,17 @@
 
           <div
             id="product__variants"
-            v-if="details && (details?.sizes.length > 0 || details?.colors.length > 0)"
+            v-if="
+              details &&
+              ((details?.sizes.length > 0 && details.sizes[0].name != null) ||
+                (details?.colors.length > 0 && details.colors[0].name != null))
+            "
           >
             <p class="product__variant__heading">Phân loại</p>
-            <div class="product__variants__list" v-if="details?.colors.length">
+            <div
+              class="product__variants__list"
+              v-if="details?.colors.length && details.colors[0].name != null"
+            >
               <p class="product__variants__list__name heading-text">Màu sắc</p>
               <div class="product__variants__list__items">
                 <div
@@ -99,7 +106,10 @@
               </div>
             </div>
 
-            <div class="product__variants__list" v-if="details?.sizes.length">
+            <div
+              class="product__variants__list"
+              v-if="details?.sizes.length && details.sizes[0].name != null"
+            >
               <p class="product__variants__list__name heading-text">Kích thước</p>
               <div class="product__variants__list__items">
                 <div
