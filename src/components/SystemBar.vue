@@ -5,7 +5,7 @@
         class="dialog"
         v-model="dialog_show"
         persistent
-        width="600"
+        width="1200"
         v-if="dialog || dialog_show"
       >
         <v-card>
@@ -17,107 +17,125 @@
           </v-card-title>
           <v-card-text>
             <v-row>
-              <div class="user__avatar">
-                <v-avatar size="120">
-                  <v-img
-                    v-if="form_shop?.avatar"
-                    cover
-                    :src="urlImage(form_shop?.avatar) ?? form_shop.avatar"
-                  ></v-img>
+              <v-col cols="6">
+                <v-row>
+                  <div class="user__avatar">
+                    <v-avatar size="120">
+                      <v-img
+                        v-if="form_shop?.avatar"
+                        cover
+                        :src="urlImage(form_shop?.avatar) ?? form_shop.avatar"
+                      ></v-img>
 
-                  <div
-                    class="user__avatar__overlay"
-                    @click="$refs.btnChooseAvatar.click()"
-                  >
-                    <input
-                      type="file"
-                      ref="btnChooseAvatar"
-                      @change="chooseAvatar"
-                      accept="image/*"
-                      style="display: none"
-                    />
-                    <div class="choose-image__title">
-                      <v-icon>mdi-camera</v-icon>
-                      <p v-if="!form_shop.avatar">Chọn avatar</p>
-                    </div>
+                      <div
+                        class="user__avatar__overlay"
+                        @click="$refs.btnChooseAvatar.click()"
+                      >
+                        <input
+                          type="file"
+                          ref="btnChooseAvatar"
+                          @change="chooseAvatar"
+                          accept="image/*"
+                          style="display: none"
+                        />
+                        <div class="choose-image__title">
+                          <v-icon>mdi-camera</v-icon>
+                          <p v-if="!form_shop.avatar">Chọn avatar</p>
+                        </div>
+                      </div>
+                    </v-avatar>
                   </div>
-                </v-avatar>
-              </div>
-              <v-col cols="9">
-                <div class="user__banner">
-                  <v-img
-                    v-if="form_shop?.banner"
-                    cover
-                    :src="urlImage(form_shop?.banner) ?? form_shop.banner"
-                  ></v-img>
-                  <div
-                    class="user__avatar__overlay"
-                    @click="$refs.btnChooseBanner.click()"
-                  >
-                    <input
-                      type="file"
-                      ref="btnChooseBanner"
-                      @change="chooseBanner"
-                      accept="image/*"
-                      style="display: none"
-                    />
-                    <div class="choose-image__title">
-                      <v-icon>mdi-camera</v-icon>
-                      <p v-if="!form_shop.banner">Chọn ảnh bìa</p>
+                  <v-col cols="9">
+                    <div class="user__banner">
+                      <v-img
+                        v-if="form_shop?.banner"
+                        cover
+                        :src="urlImage(form_shop?.banner) ?? form_shop.banner"
+                      ></v-img>
+                      <div
+                        class="user__avatar__overlay"
+                        @click="$refs.btnChooseBanner.click()"
+                      >
+                        <input
+                          type="file"
+                          ref="btnChooseBanner"
+                          @change="chooseBanner"
+                          accept="image/*"
+                          style="display: none"
+                        />
+                        <div class="choose-image__title">
+                          <v-icon>mdi-camera</v-icon>
+                          <p v-if="!form_shop.banner">Chọn ảnh bìa</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  variant="outlined"
-                  hide-details="true"
-                  label="Tên shop"
-                  v-model="form_shop.name"
-                ></v-text-field>
-              </v-col>
+                  </v-col>
+                </v-row>
+                <v-row id="form-shop">
+                  <v-col cols="12">
+                    <v-text-field
+                      variant="outlined"
+                      label="Tên shop"
+                      v-model="form_shop.name"
+                    ></v-text-field>
+                  </v-col>
 
-              <v-col cols="12">
-                <v-text-field
-                  variant="outlined"
-                  hide-details="true"
-                  type="text"
-                  label="Tỉnh/Thành phố"
-                  v-model="form_shop.locate"
-                ></v-text-field>
-              </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      variant="outlined"
+                      type="text"
+                      label="Tỉnh/Thành phố"
+                      v-model="form_shop.locate"
+                    ></v-text-field>
+                  </v-col>
 
-              <v-col cols="12">
-                <v-text-field
-                  variant="outlined"
-                  hide-details="true"
-                  type="text"
-                  label="Email"
-                  v-model="form_shop.email"
-                ></v-text-field>
+                  <v-col cols="12">
+                    <v-text-field
+                      variant="outlined"
+                      type="text"
+                      label="Email"
+                      v-model="form_shop.email"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
               </v-col>
 
               <v-col cols="6">
-                <v-select
-                  :items="carriers"
-                  item-title="name"
-                  item-value="id"
-                  variant="outlined"
-                  hide-details="true"
-                  label="Đơn vị vận chuyển"
-                  v-model="form_shop.carrier_id"
-                ></v-select>
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  variant="outlined"
-                  hide-details="true"
-                  label="Giá vận chuyển"
-                  readonly
-                  v-model="priceCarrier"
-                ></v-text-field>
+                <p class="form__heading">Thông tin kho hàng</p>
+                <v-row>
+                  <v-col cols="12">
+                    <v-text-field
+                      variant="outlined"
+                      label="Tên kho hàng"
+                      v-model="form_shop.warehouse.name"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      variant="outlined"
+                      label="Địa chỉ"
+                      v-model="form_shop.warehouse.address"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-select
+                      :items="carriers"
+                      item-title="name"
+                      item-value="id"
+                      variant="outlined"
+                      label="Đơn vị vận chuyển"
+                      v-model="form_shop.carrier_id"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      variant="outlined"
+                      label="Giá vận chuyển"
+                      readonly
+                      v-model="priceCarrier"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
               </v-col>
             </v-row>
           </v-card-text>
@@ -181,18 +199,19 @@ export default {
         avatar: null,
         banner: null,
         locate: null,
+        warehouse: {
+          name: null,
+          address: null,
+        },
       },
       carriers: [],
     };
   },
   watch: {
-    dialog() {
-      if (this.dialog !== null) {
-        this.dialog_show = this.dialog;
-      }
+    async dialog() {
       if (this.dialog) {
         this.getCarriers();
-        axios
+        await axios
           .get("shop/infor")
           .then((response) => {
             this.form_shop = response.data.data;
@@ -200,6 +219,9 @@ export default {
           .catch((error) => {
             console.log(error);
           });
+      }
+      if (this.dialog !== null) {
+        this.dialog_show = this.dialog;
       }
     },
   },
@@ -233,7 +255,12 @@ export default {
       try {
         const form_data = new FormData();
         for (let key in this.form_shop) {
-          form_data.append(key, this.form_shop[key]);
+          if (key == "warehouse") {
+            form_data.append("warehouse[name]", this.form_shop[key].name);
+            form_data.append("warehouse[address]", this.form_shop[key].address);
+          } else {
+            form_data.append(key, this.form_shop[key]);
+          }
         }
         let url = this.form_shop.id ? "shop/update" : "shop/create";
         const response = await axios.post(url, form_data);
@@ -253,6 +280,7 @@ export default {
     closeDialog() {
       this.$emit("closeDialogShopUpdate");
       this.dialog_show = false;
+      this.form_shop.id = null;
       this.form_shop.name = null;
       this.form_shop.email = null;
       this.form_shop.carrier_id = null;
@@ -260,10 +288,17 @@ export default {
       this.form_shop.banner = null;
       this.form_shop.locate = null;
     },
-    openDialog() {
-      this.$emit("showDialogShopUpdate");
-      this.dialog_show = true;
-      this.getCarriers();
+    async openDialog() {
+      this.startLoad();
+      try {
+        const response = await axios.get("shop/infor");
+        this.showAlert("Lỗi", "Bạn đã đăng ký shop rồi !", "error", null);
+      } catch (error) {
+        this.$emit("showDialogShopUpdate");
+        this.dialog_show = true;
+        this.getCarriers();
+      }
+      this.finishLoad();
     },
     async getCarriers() {
       this.startLoad();
@@ -280,6 +315,13 @@ export default {
 </script>
 
 <style scoped>
+.form__heading {
+  margin-bottom: 81px;
+  margin-top: 24px;
+  padding: 0 16px;
+  font-size: 18px;
+  font-weight: 700;
+}
 .btn-show-dialog {
   cursor: pointer;
 }

@@ -105,6 +105,19 @@
                   ></v-text-field>
                 </div>
               </v-col>
+
+              <v-col cols="6" v-if="!product.is_variant">
+                <div class="form-group">
+                  <span class="form-group__label">Số lượng</span>
+                  <v-text-field
+                    type="number"
+                    v-model="product.inventory"
+                    class="form-group__input"
+                    variant="outlined"
+                    placeholder="Nhập số lượng"
+                  ></v-text-field>
+                </div>
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols="6">
@@ -230,6 +243,7 @@
                 v-model="product.weight"
                 class="form-group__input"
                 variant="outlined"
+                type="number"
                 placeholder="Cân nặng sản phẩm"
               ></v-text-field>
             </div>
@@ -241,6 +255,7 @@
                   v-model="product.width"
                   class="form-group__input"
                   variant="outlined"
+                  type="number"
                   placeholder="Chiều rộng"
                 ></v-text-field>
               </div>
@@ -250,6 +265,7 @@
                   v-model="product.height"
                   class="form-group__input"
                   variant="outlined"
+                  type="number"
                   placeholder="Chiều cao"
                 ></v-text-field>
               </div>
@@ -258,6 +274,7 @@
                 <v-text-field
                   v-model="product.length"
                   class="form-group__input"
+                  type="number"
                   variant="outlined"
                   placeholder="Chiều dài"
                 ></v-text-field>
@@ -503,6 +520,7 @@ export default {
         brand: null,
         price: null,
         promotional_price: null,
+        inventory: 0,
         weight: null,
         length: null,
         width: null,
@@ -564,16 +582,51 @@ export default {
     },
   },
   created() {
-    this.setWindowTitle("Thêm sản phẩm");
     if (this.$route.name == "edit-product") {
       this.product_edit_id = this.$route.params.id;
+      this.setWindowTitle("Sửa sản phẩm");
       this.getProductEdit();
     } else {
+      this.setWindowTitle("Thêm sản phẩm");
       this.getCategoriesLv1();
       this.getConditions();
     }
   },
+  watch: {
+    $route(to, from) {
+      if (to.name == "add-product") {
+        this.resetProduct();
+      } else if ((to.name = "edit-product")) {
+        this.getProductEdit();
+      }
+    },
+  },
   methods: {
+    resetProduct() {
+      this.product.images = [];
+      this.product.cat_id = null;
+      this.product.condition_id = null;
+      this.product.is_variant = false;
+      this.product.is_buy_more_discount = false;
+      this.product.is_pre_order = false;
+      this.product.name = null;
+      this.product.detail = null;
+      this.product.brand = null;
+      this.product.price = null;
+      this.product.promotional_price = null;
+      this.product.inventory = 0;
+      this.product.weight = null;
+      this.product.length = null;
+      this.product.width = null;
+      this.product.height = null;
+      this.product.variant_names = [[null], [null]];
+      this.product.variant_images = [[null]];
+      this.product.variants_item_quantity = [[null]];
+      this.product.variants_item_price = [[null]];
+      this.product.discount_ranges_min = [null];
+      this.product.discount_ranges_max = [null];
+      this.product.discount_ranges_amount = [null];
+    },
     async getProductEdit() {
       this.startLoad();
       try {
@@ -628,6 +681,14 @@ export default {
           }
         } else if (["is_variant", "is_buy_more_discount", "is_pre_order"].includes(key)) {
           form_data.append(key, obj[key] ? 1 : 0);
+        } else if (key == "inventory") {
+          if (!this.product.is_variant) {
+            form_data.append(key, obj[key]);
+          }
+        } else if (key == "promotional_price") {
+          if (this.product.promotional_price != null) {
+            form_data.append(key, obj[key]);
+          }
         } else {
           form_data.append(key, obj[key]);
         }
@@ -643,7 +704,12 @@ export default {
       }
       try {
         const response = await axios.post(url, form_data);
-        this.showAlert(response.data.title, response.data.message, "success", null);
+        this.showAlert(
+          response.data.title,
+          response.data.message,
+          "success",
+          "all-products"
+        );
       } catch (error) {
         console.log(error);
         this.showAlert(

@@ -10,7 +10,7 @@
     @touchmove="handleDrag"
     @touchend="endDrag"
   >
-    <v-slide-group v-model="currentSlide" show-arrows="false" class="slide-group">
+    <v-slide-group v-model="currentSlide" show-arrows="false" class="slide-group no-padding">
       <v-slide-group-item v-for="(item, i) in items" :key="i">
         <div class="image__item" @click="clickItem(i)">
           <v-icon

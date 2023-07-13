@@ -4,6 +4,7 @@
     <SystemBar
       :dialog="dialog_shop_update"
       @closeDialogShopUpdate="dialog_shop_update = false"
+      @showDialogShopUpdate="dialog_shop_update = true"
     />
     <Header />
     <div id="body-content">

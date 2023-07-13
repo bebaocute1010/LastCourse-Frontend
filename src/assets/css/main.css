@@ -79,6 +79,9 @@
 .slide-group .v-slide-group__container {
   padding: 16px;
 }
+.no-padding .v-slide-group__container {
+  padding: 0;
+}
 
 #product .slide-group .v-slide-group__container {
   padding: 0;

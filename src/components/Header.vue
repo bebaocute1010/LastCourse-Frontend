@@ -149,7 +149,6 @@
       <div class="header-images" :to="{ name: 'home' }">
         <router-link :to="{ name: 'home' }">
           <img class="header-image__item" src="/src/assets/logo.svg" />
-          <img class="header-image__item" src="/src/assets/con-ho.svg" />
         </router-link>
       </div>
       <div class="header-search">
@@ -447,11 +446,11 @@ export default {
 }
 .header-images {
   width: 25%;
-  padding: 25px 0;
+  padding: 10px 0;
   display: flex;
 }
 .header-image__item {
-  max-width: 50%;
+  /* max-width: 50%; */
   max-height: 100%;
 }
 .header-search {

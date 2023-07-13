@@ -1,8 +1,8 @@
 <template>
   <v-col cols="3">
     <div id="user-navigation">
-      <div class="user-info" @click="openDialogUpdateShop">
-        <v-avatar class="user-info__avatar">
+      <div class="user-info">
+        <v-avatar class="user-info__avatar" @click="openDialogShopUpdate">
           <v-img cover :src="shop?.avatar"></v-img>
         </v-avatar>
         <span class="user-info__name">{{ shop?.name }}</span>
@@ -58,8 +58,8 @@ export default {
   },
   methods: {
     ...mapActions(["setShop", "unsetShop"]),
-    openDialogUpdateShop() {
-      this.$emit("openDialogShopUpdate")
+    openDialogShopUpdate() {
+      this.$emit("openDialogShopUpdate");
     },
     async getShopInfor() {
       this.startLoad();
@@ -89,10 +89,13 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-
+.user-info__avatar:hover {
+  box-shadow: 0 4px 16px rgba(236, 28, 36, 0.5);
+}
 .user-info__avatar {
   width: 73px !important;
   height: 73px !important;
+  cursor: pointer;
   margin-bottom: 24px;
 }
 
