@@ -53,6 +53,9 @@ export default {
     if (localStorage.getItem("logged_in") === null) {
       this.$router.push({ name: "login" });
     } else if (!this.shop) {
+      this.$eventBus.on("updateShopInfor", () => {
+        this.getShopInfor();
+      });
       this.getShopInfor();
     }
   },

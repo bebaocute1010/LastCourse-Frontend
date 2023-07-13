@@ -3,8 +3,9 @@ import { createApp } from "vue";
 import router from "./router";
 import { createStore } from "vuex";
 import storeConfig from "@/store";
-import Vuetify from "@/flugins/vuetify";
-import { instance } from "@/flugins/axios";
+import Vuetify from "@/plugins/vuetify";
+import eventBus from "@/plugins/event-bus";
+import { instance } from "@/plugins/axios";
 import { Field, Form } from "vee-validate";
 import TextFieldWithValidation from "@/components/TextFieldWithValidation.vue";
 import Alert from "@/components/Alert.vue";
@@ -18,7 +19,7 @@ const app = createApp(App);
 
 window.axios = instance;
 
-app.use(router).use(store).use(Vuetify);
+app.use(router).use(store).use(Vuetify).use(eventBus);
 app
   .component("Field", Field)
   .component("Form", Form)

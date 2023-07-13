@@ -264,6 +264,7 @@ export default {
         }
         let url = this.form_shop.id ? "shop/update" : "shop/create";
         const response = await axios.post(url, form_data);
+        this.$eventBus.emit("updateShopInfor")
         this.showAlert(response.data.title, response.data.message, "success", null);
         this.closeDialog();
       } catch (error) {
