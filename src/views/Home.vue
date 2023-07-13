@@ -52,8 +52,8 @@
         id="4"
         :column_number="6"
         :items="products_recommended"
-        image_w="170px"
-        image_h="170px"
+        image_w="162px"
+        image_h="162px"
       ></ProductsGrid>
 
       <div id="button-view-more">
@@ -121,6 +121,7 @@ export default {
     };
   },
   created() {
+    this.setWindowTitle("Trang chủ");
     this.getProducts("get/featured-products", this.products_feature);
     this.getProducts("get/top-selling-products", this.products_top_selling);
     this.getProducts("get/recommended-products", this.products_recommended);

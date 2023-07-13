@@ -35,4 +35,7 @@ export default {
   setRouteVerified({ commit }, route_name) {
     commit("setRouteVerified", route_name);
   },
+  setNotifications({ commit }, notifications) {
+    commit("setNotifications", notifications);
+  },
 };

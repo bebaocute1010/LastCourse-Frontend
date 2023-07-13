@@ -74,7 +74,7 @@ export default {
   created() {
     this.setWindowTitle("Đặt lại mật khẩu");
     if (!this.email_register) {
-      //   router.push({ name: "forgot-password" });
+        router.push({ name: "forgot-password" });
     }
   },
   methods: {

@@ -12,7 +12,9 @@
 
     <div class="product__more-info">
       <p class="product__price">{{ getLocaleStringNumber(price) }}</p>
-      <p class="product__sold" v-if="!show_rate">(Đã bán {{ getLocaleStringNumber(sold) }})</p>
+      <p class="product__sold" v-if="!show_rate">
+        (Đã bán {{ getLocaleStringNumber(sold) }})
+      </p>
       <div class="product__rate" v-else>
         <v-icon color="#FFB800">mdi-star</v-icon>
         <span>({{ rate }})</span>
@@ -166,6 +168,6 @@ export default {
   overflow: hidden;
 }
 .product__container:hover {
-  box-shadow: 0 4px 16px rgba(236, 28, 36, 0.7);
+  box-shadow: 0 4px 16px rgba(236, 28, 36, 0.5);
 }
 </style>

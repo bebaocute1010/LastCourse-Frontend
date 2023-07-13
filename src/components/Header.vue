@@ -372,7 +372,7 @@ export default {
     },
     startSearch() {
       clearTimeout(this.timer);
-      this.timer = setTimeout(this.search, 200);
+      this.timer = setTimeout(this.search, 500);
     },
     search() {
       this.$emit("search", this.search_text.trim());
@@ -394,6 +394,9 @@ export default {
 }
 .dialog {
   padding: 24px;
+}
+.user__avatar__overlay:hover {
+  background: #000000dd;
 }
 .user__avatar__overlay {
   position: absolute;

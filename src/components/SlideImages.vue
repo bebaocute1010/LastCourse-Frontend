@@ -12,7 +12,7 @@
   >
     <v-slide-group v-model="currentSlide" show-arrows="false" class="slide-group">
       <v-slide-group-item v-for="(item, i) in items" :key="i">
-        <div class="image__item">
+        <div class="image__item" @click="clickItem(i)">
           <v-icon
             v-if="show_delete"
             @click="deleteImage(i)"
@@ -57,6 +57,9 @@ export default {
     };
   },
   methods: {
+    clickItem(index) {
+      this.$emit("clickItem", index);
+    },
     deleteImage(i) {
       this.$emit("deleteImage", i);
     },

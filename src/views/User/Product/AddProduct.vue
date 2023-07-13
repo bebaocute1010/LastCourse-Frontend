@@ -564,6 +564,7 @@ export default {
     },
   },
   created() {
+    this.setWindowTitle("Thêm sản phẩm");
     if (this.$route.name == "edit-product") {
       this.product_edit_id = this.$route.params.id;
       this.getProductEdit();
@@ -642,10 +643,15 @@ export default {
       }
       try {
         const response = await axios.post(url, form_data);
-        this.showAlert(response.data.title, response.data.message, "success", null)
+        this.showAlert(response.data.title, response.data.message, "success", null);
       } catch (error) {
         console.log(error);
-        this.showAlert(error.response.data.title, error.response.data.message, "error", null)
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          null
+        );
       }
     },
     async getConditions() {
@@ -852,7 +858,10 @@ export default {
   display: flex;
   column-gap: 16px;
 }
-
+.image-button:hover {
+  background: #0172cb;
+  color: #ffffff;
+}
 .image-button {
   display: flex;
   flex-direction: column;
@@ -1046,6 +1055,9 @@ export default {
 .submit-btn {
   display: flex;
   justify-content: flex-end;
+}
+.button-submit:hover {
+  background-color: #01395d;
 }
 .button-submit {
   width: 197px;

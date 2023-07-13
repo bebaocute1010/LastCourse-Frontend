@@ -10,9 +10,9 @@
           <span>{{ count_down }}</span>
         </div>
       </div>
-      <button :id="'btn-view-all-' + id" class="products-list__btn-view-all">
+      <!-- <button :id="'btn-view-all-' + id" class="products-list__btn-view-all">
         Xem tất cả
-      </button>
+      </button> -->
     </div>
     <div
       class="user-not-select slide-group-container"

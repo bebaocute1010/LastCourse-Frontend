@@ -82,6 +82,7 @@ export default {
     };
   },
   created() {
+    this.setWindowTitle("Thông tin shop");
     this.getShop();
   },
   methods: {

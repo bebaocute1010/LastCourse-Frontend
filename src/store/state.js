@@ -13,4 +13,5 @@ export default {
   loading: false,
   shop: null,
   cart_products_selected: [],
+  notifications: [],
 };

@@ -84,7 +84,7 @@
                   variant="outlined"
                   hide-details="true"
                   type="text"
-                  label="Địa chỉ"
+                  label="Tỉnh/Thành phố"
                   v-model="form_shop.locate"
                 ></v-text-field>
               </v-col>
@@ -140,7 +140,7 @@
           <a href="#">Tải ứng dụng </a>
         </li>
         <li class="system-bar__item">
-          <p class="btn-show-dialog" @click="openDialog">Kênh người bán</p>
+          <p class="btn-show-dialog" @click="openDialog">Đăng ký Shop</p>
         </li>
       </ul>
 
@@ -317,6 +317,9 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.user__avatar__overlay:hover {
+  background: #000000dd;
 }
 .user__avatar__overlay {
   position: absolute;

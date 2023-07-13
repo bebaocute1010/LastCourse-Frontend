@@ -198,6 +198,7 @@ export default {
     ...mapGetters(["cart_products_selected"]),
   },
   created() {
+    this.setWindowTitle("Thanh toán");
     if (!this.cart_products_selected || this.cart_products_selected.length <= 0) {
       this.$router.push({ name: "cart" });
       return;
@@ -224,9 +225,15 @@ export default {
             payment_method: this.payment_method,
             note: this.notes[note_index],
           });
+          this.delayMethod(this.getNotifications, 2500);
           this.finishLoad();
         });
-        this.showAlert("Thành công", "Tạo đơn hàng thành công, hãy theo dõi đơn hàng của bạn nhé.", "success", "bills")
+        this.showAlert(
+          "Thành công",
+          "Tạo đơn hàng thành công, hãy theo dõi đơn hàng của bạn nhé.",
+          "success",
+          "bills"
+        );
       } catch (error) {
         console.log(error);
       }
@@ -402,11 +409,11 @@ export default {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   display: flex;
-  align-items: center;
+  width: 265px;
 }
 .shop__item-product__image img {
-  width: 100%;
-  height: 100%;
+  width: 48px;
+  height: 48px;
   object-fit: cover;
 }
 .shop__item-product__image {

@@ -7,12 +7,25 @@
             :height="480"
             :items="details?.images"
             style="width: 480px"
+            :slide_model="slide_model"
           ></BannerSlides>
           <div id="images__arrow">
             <p style="font-weight: 600">Hình ảnh sản phẩm</p>
             <div class="image__arrow-btn">
-              <v-icon> mdi-chevron-left-circle </v-icon>
-              <v-icon> mdi-chevron-right-circle </v-icon>
+              <v-icon
+                class="btn-arrow-slide"
+                @click="slide_model = Math.max(slide_model - 1, 0)"
+              >
+                mdi-chevron-left-circle
+              </v-icon>
+              <v-icon
+                class="btn-arrow-slide"
+                @click="
+                  slide_model = Math.min(slide_model + 1, details.images.length - 1)
+                "
+              >
+                mdi-chevron-right-circle
+              </v-icon>
             </div>
           </div>
           <SlideImages
@@ -20,6 +33,7 @@
             :refe="'slideImageDetail'"
             img_width="87px"
             style="height: 87px"
+            @clickItem="processItemClicked"
           >
           </SlideImages>
           <div id="shares">
@@ -62,10 +76,10 @@
 
           <div
             id="product__variants"
-            v-if="details && (details.sizes !== null || details.colors !== null)"
+            v-if="details && (details?.sizes.length > 0 || details?.colors.length > 0)"
           >
             <p class="product__variant__heading">Phân loại</p>
-            <div class="product__variants__list" v-if="details?.colors">
+            <div class="product__variants__list" v-if="details?.colors.length">
               <p class="product__variants__list__name heading-text">Màu sắc</p>
               <div class="product__variants__list__items">
                 <div
@@ -85,7 +99,7 @@
               </div>
             </div>
 
-            <div class="product__variants__list" v-if="details?.sizes">
+            <div class="product__variants__list" v-if="details?.sizes.length">
               <p class="product__variants__list__name heading-text">Kích thước</p>
               <div class="product__variants__list__items">
                 <div
@@ -122,7 +136,7 @@
               />
               <div
                 class="quantity-order__button user-not-select"
-                @click="order_quantity = Math.min(order_quantity + 1, inventory)"
+                @click="order_quantity = Math.min(order_quantity + 1, details.inventory)"
               >
                 <v-icon>mdi-plus</v-icon>
               </div>
@@ -446,6 +460,7 @@ export default {
   name: "ProductDetail",
   data() {
     return {
+      slide_model: 0,
       color_active: null,
       size_active: null,
       inventory: "...",
@@ -460,6 +475,7 @@ export default {
     };
   },
   created() {
+    this.setWindowTitle("Chi tiết sản phẩm");
     this.getProductDetails();
   },
   watch: {
@@ -469,11 +485,10 @@ export default {
       }
     },
   },
-  mounted() {},
-  beforeDestroy() {
-    window.removeEventListener("resize", this.setMaxHeight);
-  },
   methods: {
+    processItemClicked(index) {
+      this.slide_model = index;
+    },
     async addToCart(buy_now = false) {
       if (this.details.is_variant && this.product_variant_id === null) {
         this.showAlert("Cảnh báo", "Vui lòng chọn phân loại hàng", "warning", null);
@@ -534,7 +549,6 @@ export default {
       const response = await axios.get(`product/comments/${slug}?page=${page}`);
       this.comments = response.data.data;
       this.finishLoad();
-      this.setMaxHeight();
     },
     async getProductDetails() {
       this.startLoad();
@@ -545,13 +559,6 @@ export default {
       this.inventory = this.getLocaleStringNumber(this.details.inventory);
       this.price = this.getLocaleStringNumber(this.details.price);
       this.finishLoad();
-      this.setMaxHeight();
-    },
-    setMaxHeight() {
-      setTimeout(() => {
-        const extendContentHeight = this.$refs.extendContent.offsetHeight;
-        this.$refs.relateProducts.style.maxHeight = extendContentHeight + "px";
-      }, 1000);
     },
   },
 };
@@ -798,7 +805,7 @@ export default {
 }
 .quantity-order__input {
   border-radius: 2px;
-  width: 46px;
+  width: 66px;
   border: 1px solid #8f8f8f;
   text-align: center;
 }
@@ -897,6 +904,9 @@ export default {
   display: flex;
   column-gap: 16px;
   align-items: center;
+}
+.btn-arrow-slide:hover {
+  color: red;
 }
 .image__arrow-btn {
   display: flex;

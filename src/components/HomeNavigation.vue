@@ -6,9 +6,12 @@
           value="search"
           key="search"
           :to="{ name: 'search' }"
-          class="user-not-select"
+          :class="{
+            'user-not-select': true,
+            'v-list-item--active': $route?.name == 'product-detail',
+          }"
         >
-          <v-icon>mdi-home</v-icon>
+          <v-icon>mdi-magnify</v-icon>
         </v-list-item>
 
         <v-list-item
@@ -77,11 +80,12 @@
 </template>
 
 <script>
+import router from "../router";
+
 export default {
   name: "HomeNavigation",
   data() {
     return {
-      notifications: [],
       drawer: true,
       number_cart: 0,
       active_logo: false,
@@ -111,20 +115,13 @@ export default {
         });
     },
     getNumberCart() {
+      if (!localStorage.getItem("token")) {
+        return;
+      }
       axios
         .get("get/number-cart")
         .then((response) => {
           this.number_cart = response.data.number_cart;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getNotifications() {
-      axios
-        .get("get/notifications")
-        .then((response) => {
-          this.notifications = response.data.data;
         })
         .catch((error) => {
           console.log(error);

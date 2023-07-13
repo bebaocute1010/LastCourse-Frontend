@@ -7,6 +7,7 @@
       :show-arrows="false"
       color="#ffffff"
       :cycle="true"
+      v-model="model"
       interval="2000"
     >
       <v-carousel-item
@@ -24,9 +25,26 @@
 export default {
   name: "BannerSlides",
   data() {
-    return {};
+    return {
+      cur_index: 0,
+    };
+  },
+  computed: {
+    model() {
+      if (this.slide_model == null) {
+        return this.cur_index;
+      }
+      return this.slide_model;
+    },
+  },
+  mounted() {
+    setInterval(this.autoSlide, 2000);
   },
   props: {
+    slide_model: {
+      type: Number,
+      required: false,
+    },
     items: {
       type: Array,
       required: true,
@@ -34,6 +52,15 @@ export default {
     height: {
       type: Number,
       required: false,
+    },
+  },
+  methods: {
+    autoSlide() {
+      if (this.cur_index >= this.items.length - 1) {
+        this.cur_index = 0;
+      } else {
+        this.cur_index += 1;
+      }
     },
   },
 };

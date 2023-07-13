@@ -57,15 +57,6 @@
               >Đăng Nhập</router-link
             >
           </p>
-          <div class="countries-select">
-            <v-select
-              :items="countries"
-              v-model="country_selected"
-              single-line
-              hide-selected
-              variant="plain"
-            ></v-select>
-          </div>
         </div>
       </div>
     </AccountLayout>
@@ -83,8 +74,6 @@ export default {
   components: { Alert, DialogRules, AccountLayout },
   data() {
     return {
-      countries: ["Việt Nam", "Mỹ"],
-      country_selected: "Việt Nam",
       dialog_visible: false,
     };
   },
@@ -103,7 +92,7 @@ export default {
     return { schema };
   },
   created() {
-    this.setWindowTitle("Register");
+    this.setWindowTitle("Đăng Ký");
   },
   methods: {
     ...mapActions(["setEmailRegister", "setRouteVerified"]),

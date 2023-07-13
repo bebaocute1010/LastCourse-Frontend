@@ -77,7 +77,7 @@ export default {
     ...mapGetters(["email_register", "route_verified"]),
   },
   created() {
-    this.setWindowTitle("Verify OTP");
+    this.setWindowTitle("Xác minh OTP");
   },
   mounted() {
     if (!this.email_register) {

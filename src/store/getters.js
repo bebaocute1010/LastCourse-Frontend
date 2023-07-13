@@ -8,4 +8,5 @@ export default {
   shop: (state) => state.shop,
   cart_products_selected: (state) => state.cart_products_selected,
   route_verified: (state) => state.route_verified,
+  notifications: (state) => state.notifications,
 };

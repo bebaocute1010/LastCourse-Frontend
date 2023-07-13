@@ -119,6 +119,7 @@
 
               <template v-slot:bottom>
                 <v-pagination
+                  class="pagination-bar"
                   v-if="dialogDetailPageCount > 1"
                   v-model="dialog_detail_page"
                   :length="dialogDetailPageCount"
@@ -192,7 +193,7 @@
             <template v-slot:[`item.delivery`]="{ item }">
               <div class="delivery">
                 <p>{{ item.selectable.phone }}</p>
-                <p>{{ item.selectable.address }}</p>
+                <p class="delivery__address">{{ item.selectable.address }}</p>
               </div>
             </template>
 
@@ -269,6 +270,7 @@
             </template>
             <template v-slot:bottom>
               <v-pagination
+                class="pagination-bar"
                 v-if="tableBillsPageCount > 1"
                 v-model="table_bill_page"
                 :length="tableBillsPageCount"
@@ -464,6 +466,7 @@ export default {
     },
   },
   created() {
+    this.setWindowTitle("Đơn hàng của tôi");
     this.getBills();
   },
   methods: {
@@ -577,16 +580,14 @@ export default {
       let title = null;
       let message = null;
       let type = null;
-      console.log(this.getIdsEdited());
       try {
         this.startLoad();
         let response = null;
         response = await axios.post("bill/success", { ids: this.getIdsEdited() });
-        if (response) {
-          title = response.data.title;
-          message = response.data.message;
-          type = "success";
-        }
+        title = response.data.title;
+        message = response.data.message;
+        type = "success";
+        this.delayMethod(this.getNotifications, 2500);
       } catch (error) {
         console.log(error);
         title = error.response.data.title;
@@ -623,11 +624,10 @@ export default {
           } else if (this.cur_dialog_action === 5) {
             response = await axios.post("bill/cancel", { ids: ids });
           }
-          if (response) {
-            title = response.data.title;
-            message = response.data.message;
-            type = "success";
-          }
+          title = response.data.title;
+          message = response.data.message;
+          type = "success";
+          this.delayMethod(this.getNotifications, 2500);
         } catch (error) {
           console.log(error);
           title = error.response.data.title;
@@ -709,6 +709,9 @@ export default {
 </script>
 
 <style scoped>
+.pagination-bar {
+  padding-bottom: 20px;
+}
 .dialog-comment__rating__describe {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.8);
@@ -741,6 +744,10 @@ export default {
   flex-direction: column;
   row-gap: 8px;
 }
+.image-button:hover {
+  background: #0172cb;
+  color: #ffffff;
+}
 .image-button {
   display: flex;
   flex-direction: column;
@@ -762,9 +769,18 @@ export default {
   display: flex;
   column-gap: 16px;
 }
+.delivery__address {
+  height: 3em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
 .delivery {
   font-size: 14px;
   padding: 8px 0;
+  width: 320px;
 }
 .container {
   padding-bottom: 32px;
@@ -795,7 +811,7 @@ export default {
   color: #ff6600;
 }
 #main-content {
-  margin-top: 24px;
+  margin: 24px 0;
   width: 100%;
   background-color: #ffffff;
   border-radius: 8px;
@@ -861,6 +877,9 @@ export default {
   background: #f1f1f1;
   border-radius: 100px;
 }
+.content-search__icon:hover {
+  background: #3a01cb;
+}
 .content-search__icon {
   position: absolute;
   top: 3px;
@@ -870,6 +889,7 @@ export default {
   background: #0172cb;
   color: #ffffff;
   border-radius: 100px;
+  cursor: pointer;
 }
 .table-footer__checkbox-group {
   display: flex;

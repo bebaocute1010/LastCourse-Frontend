@@ -135,7 +135,7 @@ export default {
     return { schema };
   },
   created() {
-    this.setWindowTitle("Fill Information");
+    this.setWindowTitle("Đăng ký thông tin");
     if (!this.email_register) {
       router.push({ name: "register" });
     }
@@ -144,7 +144,6 @@ export default {
     onSubmit(values) {
       values.email = this.email_register;
       values.gender = values.gender == "Nam" ? 0 : values.gender == "Nữ" ? 1 : -1;
-      console.log(values.gender);
       axios
         .post("auth/register-information", values)
         .then((response) => {

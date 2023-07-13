@@ -30,12 +30,12 @@
             <div class="filter-footer">
               <button
                 v-if="!more_filter_cats"
-                id="btn-more-cats"
+                class="btn-show-cats"
                 @click="more_filter_cats = true"
               >
                 Thêm
               </button>
-              <button v-else id="btn-less-cats" @click="more_filter_cats = false">
+              <button v-else class="btn-show-cats" @click="more_filter_cats = false">
                 Bớt
               </button>
             </div>
@@ -70,6 +70,7 @@
                 bg-color="orange-lighten-1"
                 color="#FFB800"
                 size="26"
+                hover
                 @update:modelValue="getResultsSearch"
               ></v-rating>
 
@@ -224,6 +225,7 @@ export default {
     };
   },
   created() {
+    this.setWindowTitle("Tìm kiếm sản phẩm");
     this.getResultsSearch();
   },
   methods: {
@@ -231,6 +233,7 @@ export default {
     async getResultsSearch() {
       this.startLoad();
       const form_data = new FormData();
+      this.filters_search_result.filter_cats.length = 0;
       this.filter_cats_selected.forEach((item, index) => {
         if (item) {
           this.filters_search_result.filter_cats.push(this.filter_cats[index].id);
@@ -261,6 +264,9 @@ export default {
 </script>
 
 <style scoped>
+.btn-show-cats:hover {
+  color: #ec1c24;
+}
 .paginate-bar {
   padding-bottom: 40px;
 }

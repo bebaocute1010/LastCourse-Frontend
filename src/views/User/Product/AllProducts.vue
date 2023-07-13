@@ -100,6 +100,7 @@
           </template>
           <template v-slot:bottom>
             <v-pagination
+              class="pagination-bar"
               v-if="pageCount > 1"
               v-model="page"
               :length="pageCount"
@@ -236,6 +237,7 @@ export default {
     },
   },
   created() {
+    this.setWindowTitle("Tất cả sản phẩm");
     this.getProducts();
   },
   methods: {
@@ -344,6 +346,9 @@ export default {
 </script>
 
 <style scoped>
+.pagination-bar {
+  padding-bottom: 20px;
+}
 #main-content {
   width: 100%;
   background-color: #ffffff;
@@ -382,17 +387,13 @@ export default {
 .content-heading__item-quantity {
   font-size: 12px;
 }
+#button-add-product:hover {
+  background-color: #01395d;
+}
 #button-add-product {
   padding: 8px 14px;
   background: #0172cb;
   color: #ffffff;
-  border-radius: 100px;
-}
-#button-filter {
-  padding: 8px 14px;
-  background: #ec1c24;
-  color: #ffffff;
-  margin-left: 30px;
   border-radius: 100px;
 }
 .content-search {
@@ -410,6 +411,9 @@ export default {
   background: #f1f1f1;
   border-radius: 100px;
 }
+.content-search__icon:hover {
+  background: #3a01cb;
+}
 .content-search__icon {
   position: absolute;
   top: 3px;
@@ -419,6 +423,7 @@ export default {
   background: #0172cb;
   color: #ffffff;
   border-radius: 100px;
+  cursor: pointer;
 }
 .table-footer__checkbox-group {
   display: flex;

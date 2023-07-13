@@ -72,6 +72,7 @@
 
           <template v-slot:bottom>
             <v-pagination
+              class="pagination-bar"
               v-if="pageCount > 1"
               v-model="page"
               :length="pageCount"
@@ -148,6 +149,7 @@ export default {
     };
   },
   created() {
+    this.setWindowTitle("Giỏ hàng");
     this.getCarts();
   },
   computed: {
@@ -237,6 +239,9 @@ export default {
 </script>
 
 <style scoped>
+.pagination-bar {
+  padding-bottom: 20px;
+}
 .table-footer__buttons-group {
   display: flex;
   column-gap: 40px;
@@ -248,7 +253,7 @@ export default {
   color: #e60a32;
 }
 .quantity-order__input {
-  width: 30px;
+  width: 54px;
   height: 30px;
   border: 1px solid #8f8f8f;
   text-align: center;
@@ -271,9 +276,6 @@ export default {
   background: #c7e9ff;
   border: 1px solid #0074bd;
 }
-.container {
-  height: 100vh;
-}
 .content-search-table {
   padding-top: 47px;
 }
@@ -284,6 +286,8 @@ export default {
 .product-image {
   width: 48px;
   height: 48px;
+  border-radius: 4px;
+  overflow: hidden;
 }
 .product-image img {
   width: 48px;
@@ -307,6 +311,7 @@ export default {
   flex-direction: column;
   margin-left: 17px;
   text-align: left;
+  width: 202px;
 }
 .product-price {
   font-size: 14px;
@@ -328,6 +333,7 @@ export default {
   justify-content: flex-end;
   align-items: center;
   box-shadow: 0 0 8px #8f8f8f;
+  margin-bottom: 40px;
 }
 #table-footer__label {
   user-select: none;

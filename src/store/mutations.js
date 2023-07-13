@@ -36,4 +36,7 @@ export default {
   setRouteVerified(state, route_name) {
     state.route_verified = route_name;
   },
+  setNotifications(state, notifications) {
+    state.notifications = notifications;
+  },
 };

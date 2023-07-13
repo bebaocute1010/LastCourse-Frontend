@@ -63,7 +63,7 @@ export default {
     return { schema };
   },
   created() {
-    this.setWindowTitle("Register");
+    this.setWindowTitle("Quên mật khẩu");
   },
   methods: {
     ...mapActions(["setEmailRegister", "setRouteVerified"]),
