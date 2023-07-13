@@ -41,8 +41,11 @@
             class="content-search__input"
             placeholder="Tìm kiếm ..."
             v-model="search"
+            @input="searchProducts(search)"
           />
-          <v-icon class="content-search__icon">mdi-magnify</v-icon>
+          <v-icon class="content-search__icon" @click="searchProducts(search)"
+            >mdi-magnify</v-icon
+          >
         </div>
       </div>
 
@@ -51,7 +54,6 @@
           v-model:page="page"
           :headers="table_headers"
           :items="filterStatus(status_selected)"
-          :search="search"
           v-model="selected"
           class="elevation-1"
           show-select
@@ -221,6 +223,7 @@ export default {
       ],
       table_rows: [],
       product_edited_id: null,
+      timeout_id: null,
     };
   },
   computed: {
@@ -241,6 +244,20 @@ export default {
     this.getProducts();
   },
   methods: {
+    searchProducts(search) {
+      clearTimeout(this.timeout_id);
+
+      this.timeout_id = setTimeout(async () => {
+        this.startLoad();
+        try {
+          const response = await axios.get(`shop/products?search=${search}`);
+          this.table_rows = response.data.data;
+        } catch (error) {
+          console.log(error);
+        }
+        this.finishLoad();
+      }, 500);
+    },
     editeProduct(id) {
       this.$router.push({ name: "edit-product", params: { id: id } });
     },

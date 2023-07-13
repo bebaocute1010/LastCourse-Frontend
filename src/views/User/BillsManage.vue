@@ -84,8 +84,11 @@
             class="content-search__input"
             placeholder="Tìm kiếm ..."
             v-model="search"
+            @input="searchBills(search)"
           />
-          <v-icon class="content-search__icon">mdi-magnify</v-icon>
+          <v-icon class="content-search__icon" @click="searchBills(search)"
+            >mdi-magnify</v-icon
+          >
         </div>
       </div>
 
@@ -94,7 +97,6 @@
           v-model:page="page"
           :headers="table_headers"
           :items="filterStatus(status_selected)"
-          :search="search"
           v-model="selected"
           class="elevation-1"
           show-select
@@ -324,6 +326,7 @@ export default {
       cur_dialog_action: null,
       action_multiple: false,
       item_edited: null,
+      timeout_id: null,
       cur_bill_id: null,
     };
   },
@@ -340,6 +343,20 @@ export default {
     this.getBills();
   },
   methods: {
+    searchBills(search) {
+      clearTimeout(this.timeout_id);
+
+      this.timeout_id = setTimeout(async () => {
+        this.startLoad();
+        try {
+          const response = await axios.get(`shop/bills?search=${search}`);
+          this.table_rows = response.data.data;
+        } catch (error) {
+          console.log(error);
+        }
+        this.finishLoad();
+      }, 500);
+    },
     closeDialogBillDetail() {
       this.dialog_detail = false;
       this.cur_bill_id = null;
