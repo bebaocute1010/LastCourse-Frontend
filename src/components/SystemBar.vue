@@ -106,15 +106,8 @@
                   <v-col cols="12">
                     <v-text-field
                       variant="outlined"
-                      label="Tên kho hàng"
-                      v-model="form_shop.warehouse.name"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                      variant="outlined"
                       label="Địa chỉ"
-                      v-model="form_shop.warehouse.address"
+                      v-model="form_shop.warehouse"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="6">
@@ -152,10 +145,12 @@
       </v-dialog>
       <ul class="system-bar--menu">
         <li class="system-bar__item right-border">
-          <a href="#">Thương gia và thị trường </a>
+          <router-link :to="{ name: 'coming-soon' }"
+            >Thương gia và thị trường
+          </router-link>
         </li>
         <li class="system-bar__item right-border">
-          <a href="#">Tải ứng dụng </a>
+          <router-link :to="{ name: 'coming-soon' }">Tải ứng dụng</router-link>
         </li>
         <li class="system-bar__item">
           <p class="btn-show-dialog" @click="openDialog">Đăng ký Shop</p>
@@ -163,16 +158,9 @@
       </ul>
 
       <ul class="system-bar--menu">
-        <a href="#">
-          <li class="system-bar__item">
-            <v-icon>mdi-chat-question</v-icon>
-            Hỗ trợ
-          </li>
-        </a>
-        <li class="system-bar__item" id="menu-languages">
-          <v-icon>mdi-web</v-icon>
-          Tiếng Việt
-          <v-icon>mdi-menu-down</v-icon>
+        <li class="system-bar__item">
+          <v-icon>mdi-chat-question</v-icon>
+          <router-link :to="{ name: 'coming-soon' }"> Hỗ trợ</router-link>
         </li>
       </ul>
     </div>
@@ -199,10 +187,7 @@ export default {
         avatar: null,
         banner: null,
         locate: null,
-        warehouse: {
-          name: null,
-          address: null,
-        },
+        warehouse: null,
       },
       carriers: [],
     };
@@ -255,16 +240,11 @@ export default {
       try {
         const form_data = new FormData();
         for (let key in this.form_shop) {
-          if (key == "warehouse") {
-            form_data.append("warehouse[name]", this.form_shop[key].name);
-            form_data.append("warehouse[address]", this.form_shop[key].address);
-          } else {
-            form_data.append(key, this.form_shop[key]);
-          }
+          form_data.append(key, this.form_shop[key]);
         }
         let url = this.form_shop.id ? "shop/update" : "shop/create";
         const response = await axios.post(url, form_data);
-        this.$eventBus.emit("updateShopInfor")
+        this.$eventBus.emit("updateShopInfor");
         this.showAlert(response.data.title, response.data.message, "success", null);
         this.closeDialog();
       } catch (error) {

@@ -199,12 +199,6 @@ export default {
           align: "center",
         },
         {
-          title: "Kho hàng",
-          sortable: false,
-          key: "warehouse",
-          align: "center",
-        },
-        {
           title: "Đã bán",
           key: "sold",
           align: "center",

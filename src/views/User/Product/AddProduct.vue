@@ -659,7 +659,9 @@ export default {
     },
     appendArrayToFormData(key, arr, form_data = new FormData()) {
       arr.forEach((item, index) => {
-        form_data.append(`${key}[${index}]`, item);
+        if (item != null) {
+          form_data.append(`${key}[${index}]`, item);
+        }
       });
     },
     getFormData(obj, form_data = new FormData()) {
@@ -686,17 +688,19 @@ export default {
             this.appendArrayToFormData(`${key}[${i}]`, obj[key][i], form_data);
           }
         } else if (["is_variant", "is_buy_more_discount", "is_pre_order"].includes(key)) {
-          form_data.append(key, obj[key] ? 1 : 0);
+          if (obj[key] != null) {
+            form_data.append(key, obj[key] ? 1 : 0);
+          }
         } else if (key == "inventory") {
           if (!this.product.is_variant) {
-            form_data.append(key, obj[key]);
-          }
-        } else if (key == "promotional_price") {
-          if (this.product.promotional_price != null) {
-            form_data.append(key, obj[key]);
+            if (obj[key] != null) {
+              form_data.append(key, obj[key]);
+            }
           }
         } else {
-          form_data.append(key, obj[key]);
+          if (obj[key] != null) {
+            form_data.append(key, obj[key]);
+          }
         }
       }
       return form_data;
