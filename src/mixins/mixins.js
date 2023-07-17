@@ -56,7 +56,7 @@ export default {
       this.setLoading(false);
     },
     setWindowTitle(title) {
-      document.title = "M Clothing | " + title;
+      document.title = title;
     },
     showAlert(title, message, type, to) {
       this.onAlert({
@@ -70,7 +70,7 @@ export default {
         if (this.alert.show) {
           this.hideAlert();
         }
-      }, 2000);
+      }, 1500);
     },
     hideAlert() {
       const to = this.alert.to;

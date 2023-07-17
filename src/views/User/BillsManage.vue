@@ -485,8 +485,8 @@ export default {
 
       return `${formattedTime} ${formattedDate}`;
     },
-    viewDetail(bill_id) {
-      this.getBillDetails(bill_id);
+    async viewDetail(bill_id) {
+      await this.getBillDetails(bill_id);
       this.cur_bill_id = bill_id;
       this.dialog_detail = true;
     },
@@ -689,8 +689,8 @@ export default {
   font-size: 14px;
   line-height: 22px;
 }
-.product-price::before {
-  content: "đ";
+.product-price::after {
+  content: " đ";
 }
 .actions-group-button {
   display: flex;

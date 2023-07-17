@@ -81,7 +81,7 @@
             <div id="table-footer" v-if="selected.length > 0">
               <div class="table-footer__buttons-group">
                 <span>Tổng tiền</span>
-                <span class="sum-money">đ {{ getLocaleStringNumber(sumMoney()) }}</span>
+                <span class="sum-money">{{ getLocaleStringNumber(sumMoney()) }} đ</span>
                 <router-link
                   class="table-footer__buttons-item"
                   id="footer__button-show"
@@ -317,8 +317,8 @@ export default {
   font-size: 14px;
   line-height: 22px;
 }
-.product-price::before {
-  content: "đ ";
+.product-price::after {
+  content: " đ ";
 }
 .delete-item-button {
   display: flex;

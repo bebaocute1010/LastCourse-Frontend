@@ -15,6 +15,7 @@ import Cart from "@/views/Cart.vue";
 import Payment from "@/views/Payment.vue";
 import Bills from "@/views/Bills.vue";
 import BillsManage from "@/views/User/BillsManage.vue";
+import ComingSoon from "@/views/ComingSoon.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -103,6 +104,11 @@ const router = createRouter({
       path: "/shop/san-pham/tat-ca",
       name: "all-products",
       component: AllProducts,
+    },
+    {
+      path: "/coming-soon",
+      name: "coming-soon",
+      component: ComingSoon,
     },
   ],
 });

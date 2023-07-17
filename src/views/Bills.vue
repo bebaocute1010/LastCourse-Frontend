@@ -942,8 +942,8 @@ export default {
   font-size: 14px;
   line-height: 22px;
 }
-.product-price::before {
-  content: "đ";
+.product-price::after {
+  content: " đ";
 }
 .actions-group-button {
   display: flex;

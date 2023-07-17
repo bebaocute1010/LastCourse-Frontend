@@ -17,7 +17,6 @@
 *::-webkit-scrollbar-thumb:hover {
   background-color: rgb(200, 27, 27);
 }
-
 .v-row {
   margin: unset;
 }
@@ -101,4 +100,29 @@ footer {
 .filter-item__list__item .mdi-checkbox-blank-outline {
   color: #ec1c24;
   opacity: 1;
+}
+.custom-carousel .carousel__viewport {
+  padding: 16px 0;
+}
+.custom-carousel .carousel__icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+.custom-carousel .carousel__icon:hover {
+  background: #ec1c24;
+  color: #ffffff;
+}
+.custom-carousel .carousel__track {
+  column-gap: 14px;
+}
+.custom-carousel .carousel__slide {
+  flex-shrink: unset;
+}
+.v-col-custom-padding {
+  padding: 0;
+}
+.v-col-custom-padding:first-child {
+  padding-right: 24px;
 }

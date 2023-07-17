@@ -84,12 +84,12 @@
             </div>
             <div>
               <p class="shop__item-product__price">
-                đ {{ getLocaleStringNumber(product.price) }}
+                {{ getLocaleStringNumber(product.price) }} đ
               </p>
               <p class="shop__item-product__quantity">x{{ product.quantity }}</p>
             </div>
             <p class="shop__item-product__into-money">
-              đ {{ getLocaleStringNumber(product.quantity * product.price) }}
+              {{ getLocaleStringNumber(product.quantity * product.price) }} đ
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@
               <p class="heading-text">Chi phí vận chuyển</p>
               <p>
                 {{ shop.shipping_carrier }}
-                <span>đ {{ getLocaleStringNumber(shop.shipping_fee) }}</span>
+                <span>{{ getLocaleStringNumber(shop.shipping_fee) }} đ</span>
               </p>
               <p>(Nhận hàng {{ shop.delivery_time }})</p>
             </div>
@@ -161,9 +161,9 @@
             </div>
 
             <div class="fees-sum">
-              <p>đ {{ getLocaleStringNumber(subTotal()) }}</p>
-              <p>đ {{ getLocaleStringNumber(totalShipping()) }}</p>
-              <p>đ {{ getLocaleStringNumber(subTotal() + totalShipping()) }}</p>
+              <p>{{ getLocaleStringNumber(subTotal()) }} đ</p>
+              <p>{{ getLocaleStringNumber(totalShipping()) }} đ</p>
+              <p>{{ getLocaleStringNumber(subTotal() + totalShipping()) }} đ</p>
             </div>
           </div>
 
