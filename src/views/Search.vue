@@ -226,6 +226,9 @@ export default {
   },
   created() {
     this.setWindowTitle("Tìm kiếm sản phẩm");
+    if (this.$route.query.search) {
+      this.filters_search_result.search = this.$route.query.search;
+    }
     this.getResultsSearch();
   },
   methods: {
@@ -336,6 +339,14 @@ export default {
   border-bottom: 2px solid #e5e5e5;
   border-right: 2px solid #e5e5e5;
   width: 100%;
+}
+
+.filter-item:first-child {
+  max-height: 795px;
+  overflow: scroll;
+}
+.filter-item:last-child {
+  border-bottom: unset;
 }
 #filters {
   display: flex;

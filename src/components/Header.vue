@@ -157,9 +157,11 @@
             class="header-search__input"
             placeholder="Tìm kiếm"
             v-model="search_text"
-            @input="startSearch"
+            v-on:keyup.enter="search"
           />
-          <v-btn class="header-search__icon" icon><v-icon>mdi-magnify</v-icon></v-btn>
+          <v-btn class="header-search__icon" icon @click="search"
+            ><v-icon>mdi-magnify</v-icon></v-btn
+          >
         </div>
 
         <div class="header-search__results" v-if="search_rs?.length > 0">
@@ -375,6 +377,7 @@ export default {
     },
     search() {
       this.$emit("search", this.search_text.trim());
+      this.$router.push({ name: "search", query: { search: this.search_text.trim() } });
     },
   },
 };
