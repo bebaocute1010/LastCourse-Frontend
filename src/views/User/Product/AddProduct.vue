@@ -22,7 +22,8 @@
               </div>
               <SlideImages
                 refe="slideImageProduct"
-                @deleteImage="deleteImage(i)"
+                :slide_show="4"
+                @deleteImage="deleteImage"
                 :items="image_urls"
                 :img_width="'144px'"
                 :show_delete="true"
@@ -37,30 +38,17 @@
             <div class="heading-2">
               <h2>Danh mục sản phẩm</h2>
             </div>
-            <div class="form-group">
-              <span class="form-group__label">Danh mục cấp 1</span>
+            <div class="form-group" v-for="(category, index) in categories" :key="index">
+              <span class="form-group__label">Danh mục cấp {{ index + 1 }}</span>
               <v-select
-                :items="categories_lv1"
-                v-model="selected_cat_lv1"
+                :items="category"
+                v-model="categories_selected[index]"
                 item-title="name"
                 item-value="id"
                 class="form-group__select"
                 variant="outlined"
                 placeholder="Chọn danh mục sản phẩm"
-                @update:modelValue="getCategoriesLv2()"
-              ></v-select>
-            </div>
-            <div class="form-group">
-              <span class="form-group__label">Danh mục cấp 2</span>
-              <v-select
-                v-model="selected_cat_lv2"
-                :items="categories_lv2"
-                item-title="name"
-                item-value="id"
-                class="form-group__select"
-                variant="outlined"
-                placeholder="Chọn danh mục sản phẩm"
-                @update:modelValue="product.cat_id = selected_cat_lv2"
+                @update:modelValue="getCategories(index, categories_selected[index])"
               ></v-select>
             </div>
           </div>
@@ -94,7 +82,7 @@
 
           <div class="block-info">
             <v-row>
-              <v-col cols="6">
+              <v-col cols="6" class="v-col-custom-padding">
                 <div class="form-group">
                   <span class="form-group__label">Thương hiệu</span>
                   <v-text-field
@@ -106,12 +94,12 @@
                 </div>
               </v-col>
 
-              <v-col cols="6" v-if="!product.is_variant">
+              <v-col cols="6" v-if="!product.is_variant" class="v-col-custom-padding">
                 <div class="form-group">
                   <span class="form-group__label">Số lượng</span>
                   <v-text-field
-                    type="number"
-                    v-model="product.inventory"
+                    type="text"
+                    v-model="inventoryFormated"
                     class="form-group__input"
                     variant="outlined"
                     placeholder="Nhập số lượng"
@@ -120,22 +108,22 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="6">
+              <v-col cols="6" class="v-col-custom-padding">
                 <div class="form-group">
                   <span class="form-group__label">Giá niêm yết</span>
                   <v-text-field
-                    v-model="product.price"
+                    v-model="priceFormated"
                     class="form-group__input"
                     variant="outlined"
                     placeholder="Giá niêm yết của sản phẩm"
                   ></v-text-field>
                 </div>
               </v-col>
-              <v-col cols="6">
+              <v-col cols="6" class="v-col-custom-padding">
                 <div class="form-group">
                   <span class="form-group__label">Giá khuyến mại</span>
                   <v-text-field
-                    v-model="product.promotional_price"
+                    v-model="promotionalPriceFormated"
                     class="form-group__input"
                     variant="outlined"
                     placeholder="Giá khuyến mại của sản phẩm"
@@ -181,7 +169,7 @@
               <div class="table-headers">
                 <span class="table-header__item">Số lượng tối thiểu</span>
                 <span class="table-header__item">Số lượng tối đa</span>
-                <span class="table-header__item">Giá sản phẩm</span>
+                <span class="table-header__item">Số tiền giảm giá</span>
               </div>
               <div
                 class="table-rows"
@@ -190,28 +178,52 @@
               >
                 <div class="table-row__item">
                   <v-row>
-                    <v-col cols="3">
+                    <v-col cols="4">
                       <input
-                        type="number"
                         class="table-row__item__input"
                         placeholder="Tối thiểu"
-                        v-model="product.discount_ranges_min[i]"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                        :value="
+                          numberFormated()(i, null, product.discount_ranges_min).get()
+                        "
+                        @input="
+                          numberFormated()(i, null, product.discount_ranges_min).set(
+                            $event.target.value
+                          )
+                        "
                       />
                     </v-col>
                     <v-col cols="4">
                       <input
-                        type="number"
                         class="table-row__item__input"
                         placeholder="Tối đa"
-                        v-model="product.discount_ranges_max[i]"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                        :value="
+                          numberFormated()(i, null, product.discount_ranges_max).get()
+                        "
+                        @input="
+                          numberFormated()(i, null, product.discount_ranges_max).set(
+                            $event.target.value
+                          )
+                        "
                       />
                     </v-col>
-                    <v-col cols="5">
+                    <v-col cols="4">
                       <input
-                        type="number"
                         class="table-row__item__input"
-                        placeholder="Giá sản phẩm"
-                        v-model="product.discount_ranges_amount[i]"
+                        placeholder="Số tiền giảm giá"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                        :value="
+                          numberFormated()(i, null, product.discount_ranges_amount).get()
+                        "
+                        @input="
+                          numberFormated()(i, null, product.discount_ranges_amount).set(
+                            $event.target.value
+                          )
+                        "
                       />
                     </v-col>
                   </v-row>
@@ -238,8 +250,10 @@
           <div class="block-info">
             <div class="heading-2"><h2>Thông tin kiện hàng</h2></div>
             <div class="form-group">
-              <label class="form-group__label">Cân nặng</label>
+              <label class="form-group__label">Cân nặng (kg):</label>
               <v-text-field
+                pattern="[0-9]*"
+                inputmode="numeric"
                 v-model="product.weight"
                 class="form-group__input"
                 variant="outlined"
@@ -250,8 +264,10 @@
             <div class="sub-group">
               <span class="sub-group__title">Kích cỡ đóng gói</span>
               <div class="form-group">
-                <label class="form-group__label">Chiều rộng</label>
+                <label class="form-group__label">Chiều rộng (cm):</label>
                 <v-text-field
+                  pattern="[0-9]*"
+                  inputmode="numeric"
                   v-model="product.width"
                   class="form-group__input"
                   variant="outlined"
@@ -260,8 +276,10 @@
                 ></v-text-field>
               </div>
               <div class="form-group">
-                <label class="form-group__label">Chiều cao</label>
+                <label class="form-group__label">Chiều cao (cm):</label>
                 <v-text-field
+                  pattern="[0-9]*"
+                  inputmode="numeric"
                   v-model="product.height"
                   class="form-group__input"
                   variant="outlined"
@@ -270,8 +288,10 @@
                 ></v-text-field>
               </div>
               <div class="form-group">
-                <label class="form-group__label">Chiều dài</label>
+                <label class="form-group__label">Chiều dài (cm):</label>
                 <v-text-field
+                  pattern="[0-9]*"
+                  inputmode="numeric"
                   v-model="product.length"
                   class="form-group__input"
                   type="number"
@@ -401,7 +421,7 @@
                   <span>{{ item.name }}</span>
                 </div>
                 <v-row v-for="(val, j) in item.items" :key="j">
-                  <v-col cols="3">
+                  <v-col cols="4">
                     <input
                       type="text"
                       class="table-row__item__input"
@@ -411,18 +431,32 @@
                   </v-col>
                   <v-col cols="4">
                     <input
-                      type="number"
                       class="table-row__item__input"
                       placeholder="Số lượng"
-                      v-model="product.variants_item_quantity[i][j]"
+                      pattern="[0-9]*"
+                      inputmode="numeric"
+                      :value="
+                        numberFormated()(i, j, product.variants_item_quantity).get()
+                      "
+                      @input="
+                        numberFormated()(i, j, product.variants_item_quantity).set(
+                          $event.target.value
+                        )
+                      "
                     />
                   </v-col>
-                  <v-col cols="5">
+                  <v-col cols="4">
                     <input
-                      type="number"
+                      pattern="[0-9]*"
+                      inputmode="numeric"
                       class="table-row__item__input"
                       placeholder="Giá sản phẩm"
-                      v-model="product.variants_item_price[i][j]"
+                      :value="numberFormated()(i, j, product.variants_item_price).get()"
+                      @input="
+                        numberFormated()(i, j, product.variants_item_price).set(
+                          $event.target.value
+                        )
+                      "
                     />
                   </v-col>
                 </v-row>
@@ -497,8 +531,8 @@ export default {
       image_urls: [],
       activeSection: null,
       isLinkClicked: false,
-      categories_lv1: [],
-      categories_lv2: [],
+      categories: [],
+      categories_selected: [],
       conditions: [],
       selected_cat_lv1: null,
       selected_cat_lv2: null,
@@ -538,6 +572,48 @@ export default {
     };
   },
   computed: {
+    promotionalPriceFormated: {
+      get() {
+        if (this.product.promotional_price) {
+          return this.product.promotional_price.toLocaleString();
+        }
+        return null;
+      },
+      set(value) {
+        const parsed_value = parseInt(value.replace(/,/g, ""));
+        if (!isNaN(parsed_value)) {
+          this.product.promotional_price = parsed_value;
+        }
+      },
+    },
+    priceFormated: {
+      get() {
+        if (this.product.price) {
+          return this.product.price.toLocaleString();
+        }
+        return null;
+      },
+      set(value) {
+        const parsed_value = parseInt(value.replace(/,/g, ""));
+        if (!isNaN(parsed_value)) {
+          this.product.price = parsed_value;
+        }
+      },
+    },
+    inventoryFormated: {
+      get() {
+        if (this.product.inventory) {
+          return this.product.inventory.toLocaleString();
+        }
+        return null;
+      },
+      set(value) {
+        const parsed_value = parseInt(value.replace(/,/g, ""));
+        if (!isNaN(parsed_value)) {
+          this.product.inventory = parsed_value;
+        }
+      },
+    },
     variantsCount() {
       return Array.from({ length: this.variant_groups_count }, (_, index) => index);
     },
@@ -581,15 +657,15 @@ export default {
       return big_rs;
     },
   },
-  created() {
+  async created() {
+    await this.getConditions();
     if (this.$route.name == "edit-product") {
       this.product_edit_id = this.$route.params.id;
       this.setWindowTitle("Sửa sản phẩm");
-      this.getProductEdit();
+      await this.getProductEdit();
     } else {
       this.setWindowTitle("Thêm sản phẩm");
-      this.getCategoriesLv1();
-      this.getConditions();
+      await this.getCategories();
     }
   },
   watch: {
@@ -602,6 +678,28 @@ export default {
     },
   },
   methods: {
+    numberFormated() {
+      return function (i, j, array) {
+        return {
+          get() {
+            if (j != null ? array[i][j] : array[i]) {
+              return j != null ? array[i][j].toLocaleString() : array[i].toLocaleString();
+            }
+            return null;
+          },
+          set(value) {
+            const parsed_value = parseInt(value.replace(/,/g, ""));
+            if (!isNaN(parsed_value)) {
+              if (j != null) {
+                array[i][j] = parsed_value;
+              } else {
+                array[i] = parsed_value;
+              }
+            }
+          },
+        };
+      };
+    },
     resetProduct() {
       this.product.images = [];
       this.product.cat_id = null;
@@ -630,14 +728,13 @@ export default {
     async getProductEdit() {
       this.startLoad();
       try {
-        this.getCategoriesLv1();
-        this.getConditions();
         const response = await axios.get(`shop/get-product?id=${this.product_edit_id}`);
         this.image_urls = Array.from(Object.values({ ...response.data.data.images }));
+        this.categories = Array.from(Object.values({ ...response.data.data.categories }));
+        this.categories_selected = Array.from(
+          Object.values({ ...response.data.data.categories_selected })
+        );
         this.product = { ...response.data.data };
-        this.selected_cat_lv1 = this.product.cat_lv1_id;
-        this.selected_cat_lv2 = this.product.cat_lv2_id;
-        this.getCategoriesLv2(this.selected_cat_lv1);
         if (
           this.product.variant_names[0].length > 0 &&
           this.product.variant_names[0][0] != null
@@ -707,6 +804,7 @@ export default {
     },
     async saveProduct() {
       let url = "product/create";
+      this.product.cat_id = this.categories_selected[this.categories_selected.length - 1];
       let form_data = this.getFormData(this.product);
       if (this.product_edit_id !== null) {
         url = "product/update";
@@ -732,28 +830,23 @@ export default {
     },
     async getConditions() {
       try {
-        this.startLoad();
         const response = await axios.get("get/conditions");
         this.conditions = response.data.data;
-        this.finishLoad();
       } catch (error) {}
     },
-    async getCategoriesLv2() {
-      try {
-        this.product.cat_id = this.selected_cat_lv1;
-        this.startLoad();
-        const response = await axios.get(
-          "get/category/level2?parent_id=" + this.selected_cat_lv1
-        );
-        this.categories_lv2 = response.data.data;
-        this.finishLoad();
-      } catch (error) {}
-    },
-    async getCategoriesLv1() {
+    async getCategories(index, parent_id = null) {
       try {
         this.startLoad();
-        const response = await axios.get("get/category/level1");
-        this.categories_lv1 = response.data.data;
+        let url = "get/category/categories";
+        if (parent_id) {
+          url += `?parent_id=${parent_id}`;
+        }
+        const response = await axios.get(url);
+        this.categories.splice(index + 1);
+        this.categories_selected.splice(index + 1);
+        if (response.data.data?.length > 0) {
+          this.categories.push(response.data.data);
+        }
         this.finishLoad();
       } catch (error) {}
     },
@@ -925,12 +1018,6 @@ export default {
   padding: 20px 33px;
 }
 
-.block-info .v-col {
-  padding: 0;
-}
-.block-info .v-col:first-child {
-  padding-right: 30px;
-}
 .images {
   padding: 7px 0;
   display: flex;
@@ -1002,14 +1089,12 @@ export default {
   justify-content: space-between;
   margin-bottom: 16px;
 }
-
 .table-row__item__input {
   padding: 12px 17px;
   border: #c4c4c4 1px solid;
   border-radius: 8px;
   max-width: 100%;
 }
-
 .table-row__item {
   margin-bottom: 8px;
 }
@@ -1113,12 +1198,12 @@ export default {
 }
 
 .left-icon {
-  top: 24px;
+  top: 28%;
   left: -37px;
 }
 
 .right-icon {
-  top: 24px;
+  top: 28%;
   right: -37px;
 }
 

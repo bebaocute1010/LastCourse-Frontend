@@ -72,6 +72,12 @@
               </div>
             </div>
           </template>
+          <template v-slot:[`item.sold`]="{ item }">
+            <span>{{ this.getLocaleStringNumber(item.selectable.sold) }}</span>
+          </template>
+          <template v-slot:[`item.inventory`]="{ item }">
+            <span>{{ this.getLocaleStringNumber(item.selectable.inventory) }}</span>
+          </template>
           <template v-slot:[`item.status`]="{ item }">
             <span
               :class="{
@@ -326,7 +332,7 @@ export default {
       this.hideDialog();
     },
     getLocaleStringNumber(num) {
-      return num.toLocaleString("de-DE");
+      return num.toLocaleString();
     },
     getStatusCode(status) {
       return status === "Còn hàng" ? 0 : status === "Hết hàng" ? 1 : 2;
@@ -473,8 +479,8 @@ export default {
   font-size: 14px;
   line-height: 22px;
 }
-.product-price::before {
-  content: "đ";
+.product-price::after {
+  content: " đ";
 }
 .available {
   color: #0172cb;
