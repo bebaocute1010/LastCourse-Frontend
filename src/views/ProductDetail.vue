@@ -8,6 +8,7 @@
             :items="details?.images"
             style="width: 480px"
             :slide_model="slide_model"
+            @updateSlideModel="updateSlideModel"
           ></BannerSlides>
           <div id="images__arrow">
             <p style="font-weight: 600">Hình ảnh sản phẩm</p>
@@ -38,21 +39,21 @@
           </SlideImages>
           <div id="shares">
             <p>Chia sẻ:</p>
-            <div class="share__social__image">
+            <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
               <v-img contain src="/src/assets/icons/facebook.svg"></v-img>
-            </div>
+            </router-link>
 
-            <div class="share__social__image">
+            <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
               <v-img contain src="/src/assets/icons/messenger.svg"></v-img>
-            </div>
+            </router-link>
 
-            <div class="share__social__image">
+            <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
               <v-img contain src="/src/assets/icons/twiter.svg"></v-img>
-            </div>
+            </router-link>
 
-            <div class="share__social__image">
+            <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
               <v-img contain src="/src/assets/icons/share.svg"></v-img>
-            </div>
+            </router-link>
           </div>
         </div>
 
@@ -155,10 +156,10 @@
 
           <div id="inventory">
             <p class="heading-text">
-              Tồn kho: <span>{{ inventory }}</span>
+              Tồn kho: <span>{{ this.getLocaleStringNumber(inventory) }}</span>
             </p>
             <p class="heading-text">
-              Giá: <span>{{ price }} đ</span>
+              Giá: <span>{{ this.getLocaleStringNumber(price) }} đ</span>
             </p>
           </div>
 
@@ -496,6 +497,9 @@ export default {
     },
   },
   methods: {
+    updateSlideModel(value) {
+      this.slide_model = value;
+    },
     processItemClicked(index) {
       this.slide_model = index;
     },
@@ -566,8 +570,8 @@ export default {
       const response = await axios.get("product/details/" + slug);
       this.details = response.data.data;
       this.comments = this.details.comments.comments;
-      this.inventory = this.getLocaleStringNumber(this.details.inventory);
-      this.price = this.getLocaleStringNumber(this.details.price);
+      this.inventory = this.details.inventory;
+      this.price = this.details.price;
       this.finishLoad();
     },
   },

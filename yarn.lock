@@ -337,6 +337,11 @@ vue@^3.0.2, vue@^3.2.0, vue@^3.2.25, vue@^3.3.0, vue@^3.3.2, vue@3.3.2:
     "@vue/server-renderer" "3.3.2"
     "@vue/shared" "3.3.2"
 
+vue3-carousel@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.npmjs.org/vue3-carousel/-/vue3-carousel-0.3.1.tgz"
+  integrity sha512-86vUkNPBzL2PVuR9w6hUsI90ccFjLp+K8cSFpRTISf+SjUQY3fMHc5CFF5MUL62v1xYYm27zEBmQupO9VQx9Kw==
+
 vuetify@^3.3.3:
   version "3.3.3"
   resolved "https://registry.npmjs.org/vuetify/-/vuetify-3.3.3.tgz"

@@ -218,7 +218,7 @@ export default {
           price = carrier.price;
         }
       });
-      return price;
+      return this.getLocaleStringNumber(price);
     },
   },
   created() {},

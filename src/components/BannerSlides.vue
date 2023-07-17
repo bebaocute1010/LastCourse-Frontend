@@ -30,17 +30,29 @@ export default {
     };
   },
   computed: {
-    model() {
-      if (this.slide_model == null) {
+    model: {
+      get() {
+        if (this.slide_model != null) {
+          this.cur_index = this.slide_model;
+        }
         return this.cur_index;
-      }
-      return this.slide_model;
+      },
+      set(value) {
+        this.$emit("updateSlideModel", value);
+      },
     },
   },
   mounted() {
-    setInterval(this.autoSlide, 2000);
+    if (this.auto_slide) {
+      setInterval(this.autoSlide, 2000);
+    }
   },
   props: {
+    auto_slide: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
     slide_model: {
       type: Number,
       required: false,
@@ -61,6 +73,7 @@ export default {
       } else {
         this.cur_index += 1;
       }
+      this.$emit("updateSlideModel", this.cur_index);
     },
   },
 };

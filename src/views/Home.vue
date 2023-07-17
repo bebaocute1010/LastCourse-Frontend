@@ -2,24 +2,29 @@
   <DefaultLayout :search_rs="search_rs">
     <section id="banners">
       <div class="container">
-        <BannerSlides :items="banners" />
+        <BannerSlides
+          :items="banners"
+          :slide_model="slide_model"
+          :auto_slide="true"
+          @updateSlideModel="updateSlideModel"
+        />
 
         <div id="facilities">
-          <div class="facility-item">
+          <div class="facility-item user-not-select">
             <v-icon class="facility__icon">mdi-sale</v-icon>
             <div class="facility__info">
               <span class="facility__title">ƯU ĐÃI</span>
               <span class="facility__sub-title">Liên tục cập nhật vô vàn ưu đãi</span>
             </div>
           </div>
-          <div class="facility-item">
+          <div class="facility-item user-not-select">
             <v-icon class="facility__icon">mdi-truck-fast</v-icon>
             <div class="facility__info">
               <span class="facility__title">GIAO HÀNG TẬN TAY</span>
               <span class="facility__sub-title">Giao hàng tận nơi khi đặt hàng</span>
             </div>
           </div>
-          <div class="facility-item">
+          <div class="facility-item user-not-select">
             <v-icon class="facility__icon">mdi-phone-in-talk</v-icon>
             <div class="facility__info">
               <span class="facility__title">HỖ TRỢ 24/7</span>
@@ -29,7 +34,11 @@
         </div>
 
         <div id="services">
-          <div class="service-item" v-for="(item, i) in services" :key="i">
+          <div
+            class="service-item user-not-select"
+            v-for="(item, i) in services"
+            :key="i"
+          >
             <div class="service__icon">
               <v-img contain :src="item.image"></v-img>
             </div>
@@ -52,8 +61,8 @@
         id="4"
         :column_number="6"
         :items="products_recommended"
-        image_w="162px"
-        image_h="162px"
+        image_w="167px"
+        image_h="167px"
       ></ProductsGrid>
 
       <div id="button-view-more">
@@ -73,6 +82,7 @@ export default {
   name: "Home",
   data() {
     return {
+      slide_model: 0,
       page_recommend: 1,
       services: [
         {
@@ -127,6 +137,9 @@ export default {
     this.getProducts("get/recommended-products", this.products_recommended);
   },
   methods: {
+    updateSlideModel(value) {
+      this.slide_model = value;
+    },
     async getProducts(url, array) {
       this.startLoad();
       try {
