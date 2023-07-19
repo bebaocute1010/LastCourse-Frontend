@@ -65,7 +65,7 @@
           class="user-not-select item-badge"
           :to="{ name: 'cart' }"
         >
-          <v-badge v-if="number_cart" :content="number_cart" color="#0074BD">
+          <v-badge v-if="number_carts" :content="number_carts" color="#0074BD">
             <v-icon>mdi-cart</v-icon>
           </v-badge>
           <v-icon v-else>mdi-cart</v-icon>
@@ -80,18 +80,18 @@
 </template>
 
 <script>
-import router from "../router";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "HomeNavigation",
   data() {
     return {
       drawer: true,
-      number_cart: 0,
       active_logo: false,
     };
   },
   computed: {
+    ...mapGetters(["number_carts"]),
     numberNotificationUnRead() {
       return this.notifications.filter((item) => item.read_at == null).length;
     },
@@ -101,6 +101,7 @@ export default {
     this.getNumberCart();
   },
   methods: {
+    ...mapActions(["setNumberCarts"]),
     markReadAll() {
       if (!this.notifications.length) {
         return;
@@ -121,7 +122,7 @@ export default {
       axios
         .get("get/number-cart")
         .then((response) => {
-          this.number_cart = response.data.number_cart;
+          this.setNumberCarts(response.data.number_cart);
         })
         .catch((error) => {
           console.log(error);

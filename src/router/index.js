@@ -18,6 +18,7 @@ import BillsManage from "@/views/User/BillsManage.vue";
 import ComingSoon from "@/views/ComingSoon.vue";
 
 const router = createRouter({
+  mode: "history",
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
@@ -28,6 +29,21 @@ const router = createRouter({
     {
       path: "/tim-kiem-san-pham",
       name: "search",
+      component: Search,
+    },
+    {
+      path: "/san-pham/danh-muc",
+      name: "products-category",
+      component: Search,
+    },
+    {
+      path: "/san-pham/san-pham-noi-bat",
+      name: "featured-products",
+      component: Search,
+    },
+    {
+      path: "/san-pham/san-pham-ban-chay",
+      name: "top-selling-products",
       component: Search,
     },
     {
@@ -111,6 +127,16 @@ const router = createRouter({
       component: ComingSoon,
     },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash && to.hash !== "#") {
+      return {
+        selector: to.hash,
+        behavior: "smooth",
+      };
+    } else {
+      document.getElementById("app").scrollIntoView({ behavior: "smooth" });
+    }
+  },
 });
 
 export default router;

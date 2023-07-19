@@ -175,7 +175,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
 export default {
   name: "Payment",
@@ -205,7 +205,12 @@ export default {
     }
     this.getPreviewOrder();
   },
+  beforeRouteLeave(to, from, next) {
+    this.unsetCartProductsSelected();
+    next();
+  },
   methods: {
+    ...mapActions(["unsetCartProductsSelected"]),
     createBills() {
       const isReceiverComplete = Object.values(this.receiver).every(
         (value) => value !== null && value !== ""
@@ -246,6 +251,7 @@ export default {
         });
         this.shops = response.data.data;
       } catch (error) {
+        this.showAlert("Lỗi", "Đã xảy ra lỗi", "error", "home");
         console.log(error);
       }
       this.finishLoad();

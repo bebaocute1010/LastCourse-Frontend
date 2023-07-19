@@ -9,4 +9,5 @@ export default {
   cart_products_selected: (state) => state.cart_products_selected,
   route_verified: (state) => state.route_verified,
   notifications: (state) => state.notifications,
+  number_carts: (state) => state.number_carts,
 };

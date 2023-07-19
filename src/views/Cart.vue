@@ -18,14 +18,18 @@
           height="600"
         >
           <template v-slot:[`item.product`]="{ item }">
-            <div class="product">
-              <div class="product-image">
-                <img :src="item.selectable.image" />
+            <router-link
+              :to="{ name: 'product-detail', params: { slug: item.selectable.slug } }"
+            >
+              <div class="product">
+                <div class="product-image">
+                  <img :src="item.selectable.image" />
+                </div>
+                <div class="product-info">
+                  <span class="product-name">{{ item.selectable.name }}</span>
+                </div>
               </div>
-              <div class="product-info">
-                <span class="product-name">{{ item.selectable.name }}</span>
-              </div>
-            </div>
+            </router-link>
           </template>
 
           <template v-slot:[`item.price`]="{ item }">
@@ -79,6 +83,11 @@
               :total-visible="5"
             ></v-pagination>
             <div id="table-footer" v-if="selected.length > 0">
+              <div class="box-btn-delete">
+                <button @click="showDialogDelete(null, true)">Xóa tất cả</button>
+                <button @click="showDialogDelete(null)">Xóa đã chọn</button>
+                <span>(Đã chọn {{ selected.length }} sản phẩm)</span>
+              </div>
               <div class="table-footer__buttons-group">
                 <span>Tổng tiền</span>
                 <span class="sum-money">{{ getLocaleStringNumber(sumMoney()) }} đ</span>
@@ -101,7 +110,7 @@
 <script>
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
 import DialogDelete from "../components/DialogDelete.vue";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 export default {
   name: "Cart",
   components: { DefaultLayout, DialogDelete },
@@ -146,6 +155,7 @@ export default {
       ],
       table_rows: [],
       timer: null,
+      delete_all: false,
     };
   },
   created() {
@@ -153,6 +163,7 @@ export default {
     this.getCarts();
   },
   computed: {
+    ...mapGetters(["cart_products_selected"]),
     pageCount() {
       return Math.ceil(this.table_rows.length / 10);
     },
@@ -163,7 +174,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["setCartProductsSelected"]),
+    ...mapActions(["setCartProductsSelected", "setNumberCarts"]),
     startTimer(id, quantity) {
       clearTimeout(this.timer);
       this.timer = setTimeout(() => {
@@ -187,21 +198,43 @@ export default {
       }
       this.finishLoad();
     },
-    async deleteCart(id) {
+    async deleteCart(ids) {
       this.startLoad();
       try {
-        const response = await axios.delete("cart/delete?id=" + id);
+        const response = await axios.post("cart/delete", { ids: ids });
+        this.selected.length = 0;
         this.getCarts();
+        this.showAlert(response.data.title, response.data.message, "success", null);
       } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          null
+        );
         console.log(error);
       }
       this.finishLoad();
+    },
+    async getNumberCart() {
+      if (!localStorage.getItem("token")) {
+        return;
+      }
+      axios
+        .get("get/number-cart")
+        .then((response) => {
+          this.setNumberCarts(response.data.number_cart);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     async getCarts() {
       this.startLoad();
       try {
         const reponse = await axios.get("cart/get");
         this.table_rows = reponse.data.data;
+        await this.getNumberCart();
       } catch (error) {
         if (error.response.status === 401) {
           this.$router.push({ name: "login" });
@@ -212,16 +245,25 @@ export default {
       this.finishLoad();
     },
 
-    showDialogDelete(id) {
+    showDialogDelete(id, delete_all = false) {
       this.dialog_delete = true;
       this.id_product_edit = id;
+      this.delete_all = delete_all;
     },
     processResultDialogDelete(value) {
       this.dialog_delete = false;
-      if (value && this.id_product_edit != null) {
-        this.deleteCart(this.id_product_edit);
+      if (value) {
+        if (this.delete_all) {
+          const ids = this.table_rows.map((item) => item.id);
+          this.deleteCart(ids);
+        } else if (this.id_product_edit != null) {
+          this.deleteCart([this.id_product_edit]);
+        } else {
+          this.deleteCart(this.cart_products_selected);
+        }
       }
       this.id_product_edit = null;
+      this.delete_all = false;
     },
     sumMoney() {
       let sum = 0;
@@ -239,6 +281,23 @@ export default {
 </script>
 
 <style scoped>
+.box-btn-delete span {
+  font-size: 14px;
+}
+.box-btn-delete button:hover {
+  background: #560413;
+}
+.box-btn-delete button {
+  padding: 11px 33px;
+  background: #ec1c24;
+  border-radius: 100px;
+  color: #ffffff;
+}
+.box-btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .pagination-bar {
   padding-bottom: 20px;
 }
@@ -278,6 +337,9 @@ export default {
 }
 .content-search-table {
   padding-top: 47px;
+}
+.product:hover .product-name {
+  color: #ec1c24;
 }
 .product {
   display: flex;
@@ -330,7 +392,7 @@ export default {
 #table-footer {
   display: flex;
   padding: 30px 20px;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   box-shadow: 0 0 8px #8f8f8f;
   margin-bottom: 40px;

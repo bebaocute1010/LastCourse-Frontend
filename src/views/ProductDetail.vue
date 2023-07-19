@@ -2,177 +2,186 @@
   <DefaultLayout>
     <section id="product">
       <div class="container">
-        <div id="product-images">
-          <BannerSlides
-            :height="480"
-            :items="details?.images"
-            style="width: 480px"
-            :slide_model="slide_model"
-            @updateSlideModel="updateSlideModel"
-          ></BannerSlides>
-          <div id="images__arrow">
-            <p style="font-weight: 600">Hình ảnh sản phẩm</p>
-            <div class="image__arrow-btn">
-              <v-icon
-                class="btn-arrow-slide"
-                @click="slide_model = Math.max(slide_model - 1, 0)"
-              >
-                mdi-chevron-left-circle
-              </v-icon>
-              <v-icon
-                class="btn-arrow-slide"
-                @click="
-                  slide_model = Math.min(slide_model + 1, details.images.length - 1)
-                "
-              >
-                mdi-chevron-right-circle
-              </v-icon>
+        <Breadcrumbs
+          v-if="details"
+          :items="details.breadcrumb"
+          @clickBreadcrumb="handleClickBreadcrumb"
+        ></Breadcrumbs>
+        <div class="flex-box">
+          <div id="product-images">
+            <BannerSlides
+              :height="480"
+              :items="details?.images"
+              style="width: 480px"
+              :slide_model="slide_model"
+              @updateSlideModel="updateSlideModel"
+            ></BannerSlides>
+            <div id="images__arrow">
+              <p style="font-weight: 600">Hình ảnh sản phẩm</p>
+              <div class="image__arrow-btn">
+                <v-icon
+                  class="btn-arrow-slide"
+                  @click="slide_model = Math.max(slide_model - 1, 0)"
+                >
+                  mdi-chevron-left-circle
+                </v-icon>
+                <v-icon
+                  class="btn-arrow-slide"
+                  @click="
+                    slide_model = Math.min(slide_model + 1, details.images.length - 1)
+                  "
+                >
+                  mdi-chevron-right-circle
+                </v-icon>
+              </div>
+            </div>
+            <SlideImages
+              :items="details?.images"
+              :refe="'slideImageDetail'"
+              img_width="87px"
+              style="height: 87px"
+              @clickItem="processItemClicked"
+            >
+            </SlideImages>
+            <div id="shares">
+              <p>Chia sẻ:</p>
+              <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
+                <v-img contain src="/src/assets/icons/facebook.svg"></v-img>
+              </router-link>
+
+              <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
+                <v-img contain src="/src/assets/icons/messenger.svg"></v-img>
+              </router-link>
+
+              <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
+                <v-img contain src="/src/assets/icons/twiter.svg"></v-img>
+              </router-link>
+
+              <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
+                <v-img contain src="/src/assets/icons/share.svg"></v-img>
+              </router-link>
             </div>
           </div>
-          <SlideImages
-            :items="details?.images"
-            :refe="'slideImageDetail'"
-            img_width="87px"
-            style="height: 87px"
-            @clickItem="processItemClicked"
-          >
-          </SlideImages>
-          <div id="shares">
-            <p>Chia sẻ:</p>
-            <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
-              <v-img contain src="/src/assets/icons/facebook.svg"></v-img>
-            </router-link>
 
-            <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
-              <v-img contain src="/src/assets/icons/messenger.svg"></v-img>
-            </router-link>
+          <div id="product-info">
+            <p class="product__name">{{ details?.name ?? "..." }}</p>
 
-            <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
-              <v-img contain src="/src/assets/icons/twiter.svg"></v-img>
-            </router-link>
+            <div class="product__evaluates" v-if="details">
+              <v-rating
+                v-model="details.rating"
+                class="icon-size-14"
+                size="14"
+                color="#FFB800"
+                readonly
+                half-increments
+              ></v-rating>
+              <p>{{ details.rating }}/5</p>
+              <p class="product__evaluate__sold">
+                Đã bán {{ prefixSymbolsNumber(details?.sold) }}
+              </p>
+            </div>
 
-            <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
-              <v-img contain src="/src/assets/icons/share.svg"></v-img>
-            </router-link>
-          </div>
-        </div>
-
-        <div id="product-info">
-          <p class="product__name">{{ details?.name ?? "..." }}</p>
-
-          <div class="product__evaluates" v-if="details">
-            <v-rating
-              v-model="details.rating"
-              class="icon-size-14"
-              size="14"
-              color="#FFB800"
-              readonly
-              half-increments
-            ></v-rating>
-            <p>{{ details.rating }}/5</p>
-            <p class="product__evaluate__sold">
-              Đã bán {{ prefixSymbolsNumber(details?.sold) }}
-            </p>
-          </div>
-
-          <div
-            id="product__variants"
-            v-if="
-              details &&
-              ((details?.sizes.length > 0 && details.sizes[0].name != null) ||
-                (details?.colors.length > 0 && details.colors[0].name != null))
-            "
-          >
-            <p class="product__variant__heading">Phân loại</p>
             <div
-              class="product__variants__list"
-              v-if="details?.colors.length && details.colors[0].name != null"
+              id="product__variants"
+              v-if="
+                details &&
+                ((details?.sizes.length > 0 && details.sizes[0].name != null) ||
+                  (details?.colors.length > 0 && details.colors[0].name != null))
+              "
             >
-              <p class="product__variants__list__name heading-text">Màu sắc</p>
-              <div class="product__variants__list__items">
-                <div
-                  :class="{
-                    product__variant__item: true,
-                    product__variant__item__active: i === color_active,
-                  }"
-                  v-for="(variant, i) in details?.colors"
-                  :key="i"
-                  @click="chooseVariant(0, i)"
-                >
-                  <div class="product__variant__img" v-if="variant.image">
-                    <img :src="variant.image" />
+              <p class="product__variant__heading">Phân loại</p>
+              <div
+                class="product__variants__list"
+                v-if="details?.colors.length && details.colors[0].name != null"
+              >
+                <p class="product__variants__list__name heading-text">Màu sắc</p>
+                <div class="product__variants__list__items">
+                  <div
+                    :class="{
+                      product__variant__item: true,
+                      product__variant__item__active: i === color_active,
+                    }"
+                    v-for="(variant, i) in details?.colors"
+                    :key="i"
+                    @click="chooseVariant(0, i)"
+                  >
+                    <div class="product__variant__img" v-if="variant.image">
+                      <img :src="variant.image" />
+                    </div>
+                    <p class="product__variant__name">{{ variant.name }}</p>
                   </div>
-                  <p class="product__variant__name">{{ variant.name }}</p>
+                </div>
+              </div>
+
+              <div
+                class="product__variants__list"
+                v-if="details?.sizes.length && details.sizes[0].name != null"
+              >
+                <p class="product__variants__list__name heading-text">Kích thước</p>
+                <div class="product__variants__list__items">
+                  <div
+                    :class="{
+                      product__variant__item: true,
+                      product__variant__item__active: i === size_active,
+                    }"
+                    v-for="(variant, i) in details?.sizes"
+                    :key="i"
+                    @click="chooseVariant(1, i)"
+                  >
+                    <div class="product__variant__img" v-if="variant.image">
+                      <img :src="variant.image" />
+                    </div>
+                    <p class="product__variant__name">{{ variant.name }}</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div
-              class="product__variants__list"
-              v-if="details?.sizes.length && details.sizes[0].name != null"
-            >
-              <p class="product__variants__list__name heading-text">Kích thước</p>
-              <div class="product__variants__list__items">
+            <div id="quantity-order">
+              <p class="heading-text">Số lượng:</p>
+              <div>
                 <div
-                  :class="{
-                    product__variant__item: true,
-                    product__variant__item__active: i === size_active,
-                  }"
-                  v-for="(variant, i) in details?.sizes"
-                  :key="i"
-                  @click="chooseVariant(1, i)"
+                  class="quantity-order__button user-not-select"
+                  @click="order_quantity = Math.max(order_quantity - 1, 1)"
                 >
-                  <div class="product__variant__img" v-if="variant.image">
-                    <img :src="variant.image" />
-                  </div>
-                  <p class="product__variant__name">{{ variant.name }}</p>
+                  <v-icon>mdi-minus</v-icon>
+                </div>
+                <input
+                  type="number"
+                  class="quantity-order__input"
+                  v-model="order_quantity"
+                />
+                <div
+                  class="quantity-order__button user-not-select"
+                  @click="
+                    order_quantity = Math.min(order_quantity + 1, details.inventory)
+                  "
+                >
+                  <v-icon>mdi-plus</v-icon>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div id="quantity-order">
-            <p class="heading-text">Số lượng:</p>
-            <div>
-              <div
-                class="quantity-order__button user-not-select"
-                @click="order_quantity = Math.max(order_quantity - 1, 1)"
-              >
-                <v-icon>mdi-minus</v-icon>
-              </div>
-              <input
-                type="number"
-                class="quantity-order__input"
-                v-model="order_quantity"
-              />
-              <div
-                class="quantity-order__button user-not-select"
-                @click="order_quantity = Math.min(order_quantity + 1, details.inventory)"
-              >
-                <v-icon>mdi-plus</v-icon>
-              </div>
+            <div id="inventory">
+              <p class="heading-text">
+                Tồn kho: <span>{{ this.getLocaleStringNumber(inventory) }}</span>
+              </p>
+              <p class="heading-text">
+                Giá: <span>{{ this.getLocaleStringNumber(price) }} đ</span>
+              </p>
             </div>
-          </div>
 
-          <div id="inventory">
-            <p class="heading-text">
-              Tồn kho: <span>{{ this.getLocaleStringNumber(inventory) }}</span>
-            </p>
-            <p class="heading-text">
-              Giá: <span>{{ this.getLocaleStringNumber(price) }} đ</span>
-            </p>
-          </div>
-
-          <div id="actions">
-            <button id="btn-add-to-cart" @click="addToCart()">Thêm vào giỏ hàng</button>
-            <button id="btn-buy-now" @click="addToCart(true)">Mua ngay</button>
+            <div id="actions">
+              <button id="btn-add-to-cart" @click="addToCart()">Thêm vào giỏ hàng</button>
+              <button id="btn-buy-now" @click="addToCart(true)">Mua ngay</button>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <section id="product-extend">
-      <div class="container">
+      <div class="container flex-box">
         <div id="product-extend-content" ref="extendContent">
           <div id="product-extend__heading" class="user-not-select">
             <div id="shop-info">
@@ -462,12 +471,14 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import BannerSlides from "../components/BannerSlides.vue";
+import Breadcrumbs from "../components/Breadcrumbs.vue";
 import Product from "../components/Product.vue";
 import SlideImages from "../components/SlideImages.vue";
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
 export default {
-  components: { DefaultLayout, BannerSlides, SlideImages, Product },
+  components: { DefaultLayout, BannerSlides, SlideImages, Product, Breadcrumbs },
   name: "ProductDetail",
   data() {
     return {
@@ -497,6 +508,15 @@ export default {
     },
   },
   methods: {
+    ...mapActions(["setCartProductsSelected"]),
+    handleClickBreadcrumb(item) {
+      if (item.id !== -1) {
+        this.$router.push({
+          name: "products-category",
+          query: { name: item.name, id: item.id },
+        });
+      }
+    },
     updateSlideModel(value) {
       this.slide_model = value;
     },
@@ -515,6 +535,7 @@ export default {
           product_variant_id: this.product_variant_id,
           quantity: this.order_quantity,
         });
+        this.setCartProductsSelected([response.data.id]);
         this.showAlert(
           response.data.title,
           response.data.message,
@@ -566,12 +587,21 @@ export default {
     },
     async getProductDetails() {
       this.startLoad();
-      const slug = this.$route.params.slug;
-      const response = await axios.get("product/details/" + slug);
-      this.details = response.data.data;
-      this.comments = this.details.comments.comments;
-      this.inventory = this.details.inventory;
-      this.price = this.details.price;
+      try {
+        const slug = this.$route.params.slug;
+        const response = await axios.get("product/details/" + slug);
+        this.details = response.data.data;
+        this.comments = this.details.comments.comments;
+        this.inventory = this.details.inventory;
+        this.price = this.details.price;
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          "home"
+        );
+      }
       this.finishLoad();
     },
   },
@@ -582,7 +612,7 @@ export default {
 #product-extend {
   height: 2097px;
 }
-.container {
+.flex-box {
   display: flex;
   column-gap: 16px;
   max-height: 100%;

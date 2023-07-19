@@ -38,4 +38,7 @@ export default {
   setNotifications({ commit }, notifications) {
     commit("setNotifications", notifications);
   },
+  setNumberCarts({ commit }, number_carts) {
+    commit("setNumberCarts", number_carts);
+  },
 };

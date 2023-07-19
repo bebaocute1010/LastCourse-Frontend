@@ -672,18 +672,21 @@ export default {
       const date = new Date(time);
       const hours = date.getHours();
       const minutes = date.getMinutes();
-      const seconds = date.getSeconds();
       const day = date.getDate();
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
 
-      const formattedTime = `${hours}:${minutes}:${seconds}`;
-      const formattedDate = `${day}/${month}/${year}`;
+      const formattedTime = `${hours >= 10 ? hours : "0" + hours}:${
+        minutes >= 10 ? minutes : "0" + minutes
+      }`;
+      const formattedDate = `${day >= 10 ? day : "0" + day}/${
+        month >= 10 ? month : "0" + month
+      }/${year}`;
 
       return `${formattedTime} ${formattedDate}`;
     },
-    viewBillDetail(bill_id) {
-      this.getBillDetails(bill_id);
+    async viewBillDetail(bill_id) {
+      await this.getBillDetails(bill_id);
       this.cur_bill_id = bill_id;
       this.dialog_detail = true;
     },

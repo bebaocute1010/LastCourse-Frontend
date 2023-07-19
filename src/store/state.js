@@ -14,4 +14,5 @@ export default {
   shop: null,
   cart_products_selected: [],
   notifications: [],
+  canumber_cartsrts: 0,
 };

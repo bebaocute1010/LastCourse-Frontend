@@ -39,4 +39,7 @@ export default {
   setNotifications(state, notifications) {
     state.notifications = notifications;
   },
+  setNumberCarts(state, number_carts) {
+    state.number_carts = number_carts;
+  },
 };
