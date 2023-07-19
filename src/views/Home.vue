@@ -54,8 +54,14 @@
         id="2"
         :items="products_feature"
         :show_rate="true"
+        @btnViewallClicked="btnViewallClicked(2)"
       />
-      <ProductsList name="Sản phẩm bán chạy" id="3" :items="products_top_selling" />
+      <ProductsList
+        name="Sản phẩm bán chạy"
+        id="3"
+        :items="products_top_selling"
+        @btnViewallClicked="btnViewallClicked(3)"
+      />
       <ProductsGrid
         name="Có thể bạn thích"
         id="4"
@@ -137,6 +143,13 @@ export default {
     this.getProducts("get/recommended-products", this.products_recommended);
   },
   methods: {
+    btnViewallClicked(id) {
+      if (id == 2) {
+        this.$router.push({ name: "featured-products" });
+      } else {
+        this.$router.push({ name: "top-selling-products" });
+      }
+    },
     updateSlideModel(value) {
       this.slide_model = value;
     },

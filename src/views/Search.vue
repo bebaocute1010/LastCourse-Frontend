@@ -20,7 +20,7 @@
                         :ref="`checkboxCatsFilter[${i}]`"
                         :label="item.name"
                         v-model="filter_cats_selected[i]"
-                        @update:modelValue="getResultsSearch"
+                        @update:modelValue="updateValueCheckbox(i)"
                       ></v-checkbox-btn>
                     </v-list-item-action>
                   </template>
@@ -44,17 +44,9 @@
           <div class="filter-item">
             <h3 class="filter-item-heading">KHOẢNG GIÁ</h3>
             <div id="filter-range-price" class="filter-item-body">
-              <input
-                class="filter-range-price__input"
-                type="number"
-                v-model="filters_search_result.filter_price_min"
-              />
+              <input class="filter-range-price__input" v-model="priceMinFormated" />
               <v-icon>mdi-minus</v-icon>
-              <input
-                class="filter-range-price__input"
-                type="number"
-                v-model="filters_search_result.filter_price_max"
-              />
+              <input class="filter-range-price__input" v-model="priceMaxFormated" />
             </div>
 
             <div class="btn-center">
@@ -88,11 +80,13 @@
         </div>
 
         <div id="results-filter">
-          <div class="results__title" v-if="filters_search_result.search">
-            <p>Kết quả tìm kiếm cho ‘ {{ filters_search_result.search }} ‘</p>
+          <div class="results__title" v-if="getTitleResults() != null">
+            <p>
+              {{ getTitleResults() }}
+            </p>
           </div>
 
-          <div class="results__filter-options">
+          <div class="results__filter-options" v-if="page_type == 0 || page_type == 1">
             <ul class="results__filter-options__list">
               <li
                 :class="{
@@ -178,6 +172,34 @@ export default {
   name: "Search",
   components: { DefaultLayout, Product, ProductsGrid },
   computed: {
+    priceMinFormated: {
+      get() {
+        if (this.filters_search_result.filter_price_min) {
+          return this.filters_search_result.filter_price_min.toLocaleString();
+        }
+        return null;
+      },
+      set(value) {
+        const parsed_value = parseInt(value.replace(/,/g, ""));
+        if (!isNaN(parsed_value)) {
+          this.filters_search_result.filter_price_min = parsed_value;
+        }
+      },
+    },
+    priceMaxFormated: {
+      get() {
+        if (this.filters_search_result.filter_price_max) {
+          return this.filters_search_result.filter_price_max.toLocaleString();
+        }
+        return null;
+      },
+      set(value) {
+        const parsed_value = parseInt(value.replace(/,/g, ""));
+        if (!isNaN(parsed_value)) {
+          this.filters_search_result.filter_price_max = parsed_value;
+        }
+      },
+    },
     filterCats() {
       if (!this.more_filter_cats) {
         return this.filter_cats.filter((item, i) => i < 7);
@@ -201,9 +223,14 @@ export default {
       }
       this.getResultsSearch();
     },
+    $route() {
+      this.handleUpdateCategoryValue(this.$route.query?.id);
+      this.processPageType();
+    },
   },
   data() {
     return {
+      page_type: 0,
       num_page: 1,
       more_filter_cats: false,
       filter_option_selected: 0,
@@ -220,28 +247,108 @@ export default {
         sort_desc_price: null,
         sort_newest: null,
         sort_sell: null,
+        type: null,
       },
       products_grid: [],
     };
   },
   created() {
-    this.setWindowTitle("Tìm kiếm sản phẩm");
-    if (this.$route.query.search) {
-      this.filters_search_result.search = this.$route.query.search;
-    }
-    this.getResultsSearch();
+    this.processPageType();
+    this.$eventBus.on("search", (keywords) => {
+      this.filters_search_result.search = keywords;
+      this.getResultsSearch();
+    });
   },
   methods: {
-    getFormData() {},
+    updateValueCheckbox(index) {
+      if (this.page_type == 1) {
+        const category = this.filter_cats[index];
+        this.$router.push({
+          name: "products-category",
+          query: {
+            name: category.name,
+            id: category.id,
+          },
+        });
+      } else {
+        this.getResultsSearch();
+      }
+    },
+    handleUpdateCategoryValue(cat_id) {
+      if (this.page_type == 1) {
+        this.filter_cats_selected.length = 0;
+        this.filter_cats.filter((item, index) => {
+          if (item.id == cat_id) {
+            this.filter_cats_selected[index] = true;
+          }
+        });
+        this.filters_search_result.filter_cats.length = 0;
+        this.filters_search_result.filter_cats = [cat_id];
+      }
+    },
+    async processPageType() {
+      this.startLoad();
+      await this.setTypePage();
+      if (!this.filter_cats?.length) {
+        await this.getCategories();
+      }
+      this.handleUpdateCategoryValue(this.$route.query.id);
+      await this.getResultsSearch();
+      this.finishLoad();
+    },
+    async getCategories() {
+      const response = await axios.get("get/category/search");
+      this.filter_cats = response.data.data;
+    },
+    async setTypePage() {
+      this.page_type = 0;
+      let window_title = "M Clothing";
+      if (this.$route.name == "search") {
+        window_title = "Tìm kiếm sản phẩm";
+        if (this.$route.query.search) {
+          this.filters_search_result.search = this.$route.query.search;
+        }
+      } else if (this.$route.name == "products-category") {
+        this.page_type = 1;
+        window_title = "Sản phẩm danh mục";
+        this.filters_search_result.search = "";
+      } else if (this.$route.name == "featured-products") {
+        this.page_type = 2;
+        window_title = "Sản phẩm nổi bật";
+      } else if (this.$route.name == "top-selling-products") {
+        this.page_type = 3;
+        window_title = "Sản phẩm bán chạy";
+      }
+      this.filters_search_result.type = this.page_type;
+      this.setWindowTitle(window_title);
+    },
+    getTitleResults() {
+      switch (this.page_type) {
+        case 0:
+          return this.filters_search_result.search
+            ? `Kết quả tìm kiếm cho ‘ ${this.filters_search_result.search} ‘`
+            : null;
+        case 1:
+          return `Sản phẩm danh mục: ${this.$route.query.name}`;
+        case 2:
+          return "Sản phẩm nổi bật";
+        case 3:
+          return "Sản phẩm bán chạy";
+        default:
+          return null;
+      }
+    },
     async getResultsSearch() {
       this.startLoad();
       const form_data = new FormData();
-      this.filters_search_result.filter_cats.length = 0;
-      this.filter_cats_selected.forEach((item, index) => {
-        if (item) {
-          this.filters_search_result.filter_cats.push(this.filter_cats[index].id);
-        }
-      });
+      if (this.page_type != 1) {
+        this.filters_search_result.filter_cats.length = 0;
+        this.filter_cats_selected.forEach((item, index) => {
+          if (item) {
+            this.filters_search_result.filter_cats.push(this.filter_cats[index].id);
+          }
+        });
+      }
       for (let key in this.filters_search_result) {
         if (key == "filter_cats" && this.filters_search_result[key].length > 0) {
           for (let k in this.filters_search_result.filter_cats) {
@@ -251,10 +358,21 @@ export default {
           form_data.append(key, this.filters_search_result[key]);
         }
       }
-      const response = await axios.post("get/search-products", form_data);
-      this.products_grid = response.data.data.products;
-      this.num_page = response.data.data.num_page;
-      this.filter_cats = response.data.data.categories;
+      try {
+        const response = await axios.post("get/search-products", form_data);
+        this.products_grid = response.data.data.products;
+        this.num_page = response.data.data.num_page;
+        if (this.page_type != 1) {
+          this.filter_cats = response.data.data.categories;
+        }
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          "home"
+        );
+      }
       this.finishLoad();
     },
     search(value) {

@@ -2,7 +2,11 @@
   <div class="products-list container">
     <div class="products-list__heading">
       <p class="products-list__title" v-if="!flash_sale">{{ name }}</p>
-      <button :id="'btn-view-all-' + id" class="products-list__btn-view-all">
+      <button
+        :id="'btn-view-all-' + id"
+        class="products-list__btn-view-all"
+        @click="handleClickBtn()"
+      >
         Xem tất cả
       </button>
     </div>
@@ -69,7 +73,11 @@ export default {
       default: false,
     },
   },
-  methods: {},
+  methods: {
+    handleClickBtn() {
+      this.$emit("btnViewallClicked");
+    },
+  },
 };
 </script>
 

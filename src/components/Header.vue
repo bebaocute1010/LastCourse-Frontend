@@ -376,8 +376,15 @@ export default {
       this.timer = setTimeout(this.search, 500);
     },
     search() {
-      this.$emit("search", this.search_text.trim());
-      this.$router.push({ name: "search", query: { search: this.search_text.trim() } });
+      if (
+        !["featured-products", "top-selling-products", "products-category"].includes(
+          this.$route.name
+        )
+      ) {
+        this.$router.push({ name: "search", query: { search: this.search_text.trim() } });
+      } else {
+        this.$eventBus.emit("search", this.search_text.trim());
+      }
     },
   },
 };
