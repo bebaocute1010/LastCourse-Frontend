@@ -51,12 +51,6 @@ export default {
     ]),
     startLoad() {
       this.setLoading(true);
-      setTimeout(() => {
-        if (this.loading) {
-          this.finishLoad();
-          this.showAlert("Error", "Timeout", "error", null);
-        }
-      }, 30000);
     },
     finishLoad() {
       this.setLoading(false);

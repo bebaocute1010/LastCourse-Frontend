@@ -1,5 +1,5 @@
 <template>
-  <v-col cols="3">
+  <v-col class="user-nav-col" cols="3">
     <div id="user-navigation">
       <div class="user-info">
         <v-avatar class="user-info__avatar" @click="openDialogShopUpdate">
@@ -79,8 +79,9 @@ export default {
   position: sticky;
   height: 100%;
 }
-.v-col-3 {
-  max-width: 25%;
+.user-nav-col {
+  width: 340px;
+  max-width: 340px;
   height: 100vh;
   position: -webkit-sticky;
   position: sticky;
