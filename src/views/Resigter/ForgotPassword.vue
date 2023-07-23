@@ -1,41 +1,30 @@
 <template>
-  <div class="basic-page register-page">
-    <Alert />
-    <DialogRules
-      :dialog_visible="dialog_visible"
-      @updateDialogVisible="updateDialogVisible"
-    />
-    <AccountLayout>
-      <div class="form-content">
-        <div class="form-heading">
-          <p class="form-heading-title">Quên mật khẩu</p>
-          <p class="form-heading-subtitle">
-            Nhập email đã đăng ký tài khoản để nhận mã OTP
-          </p>
-        </div>
+  <div class="form-content">
+    <div class="form-heading">
+      <p class="form-heading-title">Quên mật khẩu</p>
+      <p class="form-heading-subtitle">Nhập email đã đăng ký tài khoản để nhận mã OTP</p>
+    </div>
 
-        <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
-          <TextFieldWithValidation
-            class="my-input"
-            name="email"
-            label="E-mail"
-            variant="outlined"
-            color="red"
-          />
+    <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
+      <TextFieldWithValidation
+        class="my-input"
+        name="email"
+        label="E-mail"
+        variant="outlined"
+        color="red"
+      />
 
-          <v-btn type="submit" class="base-button button-register">Tiếp tục</v-btn>
-        </Form>
+      <v-btn type="submit" class="base-button button-register">Tiếp tục</v-btn>
+    </Form>
 
-        <div class="bottom-content">
-          <p>
-            Bạn đã có tài khoản
-            <router-link :to="{ name: 'login' }" class="another-action"
-              >Đăng Nhập</router-link
-            >
-          </p>
-        </div>
-      </div>
-    </AccountLayout>
+    <div class="bottom-content">
+      <p>
+        Bạn đã có tài khoản
+        <router-link :to="{ name: 'login' }" class="another-action"
+          >Đăng Nhập</router-link
+        >
+      </p>
+    </div>
   </div>
 </template>
 

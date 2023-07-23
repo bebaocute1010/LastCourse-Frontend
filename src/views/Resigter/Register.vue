@@ -1,65 +1,60 @@
 <template>
-  <div class="basic-page register-page">
-    <Alert />
+  <div class="form-content">
     <DialogRules
       :dialog_visible="dialog_visible"
       @updateDialogVisible="updateDialogVisible"
     />
-    <AccountLayout>
-      <div class="form-content">
-        <div class="form-heading">
-          <p class="form-heading-title">Đăng ký tài khoản</p>
-          <p class="form-heading-subtitle">Đăng ký tài khoản ngay bây giờ</p>
-        </div>
+    <div class="form-heading">
+      <p class="form-heading-title">Đăng ký tài khoản</p>
+      <p class="form-heading-subtitle">Đăng ký tài khoản ngay bây giờ</p>
+    </div>
 
-        <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
-          <TextFieldWithValidation
-            class="my-input"
-            name="email"
-            label="E-mail"
-            variant="outlined"
-            color="red"
-          />
+    <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
+      <TextFieldWithValidation
+        class="my-input"
+        name="email"
+        label="E-mail"
+        variant="outlined"
+        color="red"
+      />
 
-          <Field
-            name="agreement"
-            :value="true"
-            type="checkbox"
-            v-slot="{ value, handleChange, errors }"
-          >
-            <v-checkbox
-              class="my-check-box"
-              :model-value="value"
-              @update:modelValue="handleChange"
-              color="#0074BD"
-              :error-messages="errors"
-            >
-              <template v-slot:label>
-                <label class="check-box-label">
-                  <span @click="handleChange">Tôi đồng ý với các </span>
-                  <span
-                    @click.prevent="dialog_visible = true"
-                    class="check-box-label-highlight"
-                  >
-                    Chính sách và điều khoản
-                  </span>
-                </label>
-              </template>
-            </v-checkbox>
-          </Field>
-          <v-btn type="submit" class="base-button button-register">Tiếp tục</v-btn>
-        </Form>
+      <Field
+        name="agreement"
+        :value="true"
+        type="checkbox"
+        v-slot="{ value, handleChange, errors }"
+      >
+        <v-checkbox
+          class="my-check-box"
+          :model-value="value"
+          @update:modelValue="handleChange"
+          color="#0074BD"
+          :error-messages="errors"
+        >
+          <template v-slot:label>
+            <label class="check-box-label">
+              <span @click="handleChange">Tôi đồng ý với các </span>
+              <span
+                @click.prevent="dialog_visible = true"
+                class="check-box-label-highlight"
+              >
+                Chính sách và điều khoản
+              </span>
+            </label>
+          </template>
+        </v-checkbox>
+      </Field>
+      <v-btn type="submit" class="base-button button-register">Tiếp tục</v-btn>
+    </Form>
 
-        <div class="bottom-content">
-          <p>
-            Bạn đã có tài khoản
-            <router-link :to="{ name: 'login' }" class="another-action"
-              >Đăng Nhập</router-link
-            >
-          </p>
-        </div>
-      </div>
-    </AccountLayout>
+    <div class="bottom-content">
+      <p>
+        Bạn đã có tài khoản
+        <router-link :to="{ name: 'login' }" class="another-action"
+          >Đăng Nhập</router-link
+        >
+      </p>
+    </div>
   </div>
 </template>
 

@@ -2,25 +2,25 @@
   <v-app style="position: relative">
     <loading :is_loading="loading"></loading>
     <SystemBar />
-    <header><Header @search="search" :search_rs="search_rs" /></header>
+    <Header @search="search" :search_rs="search_rs" />
 
     <div id="body-content">
-      <HomeNavigation v-if="!hidden_nav ?? true" />
+      <HomeNavigation v-if="$route?.name != 'shop-profile'" />
       <v-main>
         <div
           class="main-content"
           :style="{
-            'margin-top': hidden_nav ? 0 : '-100vh',
-            'padding-top': hidden_nav ? 0 : '24px',
+            'margin-top': $route?.name == 'shop-profile' ? 0 : '-100vh',
+            'padding-top': $route?.name == 'shop-profile' ? 0 : '24px',
           }"
         >
           <Alert />
-          <slot></slot>
+          <router-view></router-view>
         </div>
       </v-main>
     </div>
 
-    <footer v-if="!hidden_footer ?? true"><Footer /></footer>
+    <footer v-if="$route?.name != 'payment'"><Footer /></footer>
   </v-app>
 </template>
 

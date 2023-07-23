@@ -1,18 +1,18 @@
 <template>
-  <user-layout>
+  <div>
     <v-dialog v-model="dialog_detail" max-width="1200">
       <v-card class="dialog_detail">
         <v-card-title class="dialog_heading">
-          <p>Thông tin sản phẩm</p>
+          <p>Đơn hàng {{ dialog_detail_data?.code }}</p>
           <v-icon @click="closeDialogBillDetail()">mdi-close</v-icon>
         </v-card-title>
         <v-card-text>
           <v-data-table
-            items-per-page="5"
+            items-per-page="4"
             v-model:page="dialog_detail_page"
             :headers="dialog_detail_header"
-            :items="dialog_detail_data"
-            height="460"
+            :items="dialog_detail_data?.details"
+            height="378"
           >
             <template v-slot:[`item.name`]="{ item }">
               <div class="product">
@@ -29,7 +29,33 @@
               </p>
             </template>
 
+            <template v-slot:[`item.cost`]="{ item }">
+              <p class="product-price">
+                {{ this.getLocaleStringNumber(item.selectable.cost) }}
+              </p>
+            </template>
+
             <template v-slot:bottom>
+              <div class="fees-wraper" v-if="dialog_detail_data != null">
+                <div class="fees-name">
+                  <p>Tổng tiền hàng</p>
+                  <p>Tổng tiền vận chuyển</p>
+                  <p>Tổng tiền thanh toán</p>
+                </div>
+
+                <div class="fees-sum">
+                  <p>{{ getLocaleStringNumber(dialog_detail_data?.total) }} đ</p>
+                  <p>{{ getLocaleStringNumber(dialog_detail_data?.shipping_fee) }} đ</p>
+                  <p>
+                    {{
+                      getLocaleStringNumber(
+                        dialog_detail_data?.total + dialog_detail_data?.shipping_fee
+                      )
+                    }}
+                    đ
+                  </p>
+                </div>
+              </div>
               <v-pagination
                 class="pagination-bar"
                 v-if="dialogDetailPageCount > 1"
@@ -84,7 +110,7 @@
             class="content-search__input"
             placeholder="Tìm kiếm ..."
             v-model="search"
-            @input="searchBills(search)"
+            v-on:keyup.enter="searchBills(search)"
           />
           <v-icon class="content-search__icon" @click="searchBills(search)"
             >mdi-magnify</v-icon
@@ -102,6 +128,12 @@
           show-select
           height="500"
         >
+          <template v-slot:[`item.code`]="{ item }">
+            <div class="bill-code-box">
+              <v-img cover :src="item.selectable.image" width="40" height="40"></v-img>
+              <span class="bill_code">{{ item.selectable.code }}</span>
+            </div>
+          </template>
           <template v-slot:[`item.delivery`]="{ item }">
             <div class="delivery">
               <p>{{ item.selectable.phone }}</p>
@@ -217,7 +249,7 @@
         </v-data-table>
       </div>
     </div>
-  </user-layout>
+  </div>
 </template>
 
 <script>
@@ -230,17 +262,12 @@ export default {
     return {
       page: 1,
       dialog_delete: false,
-      dialog_detail_data: [],
+      dialog_detail_data: null,
       dialog_detail_page: 1,
       dialog_detail_header: [
         {
           title: "Tên sản phẩm",
           key: "name",
-          sortable: false,
-        },
-        {
-          title: "Đơn giá",
-          key: "price",
           sortable: false,
         },
         {
@@ -250,8 +277,20 @@ export default {
           align: "center",
         },
         {
+          title: "Đơn giá",
+          key: "price",
+          sortable: false,
+        },
+        {
           title: "Số lượng",
           key: "quantity",
+          sortable: false,
+          align: "center",
+        },
+
+        {
+          title: "Thành tiền",
+          key: "cost",
           sortable: false,
           align: "center",
         },
@@ -285,7 +324,13 @@ export default {
       ],
       table_headers: [
         {
-          title: "Khách hàng",
+          title: "Đơn hàng",
+          sortable: false,
+          key: "code",
+          width: 150,
+        },
+        {
+          title: "Họ tên",
           sortable: false,
           key: "receiver",
           width: 150,
@@ -305,11 +350,14 @@ export default {
         },
         {
           title: "Thời gian đặt",
+          sortable: false,
           key: "order_time",
           align: "center",
+          width: 170,
         },
         {
           title: "Trạng thái",
+          sortable: false,
           key: "status",
           align: "center",
         },
@@ -318,6 +366,7 @@ export default {
           sortable: false,
           key: "actions",
           align: "center",
+          width: 200,
         },
       ],
       table_rows: [],
@@ -327,7 +376,6 @@ export default {
       action_multiple: false,
       item_edited: null,
       timeout_id: null,
-      cur_bill_id: null,
     };
   },
   computed: {
@@ -335,12 +383,20 @@ export default {
       return Math.ceil(this.filterStatus(this.status_selected).length / 10);
     },
     dialogDetailPageCount() {
-      return Math.ceil(this.dialog_detail_data.length / 5);
+      return Math.ceil(this.dialog_detail_data?.details.length / 4);
     },
   },
-  created() {
+  async created() {
     this.setWindowTitle("Quản lý đơn hàng");
-    this.getBills();
+    await this.getBills();
+    if (this.$route.query.code != null) {
+      const item = this.table_rows.find(
+        ({ code }) => code == "#" + this.$route.query.code
+      );
+      if (item) {
+        this.viewBillDetail(item.id);
+      }
+    }
   },
   methods: {
     searchBills(search) {
@@ -359,14 +415,13 @@ export default {
     },
     closeDialogBillDetail() {
       this.dialog_detail = false;
-      this.cur_bill_id = null;
-      this.dialog_detail_data = [];
+      this.dialog_detail_data = null;
     },
     async getBillDetails(bill_id) {
       this.startLoad();
       try {
         const response = await axios.get(`bill/details?id=${bill_id}`);
-        this.dialog_detail_data = response.data.data;
+        this.dialog_detail_data = response.data;
       } catch (error) {
         console.log(error);
       }
@@ -443,7 +498,7 @@ export default {
             title = response.data.title;
             message = response.data.message;
             type = "success";
-            this.delayMethod(this.getNotifications, 2500);
+            this.delayMethod(this.getNotifications, 1000);
           }
         } catch (error) {
           console.log(error);
@@ -490,7 +545,6 @@ export default {
     },
     async viewDetail(bill_id) {
       await this.getBillDetails(bill_id);
-      this.cur_bill_id = bill_id;
       this.dialog_detail = true;
     },
     filterStatus(status) {
@@ -527,11 +581,36 @@ export default {
     status_selected() {
       this.selected_all = this.isSelectedAll();
     },
+    $route() {
+      if (this.$route.query.code != null) {
+        const item = this.table_rows.find(
+          ({ code }) => code == "#" + this.$route.query.code
+        );
+        if (item) {
+          this.viewBillDetail(item.id);
+        }
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
+.content-search-table {
+  font-size: 14px;
+}
+.table-wrapper {
+  padding: 0 30px 0 100px;
+}
+.fees-wraper {
+  padding-top: 12px;
+  display: flex;
+  column-gap: 46px;
+  justify-content: flex-end;
+}
+.fees-sum {
+  text-align: right;
+}
 .product-name {
   width: 300px;
   font-size: 14px;

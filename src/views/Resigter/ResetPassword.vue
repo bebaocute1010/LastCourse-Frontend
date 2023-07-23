@@ -1,36 +1,31 @@
 <template>
-  <div class="basic-page account-info-register-page center-row">
-    <Alert />
-    <AccountLayout class="hide-logo">
-      <div class="form-content">
-        <div class="form-heading">
-          <p class="form-heading-title">Đặt lại mật khẩu</p>
-        </div>
-        <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
-          <TextFieldWithValidation
-            class="my-input"
-            name="password"
-            label="Mật khẩu mới"
-            :type="show_password ? 'text' : 'password'"
-            :append-inner-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append-inner="show_password = !show_password"
-            variant="outlined"
-            color="red"
-          />
-          <TextFieldWithValidation
-            class="my-input"
-            name="password_confirmation"
-            label="Xác nhận mật khẩu mới"
-            :type="show_password_2 ? 'text' : 'password'"
-            :append-inner-icon="show_password_2 ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append-inner="show_password_2 = !show_password_2"
-            variant="outlined"
-            color="red"
-          />
-          <v-btn type="submit" class="base-button button-finish">Xong</v-btn>
-        </Form>
-      </div>
-    </AccountLayout>
+  <div class="form-content">
+    <div class="form-heading">
+      <p class="form-heading-title">Đặt lại mật khẩu</p>
+    </div>
+    <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
+      <TextFieldWithValidation
+        class="my-input"
+        name="password"
+        label="Mật khẩu mới"
+        :type="show_password ? 'text' : 'password'"
+        :append-inner-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
+        @click:append-inner="show_password = !show_password"
+        variant="outlined"
+        color="red"
+      />
+      <TextFieldWithValidation
+        class="my-input"
+        name="password_confirmation"
+        label="Xác nhận mật khẩu mới"
+        :type="show_password_2 ? 'text' : 'password'"
+        :append-inner-icon="show_password_2 ? 'mdi-eye' : 'mdi-eye-off'"
+        @click:append-inner="show_password_2 = !show_password_2"
+        variant="outlined"
+        color="red"
+      />
+      <v-btn type="submit" class="base-button button-finish">Xong</v-btn>
+    </Form>
   </div>
 </template>
 
@@ -74,7 +69,7 @@ export default {
   created() {
     this.setWindowTitle("Đặt lại mật khẩu");
     if (!this.email_register) {
-        router.push({ name: "forgot-password" });
+      router.push({ name: "forgot-password" });
     }
   },
   methods: {

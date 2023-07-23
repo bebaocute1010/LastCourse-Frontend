@@ -1,5 +1,5 @@
 <template>
-  <default-layout :hidden_footer="true">
+  <div>
     <v-dialog
       class="dialog"
       v-model="dialog_show"
@@ -41,10 +41,10 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue-darken-1" variant="text" @click="closeDialog()">
-            Close
+            Đóng
           </v-btn>
           <v-btn color="blue-darken-1" variant="text" @click="updateShipping()">
-            Save
+            Lưu
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -144,7 +144,7 @@
                 v-model="payment_method"
                 value="1"
               />
-              <label>Zalo pay</label>
+              <label>ZaloPay</label>
               <div class="payment-method-item__image">
                 <img src="/src/assets/icons/zalo-pay.svg" />
               </div>
@@ -171,7 +171,7 @@
         </div>
       </div>
     </div>
-  </default-layout>
+  </div>
 </template>
 
 <script>
@@ -230,7 +230,7 @@ export default {
             payment_method: this.payment_method,
             note: this.notes[note_index],
           });
-          this.delayMethod(this.getNotifications, 2500);
+          this.delayMethod(this.getNotifications, 1000);
           this.finishLoad();
         });
         this.showAlert(
@@ -327,6 +327,9 @@ export default {
   flex-direction: column;
   align-items: flex-end;
   row-gap: 17px;
+}
+.fees-sum {
+  text-align: right;
 }
 .order-summary button {
   padding: 12px 136px;

@@ -1,338 +1,369 @@
 <template>
-  <default-layout>
-    <div class="container">
-      <v-dialog v-model="dialog_comment" max-width="800">
-        <v-card class="dialog_detail">
-          <v-card-title class="dialog_heading">
-            <p>Đánh giá sản phẩm</p>
-            <v-icon @click="closeDialogComment()">mdi-close</v-icon>
-          </v-card-title>
-          <v-card-text>
-            <div class="dialog-comment">
-              <div class="dialog-comment__flex dialog-comment__product">
-                <div class="dialog-comment__img">
-                  <v-img cover :src="item_edited?.image"></v-img>
-                </div>
-                <div>
-                  <p class="dialog-comment__product-name">{{ item_edited?.name }}</p>
-                  <p
-                    class="dialog-comment__product-variant"
-                    v-if="item_edited?.variant !== '-'"
-                  >
-                    Phân loại: {{ item_edited?.variant }}
-                  </p>
-                </div>
+  <div class="table-wrapper">
+    <v-dialog v-model="dialog_comment" max-width="800">
+      <v-card class="dialog_detail">
+        <v-card-title class="dialog_heading">
+          <p>Đánh giá sản phẩm</p>
+          <v-icon @click="closeDialogComment()">mdi-close</v-icon>
+        </v-card-title>
+        <v-card-text>
+          <div class="dialog-comment">
+            <div class="dialog-comment__flex dialog-comment__product">
+              <div class="dialog-comment__img">
+                <v-img cover :src="item_edited?.image"></v-img>
               </div>
-              <div class="dialog-comment__flex dialog-comment__rating">
-                <label>Chất lượng sản phẩm:</label>
-                <v-rating
-                  v-model="item_comment.rating"
-                  size="24"
-                  color="#FFB800"
-                ></v-rating>
-                <label class="dialog-comment__rating__describe">{{
-                  getRatingString(item_comment.rating)
-                }}</label>
-              </div>
-              <v-textarea
-                variant="outlined"
-                placeholder="Nội dung đánh giá ..."
-                v-model="item_comment.content"
-                no-resize
-              ></v-textarea>
-              <div class="images user-not-select">
-                <div class="image-button" @click="$refs.images.click()">
-                  <v-icon>mdi-plus-circle</v-icon>
-                  <span>Thêm ảnh</span>
-                  <input
-                    hidden
-                    multiple
-                    ref="images"
-                    type="file"
-                    accept="image/*"
-                    @change="onChangeImages"
-                  />
-                </div>
-                <SlideImages
-                  refe="slideImageProduct"
-                  @deleteImage="deleteImage(i)"
-                  :items="image_urls"
-                  :img_width="'70px'"
-                  :show_delete="true"
-                  style="height: 70px"
-                ></SlideImages>
+              <div>
+                <p class="dialog-comment__product-name">{{ item_edited?.name }}</p>
+                <p
+                  class="dialog-comment__product-variant"
+                  v-if="item_edited?.variant !== '-'"
+                >
+                  Phân loại: {{ item_edited?.variant }}
+                </p>
               </div>
             </div>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="closeDialogComment()"> Đóng </v-btn>
-            <v-btn @click="submitComment()"> Hoàn tất </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-
-      <v-dialog v-model="dialog_detail" max-width="1200">
-        <v-card class="dialog_detail">
-          <v-card-title class="dialog_heading">
-            <p>Thông tin sản phẩm</p>
-            <v-icon @click="closeDialogBillDetail()">mdi-close</v-icon>
-          </v-card-title>
-          <v-card-text>
-            <v-data-table
-              items-per-page="5"
-              v-model:page="dialog_detail_page"
-              :headers="dialog_detail_header"
-              :items="dialog_detail_data"
-              height="460"
-            >
-              <template v-slot:[`item.name`]="{ item }">
-                <div class="product">
-                  <div class="product-image">
-                    <v-img cover :src="item.selectable.image"></v-img>
-                  </div>
-                  <p class="product-name">{{ item.selectable.name }}</p>
-                </div>
-              </template>
-
-              <template v-slot:[`item.price`]="{ item }">
-                <p class="product-price">
-                  {{ this.getLocaleStringNumber(item.selectable.price) }}
-                </p>
-              </template>
-
-              <template v-slot:[`item.actions`]="{ item }">
-                <div
-                  class="actions-group-button"
-                  v-if="item.selectable.have_evaluated === null"
-                >
-                  <button
-                    class="action-button edit-item-button"
-                    @click="showDialogComment(item.selectable)"
-                  >
-                    Đánh giá
-                  </button>
-                </div>
-                <span v-else-if="item.selectable.have_evaluated">Đã đánh giá</span>
-                <span v-else>-</span>
-              </template>
-
-              <template v-slot:bottom>
-                <v-pagination
-                  class="pagination-bar"
-                  v-if="dialogDetailPageCount > 1"
-                  v-model="dialog_detail_page"
-                  :length="dialogDetailPageCount"
-                  :total-visible="5"
-                ></v-pagination>
-              </template>
-            </v-data-table>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="closeDialogBillDetail()"> Đóng </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <dialog-delete
-        :dialog="dialog_delete"
-        :title="dialog_delete_title"
-        :text="dialog_delete_text"
-        @emitResultDialog="processResultDialogDelete"
-      ></dialog-delete>
-      <div id="main-content">
-        <div class="content-heading">
-          <div>
-            <ul class="content-heading__list">
-              <li
-                :class="{
-                  'content-heading__item': true,
-                  'content-heading__active': i === status_selected,
-                }"
-                v-for="(item, i) in heading_items"
-                :key="i"
-                @click="
-                  {
-                    status_selected = i;
-                    selected = [];
-                  }
-                "
-              >
-                <span class="content-heading__item-title">{{ item.title }}</span>
-                <span class="content-heading__item-quantity"
-                  >({{ filterStatus(i).length }})</span
-                >
-              </li>
-            </ul>
+            <div class="dialog-comment__flex dialog-comment__rating">
+              <label>Chất lượng sản phẩm:</label>
+              <v-rating
+                v-model="item_comment.rating"
+                size="24"
+                color="#FFB800"
+              ></v-rating>
+              <label class="dialog-comment__rating__describe">{{
+                getRatingString(item_comment.rating)
+              }}</label>
+            </div>
+            <v-textarea
+              variant="outlined"
+              placeholder="Nội dung đánh giá ..."
+              v-model="item_comment.content"
+              no-resize
+            ></v-textarea>
+            <div class="images user-not-select">
+              <div class="image-button" @click="$refs.images.click()">
+                <v-icon>mdi-plus-circle</v-icon>
+                <span>Thêm ảnh</span>
+                <input
+                  hidden
+                  multiple
+                  ref="images"
+                  type="file"
+                  accept="image/*"
+                  @change="onChangeImages"
+                />
+              </div>
+              <SlideImages
+                refe="slideImageProduct"
+                @deleteImage="deleteImage(i)"
+                :items="image_urls"
+                :img_width="'70px'"
+                :show_delete="true"
+                style="height: 70px"
+              ></SlideImages>
+            </div>
           </div>
-        </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="closeDialogComment()"> Đóng </v-btn>
+          <v-btn @click="submitComment()"> Hoàn tất </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
-        <div class="content-search">
-          <div class="content-search-box">
-            <input
-              type="text"
-              class="content-search__input"
-              placeholder="Tìm kiếm ..."
-              v-model="search"
-              @input="searchBills(search)"
-            />
-            <v-icon class="content-search__icon" @click="searchBills(search)"
-              >mdi-magnify</v-icon
-            >
-          </div>
-        </div>
-
-        <div class="content-search-table">
+    <v-dialog v-model="dialog_detail" max-width="1200">
+      <v-card class="dialog_detail">
+        <v-card-title class="dialog_heading">
+          <p>Đơn hàng {{ dialog_detail_data?.code }}</p>
+          <v-icon @click="closeDialogBillDetail()">mdi-close</v-icon>
+        </v-card-title>
+        <v-card-text>
           <v-data-table
-            v-model:page="table_bill_page"
-            :headers="table_headers"
-            :items="filterStatus(status_selected)"
-            v-model="selected"
-            show-select
-            height="500"
-            :items-per-page="10"
+            v-if="dialog_detail_data?.details"
+            items-per-page="4"
+            v-model:page="dialog_detail_page"
+            :headers="dialog_detail_header"
+            :items="dialog_detail_data.details"
+            height="378"
           >
-            <template v-slot:[`item.delivery`]="{ item }">
-              <div class="delivery">
-                <p>{{ item.selectable.phone }}</p>
-                <p class="delivery__address">{{ item.selectable.address }}</p>
+            <template v-slot:[`item.name`]="{ item }">
+              <div class="product">
+                <div class="product-image">
+                  <v-img cover :src="item.selectable.image"></v-img>
+                </div>
+                <p class="product-name">{{ item.selectable.name }}</p>
               </div>
             </template>
 
-            <template v-slot:[`item.detail`]="{ item }">
-              <div class="detail">
-                <button @click="viewBillDetail(item.selectable.id)">
-                  Xem <v-icon>mdi-eye</v-icon>
-                </button>
-              </div>
+            <template v-slot:[`item.price`]="{ item }">
+              <p class="product-price">
+                {{ this.getLocaleStringNumber(item.selectable.price) }}
+              </p>
             </template>
 
-            <template v-slot:[`item.status`]="{ item }">
-              <v-chip :color="getColor(item.selectable.status)">{{
-                getStatusString(item.selectable.status)
-              }}</v-chip>
-            </template>
-
-            <template v-slot:[`item.order_time`]="{ item }">
-              <span>{{ formatTime(item.selectable.created_at) }}</span>
+            <template v-slot:[`item.cost`]="{ item }">
+              <p class="product-price">
+                {{ this.getLocaleStringNumber(item.selectable.cost) }}
+              </p>
             </template>
 
             <template v-slot:[`item.actions`]="{ item }">
               <div
                 class="actions-group-button"
-                v-if="[0, 1, 2, 3].includes(item.selectable.status)"
+                v-if="item.selectable.have_evaluated === null"
               >
                 <button
-                  v-if="[0, 1].includes(item.selectable.status)"
-                  class="action-button delete-item-button"
-                  @click="
-                    showDialogDelete(
-                      'Hủy đơn hàng',
-                      'Bạn có chắc chắn muốn hủy đơn hàng này ?',
-                      5,
-                      false,
-                      item.selectable
-                    )
-                  "
-                >
-                  Hủy
-                </button>
-                <button
-                  v-if="item.selectable.status === 2"
                   class="action-button edit-item-button"
-                  @click="receive(false, item.selectable)"
-                >
-                  Nhận
-                </button>
-                <button
-                  v-if="item.selectable.status === 2"
-                  class="action-button delete-item-button"
-                  @click="
-                    showDialogDelete(
-                      'Hoàn đơn hàng',
-                      'Bạn có chắc chắn muốn hoàn đơn hàng này cho người bán ?',
-                      4,
-                      false,
-                      item.selectable
-                    )
-                  "
-                >
-                  Hoàn
-                </button>
-
-                <button
-                  v-if="item.selectable.status === 3"
-                  class="action-button edit-item-button"
-                  @click="viewBillDetail(item.selectable.id)"
+                  @click="showDialogComment(item.selectable)"
                 >
                   Đánh giá
                 </button>
               </div>
+              <span v-else-if="item.selectable.have_evaluated">Đã đánh giá</span>
               <span v-else>-</span>
             </template>
+
             <template v-slot:bottom>
+              <div class="fees-wraper" v-if="dialog_detail_data != null">
+                <div class="fees-name">
+                  <p>Tổng tiền hàng</p>
+                  <p>Tổng tiền vận chuyển</p>
+                  <p>Tổng tiền thanh toán</p>
+                </div>
+
+                <div class="fees-sum">
+                  <p>{{ getLocaleStringNumber(dialog_detail_data?.total) }} đ</p>
+                  <p>{{ getLocaleStringNumber(dialog_detail_data?.shipping_fee) }} đ</p>
+                  <p>
+                    {{
+                      getLocaleStringNumber(
+                        dialog_detail_data?.total + dialog_detail_data?.shipping_fee
+                      )
+                    }}
+                    đ
+                  </p>
+                </div>
+              </div>
               <v-pagination
                 class="pagination-bar"
-                v-if="tableBillsPageCount > 1"
-                v-model="table_bill_page"
-                :length="tableBillsPageCount"
+                v-if="dialogDetailPageCount > 1"
+                v-model="dialog_detail_page"
+                :length="dialogDetailPageCount"
                 :total-visible="5"
               ></v-pagination>
-              <div
-                id="table-footer"
-                v-if="selected.length > 0 && status_selected > 0 && status_selected < 4"
+            </template>
+          </v-data-table>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="closeDialogBillDetail()"> Đóng </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <dialog-delete
+      :dialog="dialog_delete"
+      :title="dialog_delete_title"
+      :text="dialog_delete_text"
+      @emitResultDialog="processResultDialogDelete"
+    ></dialog-delete>
+    <div id="main-content">
+      <div class="content-heading">
+        <div>
+          <ul class="content-heading__list">
+            <li
+              :class="{
+                'content-heading__item': true,
+                'content-heading__active': i === status_selected,
+              }"
+              v-for="(item, i) in heading_items"
+              :key="i"
+              @click="
+                {
+                  status_selected = i;
+                  selected = [];
+                }
+              "
+            >
+              <span class="content-heading__item-title">{{ item.title }}</span>
+              <span class="content-heading__item-quantity"
+                >({{ filterStatus(i).length }})</span
               >
-                <div id="table-footer__number-selected">
-                  <span>{{ selected.length }} đơn hàng đã được chọn</span>
-                  <div class="table-footer__buttons-group">
-                    <div class="actions-group-button">
-                      <button
-                        v-if="status_selected === 2 || status_selected === 1"
-                        class="action-button delete-item-button"
-                        @click="
-                          showDialogDelete(
-                            'Hủy đơn hàng',
-                            'Bạn có chắc chắn muốn hủy những đơn hàng đã chọn ?',
-                            5,
-                            true,
-                            null
-                          )
-                        "
-                      >
-                        Hủy
-                      </button>
-                      <button
-                        v-if="status_selected === 3"
-                        class="action-button edit-item-button"
-                        @click="receive(true, null)"
-                      >
-                        Nhận
-                      </button>
-                      <button
-                        v-if="status_selected === 3"
-                        class="action-button delete-item-button"
-                        @click="
-                          showDialogDelete(
-                            'Hoàn đơn hàng',
-                            'Bạn có chắc chắn muốn hoàn những đơn hàng đã chọn cho người bán ?',
-                            4,
-                            true,
-                            null
-                          )
-                        "
-                      >
-                        Hoàn
-                      </button>
-                    </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="content-search">
+        <div class="content-search-box">
+          <input
+            type="text"
+            class="content-search__input"
+            placeholder="Tìm kiếm ..."
+            v-model="search"
+            v-on:keyup.enter="searchBills(search)"
+          />
+          <v-icon class="content-search__icon" @click="searchBills(search)"
+            >mdi-magnify</v-icon
+          >
+        </div>
+      </div>
+
+      <div class="content-search-table">
+        <v-data-table
+          v-model:page="table_bill_page"
+          :headers="table_headers"
+          :items="filterStatus(status_selected)"
+          v-model="selected"
+          show-select
+          height="500"
+          :items-per-page="10"
+        >
+          <template v-slot:[`item.code`]="{ item }">
+            <div class="bill-code-box">
+              <v-img cover :src="item.selectable.image" width="40" height="40"></v-img>
+              <span class="bill_code">{{ item.selectable.code }}</span>
+            </div>
+          </template>
+          <template v-slot:[`item.delivery`]="{ item }">
+            <div class="delivery">
+              <p>{{ item.selectable.phone }}</p>
+              <p class="delivery__address">{{ item.selectable.address }}</p>
+            </div>
+          </template>
+
+          <template v-slot:[`item.detail`]="{ item }">
+            <div class="detail">
+              <button @click="viewBillDetail(item.selectable.id)">
+                Xem <v-icon>mdi-eye</v-icon>
+              </button>
+            </div>
+          </template>
+
+          <template v-slot:[`item.status`]="{ item }">
+            <v-chip :color="getColor(item.selectable.status)">{{
+              getStatusString(item.selectable.status)
+            }}</v-chip>
+          </template>
+
+          <template v-slot:[`item.order_time`]="{ item }">
+            <span>{{ formatTime(item.selectable.created_at) }}</span>
+          </template>
+
+          <template v-slot:[`item.actions`]="{ item }">
+            <div
+              class="actions-group-button"
+              v-if="[0, 1, 2, 3].includes(item.selectable.status)"
+            >
+              <button
+                v-if="[0, 1].includes(item.selectable.status)"
+                class="action-button delete-item-button"
+                @click="
+                  showDialogDelete(
+                    'Hủy đơn hàng',
+                    'Bạn có chắc chắn muốn hủy đơn hàng này ?',
+                    5,
+                    false,
+                    item.selectable
+                  )
+                "
+              >
+                Hủy
+              </button>
+              <button
+                v-if="item.selectable.status === 2"
+                class="action-button edit-item-button"
+                @click="receive(false, item.selectable)"
+              >
+                Nhận
+              </button>
+              <button
+                v-if="item.selectable.status === 2"
+                class="action-button delete-item-button"
+                @click="
+                  showDialogDelete(
+                    'Hoàn đơn hàng',
+                    'Bạn có chắc chắn muốn hoàn đơn hàng này cho người bán ?',
+                    4,
+                    false,
+                    item.selectable
+                  )
+                "
+              >
+                Hoàn
+              </button>
+
+              <button
+                v-if="item.selectable.status === 3"
+                class="action-button edit-item-button"
+                @click="viewBillDetail(item.selectable.id)"
+              >
+                Đánh giá
+              </button>
+            </div>
+            <span v-else>-</span>
+          </template>
+          <template v-slot:bottom>
+            <v-pagination
+              class="pagination-bar"
+              v-if="tableBillsPageCount > 1"
+              v-model="table_bill_page"
+              :length="tableBillsPageCount"
+              :total-visible="5"
+            ></v-pagination>
+            <div
+              id="table-footer"
+              v-if="selected.length > 0 && status_selected > 0 && status_selected < 4"
+            >
+              <div id="table-footer__number-selected">
+                <span>{{ selected.length }} đơn hàng đã được chọn</span>
+                <div class="table-footer__buttons-group">
+                  <div class="actions-group-button">
+                    <button
+                      v-if="status_selected === 2 || status_selected === 1"
+                      class="action-button delete-item-button"
+                      @click="
+                        showDialogDelete(
+                          'Hủy đơn hàng',
+                          'Bạn có chắc chắn muốn hủy những đơn hàng đã chọn ?',
+                          5,
+                          true,
+                          null
+                        )
+                      "
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      v-if="status_selected === 3"
+                      class="action-button edit-item-button"
+                      @click="receive(true, null)"
+                    >
+                      Nhận
+                    </button>
+                    <button
+                      v-if="status_selected === 3"
+                      class="action-button delete-item-button"
+                      @click="
+                        showDialogDelete(
+                          'Hoàn đơn hàng',
+                          'Bạn có chắc chắn muốn hoàn những đơn hàng đã chọn cho người bán ?',
+                          4,
+                          true,
+                          null
+                        )
+                      "
+                    >
+                      Hoàn
+                    </button>
                   </div>
                 </div>
               </div>
-            </template>
-          </v-data-table>
-        </div>
+            </div>
+          </template>
+        </v-data-table>
       </div>
     </div>
-  </default-layout>
+  </div>
 </template>
 
 <script>
@@ -347,16 +378,11 @@ export default {
       table_bill_page: 1,
       dialog_detail_page: 1,
       dialog_delete: false,
-      dialog_detail_data: [],
+      dialog_detail_data: null,
       dialog_detail_header: [
         {
           title: "Tên sản phẩm",
           key: "name",
-          sortable: false,
-        },
-        {
-          title: "Đơn giá",
-          key: "price",
           sortable: false,
         },
         {
@@ -366,8 +392,20 @@ export default {
           align: "center",
         },
         {
+          title: "Đơn giá",
+          key: "price",
+          sortable: false,
+        },
+        {
           title: "Số lượng",
           key: "quantity",
+          sortable: false,
+          align: "center",
+        },
+
+        {
+          title: "Thành tiền",
+          key: "cost",
           sortable: false,
           align: "center",
         },
@@ -408,6 +446,12 @@ export default {
       ],
       table_headers: [
         {
+          title: "Đơn hàng",
+          sortable: false,
+          key: "code",
+          width: 150,
+        },
+        {
           title: "Họ tên",
           sortable: false,
           key: "receiver",
@@ -428,11 +472,14 @@ export default {
         },
         {
           title: "Thời gian đặt",
+          sortable: false,
           key: "order_time",
           align: "center",
+          width: 170,
         },
         {
           title: "Trạng thái",
+          sortable: false,
           key: "status",
           align: "center",
         },
@@ -465,12 +512,20 @@ export default {
       return Math.ceil(this.filterStatus(this.status_selected).length / 10);
     },
     dialogDetailPageCount() {
-      return Math.ceil(this.dialog_detail_data.length / 5);
+      return Math.ceil(this.dialog_detail_data.details.length / 4);
     },
   },
-  created() {
+  async created() {
     this.setWindowTitle("Đơn hàng của tôi");
-    this.getBills();
+    await this.getBills();
+    if (this.$route.query.code != null) {
+      const item = this.table_rows.find(
+        ({ code }) => code == "#" + this.$route.query.code
+      );
+      if (item) {
+        this.viewBillDetail(item.id);
+      }
+    }
   },
   methods: {
     searchBills(search) {
@@ -559,13 +614,13 @@ export default {
     closeDialogBillDetail() {
       this.dialog_detail = false;
       this.cur_bill_id = null;
-      this.dialog_detail_data = [];
+      this.dialog_detail_data = null;
     },
     async getBillDetails(bill_id) {
       this.startLoad();
       try {
         const response = await axios.get(`bill/details?id=${bill_id}`);
-        this.dialog_detail_data = response.data.data;
+        this.dialog_detail_data = response.data;
       } catch (error) {
         console.log(error);
       }
@@ -604,7 +659,7 @@ export default {
         title = response.data.title;
         message = response.data.message;
         type = "success";
-        this.delayMethod(this.getNotifications, 2500);
+        this.delayMethod(this.getNotifications, 1000);
       } catch (error) {
         console.log(error);
         title = error.response.data.title;
@@ -644,7 +699,7 @@ export default {
           title = response.data.title;
           message = response.data.message;
           type = "success";
-          this.delayMethod(this.getNotifications, 2500);
+          this.delayMethod(this.getNotifications, 1000);
         } catch (error) {
           console.log(error);
           title = error.response.data.title;
@@ -724,13 +779,35 @@ export default {
     status_selected() {
       this.selected_all = this.isSelectedAll();
     },
+    $route() {
+      if (this.$route.query.code != null) {
+        const item = this.table_rows.find(
+          ({ code }) => code == "#" + this.$route.query.code
+        );
+        if (item) {
+          this.viewBillDetail(item.id);
+        }
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-.pagination-bar {
-  padding-bottom: 20px;
+.content-search-table {
+  font-size: 14px;
+}
+.table-wrapper {
+  padding: 0 30px 0 100px;
+}
+.fees-wraper {
+  padding-top: 12px;
+  display: flex;
+  column-gap: 46px;
+  justify-content: flex-end;
+}
+.fees-sum {
+  text-align: right;
 }
 .dialog-comment__rating__describe {
   font-size: 14px;
@@ -800,7 +877,7 @@ export default {
 .delivery {
   font-size: 14px;
   padding: 8px 0;
-  width: 320px;
+  width: 250px;
 }
 .container {
   padding-bottom: 32px;

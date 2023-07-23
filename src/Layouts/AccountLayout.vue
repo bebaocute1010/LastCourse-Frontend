@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <Alert />
     <loading :is_loading="loading"></loading>
     <v-row class="content">
       <v-col class="banner" cols="7">
@@ -22,7 +23,7 @@
             <v-img src="/src/assets/logo.svg" />
           </div>
           <main>
-            <slot></slot>
+            <router-view></router-view>
           </main>
         </div>
       </v-col>
@@ -40,11 +41,8 @@ export default {
 </script>
 
 <style>
-.basic-page {
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
+.v-form {
+  padding: 5px;
 }
 .container {
   max-width: 1175px;
@@ -52,6 +50,8 @@ export default {
 
 .center-row .content {
   display: flex;
+  height: 100vh;
+  justify-content: center;
   align-items: center;
 }
 

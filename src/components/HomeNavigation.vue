@@ -45,7 +45,11 @@
             </v-list-item>
 
             <div v-else class="notify-item">
-              <v-list-item v-for="notify in notifications" :key="notify.id">
+              <v-list-item
+                v-for="notify in notifications"
+                :key="notify.id"
+                @click="gotoBillDetail(notify)"
+              >
                 <v-list-item-title
                   :class="{ 'notify-item__unread': notify.read_at == null }"
                   >{{ notify.title }}</v-list-item-title
@@ -102,6 +106,23 @@ export default {
   },
   methods: {
     ...mapActions(["setNumberCarts"]),
+    gotoBillDetail(notify) {
+      axios.put("get/notifications/mark-read?id=" + notify.id).then((response) => {
+        this.getNotifications();
+      });
+      let name = "";
+      if (notify.type == "user") {
+        name = "bills";
+      } else if (notify.type == "shop") {
+        name = "bills-manage";
+      }
+      this.$router.push({
+        name: name,
+        query: {
+          code: notify.code,
+        },
+      });
+    },
     markReadAll() {
       if (!this.notifications.length) {
         return;
@@ -133,6 +154,9 @@ export default {
 </script>
 
 <style>
+.notify-item {
+  cursor: pointer;
+}
 .v-list-item__content .notify-item__unread {
   font-weight: 700;
 }

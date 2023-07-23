@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout :hidden_footer="true">
+  <div>
     <dialog-delete
       :dialog="dialog_delete"
       title="Xóa sản phẩm khỏi giỏ hàng"
@@ -104,7 +104,7 @@
         </v-data-table>
       </div>
     </div>
-  </DefaultLayout>
+  </div>
 </template>
 
 <script>

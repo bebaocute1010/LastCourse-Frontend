@@ -1,7 +1,5 @@
 <template>
-  <DefaultLayout :hidden_nav="true">
-    <div id="content" class="user-not-select">Coming soon</div>
-  </DefaultLayout>
+  <div id="content" class="user-not-select">Coming soon</div>
 </template>
 
 <script>
@@ -20,9 +18,9 @@ export default {
   text-align: center;
   font-family: "Kalam", cursive;
   padding: 48px;
-  padding-bottom: 24px;
   font-size: 36px;
   font-weight: 700;
+  height: 100vh;
 }
 .main-content {
   padding: 0 !important;

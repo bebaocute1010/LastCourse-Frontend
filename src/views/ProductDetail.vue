@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout>
+  <div>
     <section id="product">
       <div class="container">
         <Breadcrumbs
@@ -223,8 +223,8 @@
                 <router-link
                   id="btn-view-shop"
                   :to="
-                    details?.shop.id
-                      ? { name: 'shop-profile', params: { id: details.shop.id } }
+                    details?.shop.slug
+                      ? { name: 'shop-profile', params: { slug: details.shop.slug } }
                       : '#'
                   "
                   >Xem shop</router-link
@@ -288,22 +288,22 @@
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 0,
+                        '__item__rating__filter-item__active': rating_filter_select === 0,
                       }"
+                      @click="rating_filter_select = 0"
                     >
                       <p>Tất cả</p>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.all) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[0]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 5,
+                        '__item__rating__filter-item__active': rating_filter_select === 5,
                       }"
+                      @click="rating_filter_select = 5"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -314,16 +314,16 @@
                         model-value="5"
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_5) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[5]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 4,
+                        '__item__rating__filter-item__active': rating_filter_select === 4,
                       }"
+                      @click="rating_filter_select = 4"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -334,16 +334,16 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_4) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[4]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 3,
+                        '__item__rating__filter-item__active': rating_filter_select === 3,
                       }"
+                      @click="rating_filter_select = 3"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -354,16 +354,16 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_3) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[3]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 2,
+                        '__item__rating__filter-item__active': rating_filter_select === 2,
                       }"
+                      @click="rating_filter_select = 2"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -374,16 +374,16 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_2) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[2]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 1,
+                        '__item__rating__filter-item__active': rating_filter_select === 1,
                       }"
+                      @click="rating_filter_select = 1"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -394,13 +394,13 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_1) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[1]) }})
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div class="__item__rating__body">
+                <div class="__item__rating__body" v-if="details?.comments.num_page > 0">
                   <div
                     class="__item__rating__comment"
                     v-for="comment in comments"
@@ -439,10 +439,12 @@
                     </div>
                   </div>
                 </div>
+                <div class="rating-not-item" v-else>Không có đánh giá nào.</div>
               </div>
             </div>
 
             <v-pagination
+              v-if="details?.comments.num_page > 1"
               v-model="page_active"
               :length="details?.comments.num_page"
               :total-visible="5"
@@ -467,7 +469,7 @@
         </div>
       </div>
     </section>
-  </DefaultLayout>
+  </div>
 </template>
 
 <script>
@@ -482,13 +484,14 @@ export default {
   name: "ProductDetail",
   data() {
     return {
+      rating_filter: null,
       slide_model: 0,
       color_active: null,
       size_active: null,
       inventory: "...",
       price: "...",
       page_active: 1,
-      rating_filter_select: 1,
+      rating_filter_select: 0,
       expand: false,
       order_quantity: 1,
       comments: [],
@@ -496,16 +499,20 @@ export default {
       product_variant_id: null,
     };
   },
-  created() {
-    this.setWindowTitle("Chi tiết sản phẩm");
-    this.getProductDetails();
-  },
   watch: {
     $route(to, from) {
-      if (to.params.slug !== from.params.slug) {
+      if (to.name == "product-details" && to.params.slug !== from.params.slug) {
         this.getProductDetails();
       }
     },
+    rating_filter_select() {
+      this.page_active = 1;
+      this.getComments(this.page_active);
+    },
+  },
+  created() {
+    this.setWindowTitle("Chi tiết sản phẩm");
+    this.getProductDetails();
   },
   methods: {
     ...mapActions(["setCartProductsSelected"]),
@@ -581,8 +588,15 @@ export default {
     async getComments(page) {
       this.startLoad();
       const slug = this.$route.params.slug;
-      const response = await axios.get(`product/comments/${slug}?page=${page}`);
+      const response = await axios.get(
+        `product/comments/${slug}?page=${page}${
+          this.rating_filter_select != 0 ? "&rating=" + this.rating_filter_select : ""
+        }`
+      );
       this.comments = response.data.data;
+      this.details.comments.num_page = Math.ceil(
+        this.details.rating_count[this.rating_filter_select] / 6
+      );
       this.finishLoad();
     },
     async getProductDetails() {
@@ -609,6 +623,11 @@ export default {
 </script>
 
 <style scoped>
+.rating-not-item {
+  padding: 16px 0;
+  width: 100%;
+  text-align: center;
+}
 #product-extend {
   height: 2097px;
 }
@@ -695,18 +714,20 @@ export default {
   flex-direction: column;
   row-gap: 16px;
 }
-.__item__rating__filter-item__active {
-  color: #ec1c24;
-  border: 1px solid #ec1c24;
-}
 .__item__rating__filter-item {
   display: flex;
   align-items: center;
+  border: 1px solid #ffffff;
   column-gap: 12px;
   background: #ffffff;
   padding: 12px;
   border-radius: 100px;
   cursor: pointer;
+}
+
+.__item__rating__filter-item__active {
+  color: #ec1c24;
+  border: 1px solid #ec1c24;
 }
 .__item__rating__filters {
   column-gap: 8px;

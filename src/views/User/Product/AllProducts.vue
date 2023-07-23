@@ -1,159 +1,160 @@
 <template>
-  <UserLayout>
+  <div id="main-content">
     <DialogDelete
       :dialog="dialog.show"
       :title="dialog.title"
       :text="dialog.text"
       @emitResultDialog="processResultDialogDelete"
     />
-    <div id="main-content">
-      <div class="content-heading">
-        <div>
-          <ul class="content-heading__list">
-            <li
-              :class="{
-                'content-heading__item': true,
-                'content-heading__active': i === status_selected,
-              }"
-              v-for="(item, i) in heading_items"
-              :key="i"
-              @click="status_selected = i"
-            >
-              <span class="content-heading__item-title">{{ item.title }}</span>
-              <span class="content-heading__item-quantity"
-                >({{ filterStatus(i).length }})</span
-              >
-            </li>
-          </ul>
-        </div>
-
-        <div class="content-heading__buttons">
-          <router-link :to="{ name: 'add-product' }">
-            <button id="button-add-product">+ Thêm sản phẩm</button>
-          </router-link>
-        </div>
-      </div>
-
-      <div class="content-search">
-        <div class="content-search-box">
-          <input
-            type="text"
-            class="content-search__input"
-            placeholder="Tìm kiếm ..."
-            v-model="search"
-            @input="searchProducts(search)"
-          />
-          <v-icon class="content-search__icon" @click="searchProducts(search)"
-            >mdi-magnify</v-icon
+    <div class="content-heading">
+      <div>
+        <ul class="content-heading__list">
+          <li
+            :class="{
+              'content-heading__item': true,
+              'content-heading__active': i === status_selected,
+            }"
+            v-for="(item, i) in heading_items"
+            :key="i"
+            @click="status_selected = i"
           >
-        </div>
+            <span class="content-heading__item-title">{{ item.title }}</span>
+            <span class="content-heading__item-quantity"
+              >({{ filterStatus(i).length }})</span
+            >
+          </li>
+        </ul>
       </div>
 
-      <div class="content-search-table">
-        <v-data-table
-          v-model:page="page"
-          :headers="table_headers"
-          :items="filterStatus(status_selected)"
-          v-model="selected"
-          class="elevation-1"
-          show-select
-          height="460"
-        >
-          <template v-slot:[`item.product`]="{ item }">
-            <div class="product">
-              <div class="product-image">
-                <img :src="item.selectable.image" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">{{ item.selectable.name }}</span>
-                <span class="product-price">
-                  {{ getLocaleStringNumber(item.selectable.price) }}
-                </span>
-              </div>
-            </div>
-          </template>
-          <template v-slot:[`item.sold`]="{ item }">
-            <span>{{ this.getLocaleStringNumber(item.selectable.sold) }}</span>
-          </template>
-          <template v-slot:[`item.inventory`]="{ item }">
-            <span>{{ this.getLocaleStringNumber(item.selectable.inventory) }}</span>
-          </template>
-          <template v-slot:[`item.status`]="{ item }">
-            <span
-              :class="{
-                available: item.selectable.status === 'Còn hàng',
-                unavailable: item.selectable.status === 'Hết hàng',
-                hidden: item.selectable.status === 'Đã ẩn',
-              }"
-              >{{ item.selectable.status }}</span
-            >
-          </template>
-          <template v-slot:[`item.actions`]="{ item }">
-            <div class="actions-group-button">
-              <div
-                class="user-not-select action-button edit-item-button"
-                @click="editeProduct(item.selectable.id)"
-              >
-                <v-icon>mdi-pencil-box</v-icon>
-                <span>Sửa</span>
-              </div>
-              <div
-                class="user-not-select action-button delete-item-button"
-                @click="showDialog(item.selectable.id)"
-              >
-                <v-icon>mdi-delete</v-icon>
-                <span>Xóa</span>
-              </div>
-            </div>
-          </template>
-          <template v-slot:bottom>
-            <v-pagination
-              class="pagination-bar"
-              v-if="pageCount > 1"
-              v-model="page"
-              :length="pageCount"
-              :total-visible="5"
-            ></v-pagination>
-            <div id="table-footer" v-if="selected.length > 0">
-              <div class="table-footer__checkbox-group">
-                <input
-                  type="checkbox"
-                  class="table-checkbox"
-                  id="table-footer__checkbox"
-                  v-model="selected_all"
-                  @change="footerSelectAll"
-                />
-                <label for="table-footer__checkbox" id="table-footer__label"
-                  >Chọn tất cả</label
-                >
-              </div>
-              <div id="table-footer__number-selected">
-                <span>{{ selected.length }} sản phẩm đã được chọn</span>
-                <div class="table-footer__buttons-group">
-                  <button
-                    class="table-footer__buttons-item"
-                    id="footer__button-hidden"
-                    v-if="status_selected < 3"
-                    @click="updateProductStatuses(0)"
-                  >
-                    Ẩn
-                  </button>
-                  <button
-                    class="table-footer__buttons-item"
-                    id="footer__button-show"
-                    v-if="status_selected == 0 || status_selected == 3"
-                    @click="updateProductStatuses(1)"
-                  >
-                    Hiển thị
-                  </button>
-                </div>
-              </div>
-            </div>
-          </template>
-        </v-data-table>
+      <div class="content-heading__buttons">
+        <router-link :to="{ name: 'add-product' }">
+          <button id="button-add-product">+ Thêm sản phẩm</button>
+        </router-link>
       </div>
     </div>
-  </UserLayout>
+
+    <div class="content-search">
+      <div class="content-search-box">
+        <input
+          type="text"
+          class="content-search__input"
+          placeholder="Tìm kiếm ..."
+          v-model="search"
+          @input="searchProducts(search)"
+        />
+        <v-icon class="content-search__icon" @click="searchProducts(search)"
+          >mdi-magnify</v-icon
+        >
+      </div>
+    </div>
+
+    <div class="content-search-table">
+      <v-data-table
+        v-model:page="page"
+        :headers="table_headers"
+        :items="filterStatus(status_selected)"
+        v-model="selected"
+        class="elevation-1"
+        show-select
+        height="460"
+      >
+        <template v-slot:[`item.product`]="{ item }">
+          <router-link
+            :to="{ name: 'product-detail', params: { slug: item.selectable.slug } }"
+            class="product"
+          >
+            <div class="product-image">
+              <img :src="item.selectable.image" />
+            </div>
+            <div class="product-info">
+              <span class="product-name">{{ item.selectable.name }}</span>
+              <span class="product-price">
+                {{ getLocaleStringNumber(item.selectable.price) }}
+              </span>
+            </div>
+          </router-link>
+        </template>
+        <template v-slot:[`item.sold`]="{ item }">
+          <span>{{ this.getLocaleStringNumber(item.selectable.sold) }}</span>
+        </template>
+        <template v-slot:[`item.inventory`]="{ item }">
+          <span>{{ this.getLocaleStringNumber(item.selectable.inventory) }}</span>
+        </template>
+        <template v-slot:[`item.status`]="{ item }">
+          <span
+            :class="{
+              available: item.selectable.status === 'Còn hàng',
+              unavailable: item.selectable.status === 'Hết hàng',
+              hidden: item.selectable.status === 'Đã ẩn',
+            }"
+            >{{ item.selectable.status }}</span
+          >
+        </template>
+        <template v-slot:[`item.actions`]="{ item }">
+          <div class="actions-group-button">
+            <div
+              class="user-not-select action-button edit-item-button"
+              @click="editeProduct(item.selectable.id)"
+            >
+              <v-icon>mdi-pencil-box</v-icon>
+              <span>Sửa</span>
+            </div>
+            <div
+              class="user-not-select action-button delete-item-button"
+              @click="showDialog(item.selectable.id)"
+            >
+              <v-icon>mdi-delete</v-icon>
+              <span>Xóa</span>
+            </div>
+          </div>
+        </template>
+        <template v-slot:bottom>
+          <v-pagination
+            class="pagination-bar"
+            v-if="pageCount > 1"
+            v-model="page"
+            :length="pageCount"
+            :total-visible="5"
+          ></v-pagination>
+          <div id="table-footer" v-if="selected.length > 0">
+            <div class="table-footer__checkbox-group">
+              <input
+                type="checkbox"
+                class="table-checkbox"
+                id="table-footer__checkbox"
+                v-model="selected_all"
+                @change="footerSelectAll"
+              />
+              <label for="table-footer__checkbox" id="table-footer__label"
+                >Chọn tất cả</label
+              >
+            </div>
+            <div id="table-footer__number-selected">
+              <span>{{ selected.length }} sản phẩm đã được chọn</span>
+              <div class="table-footer__buttons-group">
+                <button
+                  class="table-footer__buttons-item"
+                  id="footer__button-hidden"
+                  v-if="status_selected < 3"
+                  @click="updateProductStatuses(0)"
+                >
+                  Ẩn
+                </button>
+                <button
+                  class="table-footer__buttons-item"
+                  id="footer__button-show"
+                  v-if="status_selected == 0 || status_selected == 3"
+                  @click="updateProductStatuses(1)"
+                >
+                  Hiển thị
+                </button>
+              </div>
+            </div>
+          </div>
+        </template>
+      </v-data-table>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -292,8 +293,17 @@ export default {
     async showProducts() {},
     async getProducts() {
       this.startLoad();
-      const response = await axios.get("shop/products");
-      this.table_rows = response.data.data;
+      try {
+        const response = await axios.get("shop/products");
+        this.table_rows = response.data.data;
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          "home"
+        );
+      }
       this.finishLoad();
     },
     isSelectedAll() {
@@ -450,6 +460,9 @@ export default {
 .product {
   display: flex;
   padding: 15px 0;
+}
+.product:hover .product-name {
+  color: #ec1c24;
 }
 .product-image {
   width: 48px;

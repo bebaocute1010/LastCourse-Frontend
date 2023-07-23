@@ -1,5 +1,5 @@
 <template>
-  <default-layout :hidden_nav="true">
+  <div>
     <div class="shop-profile__header">
       <div class="container">
         <div class="shop-profile__banner">
@@ -49,12 +49,26 @@
 
     <div class="shop-profile__body">
       <div class="container">
+        <div class="content-search-box">
+          <input
+            type="text"
+            class="content-search__input"
+            placeholder="Tìm kiếm trong shop này ..."
+            autocomplete="false"
+            v-model="search"
+            v-on:keyup.enter="getShop(search)"
+          />
+          <v-icon class="content-search__icon" @click="getShop(search)"
+            >mdi-magnify</v-icon
+          >
+        </div>
+
         <products-grid
           :hidden_heading="true"
           :items="shop?.products"
           :column_number="6"
-          image_w="180px"
-          image_h="180px"
+          image_w="167px"
+          image_h="167px"
         >
         </products-grid>
       </div>
@@ -67,7 +81,7 @@
         active-color="#EC1C24"
       ></v-pagination>
     </div>
-  </default-layout>
+  </div>
 </template>
 
 <script>
@@ -106,10 +120,21 @@ export default {
       }
       this.finishLoad();
     },
-    async getShop() {
+    async getShop(search = "") {
       this.startLoad();
-      const response = await axios.get("get/shop/" + this.$route.params.id);
-      this.shop = response.data.data;
+      try {
+        const response = await axios.get(
+          "get/shop?slug=" + this.$route.params.slug + "&search=" + search
+        );
+        this.shop = response.data.data;
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          "home"
+        );
+      }
       this.finishLoad();
     },
   },
@@ -117,6 +142,32 @@ export default {
 </script>
 
 <style scoped>
+.content-search-box {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 24px;
+}
+.content-search__input {
+  padding: 12px 16px;
+  width: 657px;
+  background: #ffffff;
+  border-radius: 100px;
+}
+.content-search__icon:hover {
+  background: #3a01cb;
+}
+.content-search__icon {
+  position: absolute;
+  top: 3px;
+  right: 522px;
+  height: 42px;
+  width: 58px;
+  background: #0172cb;
+  color: #ffffff;
+  border-radius: 100px;
+  cursor: pointer;
+}
 .button-unfollow:hover {
   background: #620000;
 }

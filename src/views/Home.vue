@@ -1,5 +1,5 @@
 <template>
-  <DefaultLayout :search_rs="search_rs">
+  <div>
     <section id="banners">
       <div class="container">
         <BannerSlides
@@ -32,19 +32,59 @@
             </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div id="services">
-          <div
-            class="service-item user-not-select"
-            v-for="(item, i) in services"
-            :key="i"
-          >
-            <div class="service__icon">
-              <v-img contain :src="item.image"></v-img>
+    <section id="categories">
+      <div class="container">
+        <Carousel class="custom-carousel carousel-no-gap" v-bind="settings">
+          <Slide v-for="index in Math.ceil(categories.length / 2)" :key="index">
+            <div class="carousel__item">
+              <div class="grouped-items">
+                <router-link
+                  v-if="categories[(index - 1) * 2]"
+                  :to="{
+                    name: 'products-category',
+                    query: {
+                      name: categories[(index - 1) * 2].name,
+                      id: categories[(index - 1) * 2].id,
+                    },
+                  }"
+                  class="category-item"
+                >
+                  <v-avatar size="70" class="category-item__avatar"
+                    ><v-img :src="categories[(index - 1) * 2].image"></v-img
+                  ></v-avatar>
+                  <p class="category-item__name">
+                    {{ categories[(index - 1) * 2].name }}
+                  </p>
+                </router-link>
+                <router-link
+                  v-if="categories[(index - 1) * 2 + 1]"
+                  :to="{
+                    name: 'products-category',
+                    query: {
+                      name: categories[(index - 1) * 2 + 1].name,
+                      id: categories[(index - 1) * 2 + 1].id,
+                    },
+                  }"
+                  class="category-item"
+                >
+                  <v-avatar size="70" class="category-item__avatar"
+                    ><v-img :src="categories[(index - 1) * 2 + 1].image"></v-img
+                  ></v-avatar>
+                  <p class="category-item__name">
+                    {{ categories[(index - 1) * 2 + 1].name }}
+                  </p>
+                </router-link>
+              </div>
             </div>
-            <span class="service__name">{{ item.name }}</span>
-          </div>
-        </div>
+          </Slide>
+
+          <template #addons>
+            <Navigation />
+          </template>
+        </Carousel>
       </div>
     </section>
 
@@ -75,7 +115,7 @@
         <button @click="viewMore()">Xem thêm</button>
       </div>
     </section>
-  </DefaultLayout>
+  </div>
 </template>
 
 <script>
@@ -83,11 +123,28 @@ import DefaultLayout from "../Layouts/DefaultLayout.vue";
 import BannerSlides from "../components/BannerSlides.vue";
 import ProductsGrid from "../components/ProductsGrid.vue";
 import ProductsList from "../components/ProductsList.vue";
+import { Carousel, Navigation, Slide } from "vue3-carousel";
+import "vue3-carousel/dist/carousel.css";
+
 export default {
-  components: { DefaultLayout, BannerSlides, ProductsList, ProductsGrid },
+  components: {
+    DefaultLayout,
+    BannerSlides,
+    ProductsList,
+    ProductsGrid,
+    Carousel,
+    Navigation,
+    Slide,
+  },
   name: "Home",
   data() {
     return {
+      settings: {
+        itemsToShow: 6,
+        itemsToScroll: 2,
+        mouseDrag: false,
+        snapAlign: "center",
+      },
       slide_model: 0,
       page_recommend: 1,
       services: [
@@ -134,15 +191,27 @@ export default {
             "https://static.vecteezy.com/system/resources/previews/015/614/507/non_2x/online-shopping-on-phone-buy-sell-business-digital-web-banner-application-money-advertising-payment-ecommerce-illustration-search-podium-vector.jpg",
         },
       ],
+      categories: [],
     };
   },
-  created() {
-    this.setWindowTitle("Trang chủ");
-    this.getProducts("get/featured-products", this.products_feature);
-    this.getProducts("get/top-selling-products", this.products_top_selling);
-    this.getProducts("get/recommended-products", this.products_recommended);
+  async created() {
+    this.startLoad();
+    await this.setWindowTitle("Trang chủ");
+    await this.getCategories();
+    await this.getProducts("get/featured-products", this.products_feature);
+    await this.getProducts("get/top-selling-products", this.products_top_selling);
+    await this.getProducts("get/recommended-products", this.products_recommended);
+    this.finishLoad();
   },
   methods: {
+    async getCategories() {
+      try {
+        const response = await axios.get("get/category/all");
+        this.categories = response.data.data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
     btnViewallClicked(id) {
       if (id == 2) {
         this.$router.push({ name: "featured-products" });
@@ -154,14 +223,12 @@ export default {
       this.slide_model = value;
     },
     async getProducts(url, array) {
-      this.startLoad();
       try {
         const response = await axios.get(url);
         array.splice(0, array.length, ...response.data.data);
       } catch (error) {
         throw error;
       }
-      this.finishLoad();
     },
     async viewMore() {
       this.page_recommend += 1;
@@ -181,6 +248,54 @@ export default {
 </script>
 
 <style>
+.carousel-no-gap .carousel__track {
+  column-gap: 0 !important;
+}
+
+.carousel__item {
+  height: 100%;
+}
+
+.grouped-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-top: 24px;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-right: unset;
+  transition: transform 0.3s ease;
+  padding: 14px 0;
+  opacity: 0.85;
+  width: 183px;
+  height: 175px;
+}
+
+.category-item:last-child {
+  border-right: 1px solid #eeeeee;
+}
+
+.category-item:hover .carousel__item {
+  z-index: 1;
+}
+.category-item:hover {
+  opacity: 1;
+  transform: scale(1.04);
+  color: #ec1c24;
+  border: none;
+}
+
 .facility__sub-title {
   font-size: 14px;
   color: #555555;
