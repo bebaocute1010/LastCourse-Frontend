@@ -35,6 +35,7 @@
                 "
               >
                 <v-radio
+                  class="category-radio-btn"
                   v-for="(item, i) in filter_cats"
                   :key="i"
                   color="#EC1C24"
@@ -194,7 +195,11 @@ export default {
       set(value) {
         const parsed_value = parseInt(value.replace(/,/g, ""));
         if (!isNaN(parsed_value)) {
-          this.filters_search_result.filter_price_min = parsed_value;
+          if (parsed_value == 0) {
+            this.filters_search_result.filter_price_min = null;
+          } else {
+            this.filters_search_result.filter_price_min = parsed_value;
+          }
         }
       },
     },
@@ -208,7 +213,11 @@ export default {
       set(value) {
         const parsed_value = parseInt(value.replace(/,/g, ""));
         if (!isNaN(parsed_value)) {
-          this.filters_search_result.filter_price_max = parsed_value;
+          if (parsed_value == 0) {
+            this.filters_search_result.filter_price_max = null;
+          } else {
+            this.filters_search_result.filter_price_max = parsed_value;
+          }
         }
       },
     },

@@ -51,7 +51,7 @@ export default {
     const password = ref("");
     const schema = {
       password: (value) => {
-        if (value?.length > 8) {
+        if (value?.length >= 8) {
           password.value = value;
           return true;
         }

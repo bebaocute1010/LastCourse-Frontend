@@ -30,7 +30,7 @@ const router = createRouter({
       component: DefaultLayout,
       children: [
         {
-          path: "trang-chu",
+          path: "",
           name: "home",
           component: Home,
         },

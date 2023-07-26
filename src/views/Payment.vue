@@ -195,14 +195,20 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["cart_products_selected"]),
+    ...mapGetters(["cart_products_selected", "user"]),
   },
-  created() {
+  async created() {
     this.setWindowTitle("Thanh toán");
     if (!this.cart_products_selected || this.cart_products_selected.length <= 0) {
       this.$router.push({ name: "cart" });
       return;
     }
+    await this.getUser();
+    this.receiver = {
+      name: this.user.last_receiver,
+      address: this.user.last_address,
+      phone: this.user.last_phone,
+    };
     this.getPreviewOrder();
   },
   beforeRouteLeave(to, from, next) {
@@ -230,7 +236,7 @@ export default {
             payment_method: this.payment_method,
             note: this.notes[note_index],
           });
-          this.delayMethod(this.getNotifications, 1000);
+          this.delayMethod(this.getNotifications, 2000);
           this.finishLoad();
         });
         this.showAlert(

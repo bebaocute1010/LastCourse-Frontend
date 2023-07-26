@@ -118,13 +118,13 @@ export default {
     const schema = {
       username: (value) => {
         if (!value) return "Vui lòng điền tên đăng nhập.";
-        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value))
+        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?]+/.test(value))
           return "Tên đăng nhập không hợp lệ.";
         if (value?.length < 8) return "Tên đăng nhập phải nhiều hơn 8 ký tự.";
         return true;
       },
       password: (value) => {
-        if (value?.length > 8) {
+        if (value?.length >= 8) {
           password.value = value;
           return true;
         }
@@ -157,7 +157,7 @@ export default {
   created() {
     this.setWindowTitle("Đăng ký thông tin");
     if (!this.email_register) {
-      // router.push({ name: "register" });
+      router.push({ name: "register" });
     }
   },
   methods: {

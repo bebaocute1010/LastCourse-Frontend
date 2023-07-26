@@ -92,7 +92,7 @@
               <p class="product__variant__heading">Phân loại</p>
               <div
                 class="product__variants__list"
-                v-if="details?.colors.length && details.colors[0].name != null"
+                v-if="details?.colors.length && details.colors[0].name"
               >
                 <p class="product__variants__list__name heading-text">Màu sắc</p>
                 <div class="product__variants__list__items">
@@ -101,7 +101,7 @@
                       product__variant__item: true,
                       product__variant__item__active: i === color_active,
                     }"
-                    v-for="(variant, i) in details?.colors"
+                    v-for="(variant, i) in details.colors"
                     :key="i"
                     @click="chooseVariant(0, i)"
                   >
@@ -167,7 +167,19 @@
                 Tồn kho: <span>{{ this.getLocaleStringNumber(inventory) }}</span>
               </p>
               <p class="heading-text">
-                Giá: <span>{{ this.getLocaleStringNumber(price) }} đ</span>
+                Giá:
+                <span v-if="details?.promotional_price == null">
+                  {{ this.getLocaleStringNumber(price) }} đ</span
+                >
+
+                <span v-if="details?.promotional_price != null">
+                  <strong class="default-price">
+                    {{ this.getLocaleStringNumber(price) }} đ</strong
+                  >
+                  <strong class="promotional-price">
+                    {{ this.getLocaleStringNumber(details.promotional_price) }} đ</strong
+                  >
+                </span>
               </p>
             </div>
 
@@ -501,7 +513,7 @@ export default {
   },
   watch: {
     $route(to, from) {
-      if (to.name == "product-details" && to.params.slug !== from.params.slug) {
+      if (to.name == "product-detail" && to.params.slug !== from.params.slug) {
         this.getProductDetails();
       }
     },
@@ -553,9 +565,10 @@ export default {
         this.showAlert(
           error.response.data.title,
           error.response.data.message,
-          "errror",
-          buy_now ? "payment" : null
+          "error",
+          null
         );
+        this.setCartProductsSelected([]);
         console.log(error);
       }
       this.finishLoad();
@@ -564,9 +577,9 @@ export default {
       this.startLoad();
       const slug = this.$route.params.slug;
       if (type == 0) {
-        this.color_active = index;
+        this.color_active = this.color_active != index ? index : null;
       } else if (type == 1) {
-        this.size_active = index;
+        this.size_active = this.size_active != index ? index : null;
       }
       let url = `product/variant-quantity/${slug}`;
       let color =
@@ -580,6 +593,8 @@ export default {
         });
         this.inventory = response.data.inventory;
         this.product_variant_id = response.data?.product_variant_id ?? null;
+        this.details.promotional_price = response.data.promotional_price;
+        this.price = response.data?.price ?? this.price;
       } catch (error) {
         console.log(error);
       }
@@ -988,5 +1003,14 @@ export default {
   flex-direction: column;
   padding: 10px;
   row-gap: 20px;
+}
+
+.default-price {
+  color: black;
+  font-weight: 400;
+  font-size: 14px;
+  text-decoration: line-through;
+  margin-right: 16px;
+  line-height: -0.5;
 }
 </style>

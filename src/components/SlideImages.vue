@@ -10,9 +10,13 @@
     @touchmove="handleDrag"
     @touchend="endDrag"
   >
-    <v-slide-group v-model="currentSlide" show-arrows="false" class="slide-group no-padding">
+    <v-slide-group
+      v-model="currentSlide"
+      show-arrows="false"
+      class="slide-group no-padding"
+    >
       <v-slide-group-item v-for="(item, i) in items" :key="i">
-        <div class="image__item" @click="clickItem(i)">
+        <div class="img-thumbnail image__item" @click="clickItem(i)">
           <v-icon
             v-if="show_delete"
             @click="deleteImage(i)"
@@ -119,11 +123,12 @@ export default {
 <style scoped>
 .image__item {
   position: relative;
+  border-radius: 8px;
+  overflow: hidden;
 }
 img {
   object-fit: cover;
   height: 100%;
-  border-radius: 8px;
   pointer-events: none;
 }
 .slide-group {

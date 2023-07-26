@@ -179,7 +179,7 @@
       <v-menu v-else open-on-hover>
         <template v-slot:activator="{ props }">
           <div class="user-info" v-bind="props">
-            <p class="user__name" v-bind="props">{{ user?.name }}</p>
+            <p class="user__name" v-bind="props">{{ user?.fullname }}</p>
 
             <v-avatar class="user__avatar">
               <v-img cover :src="user?.avatar"></v-img>

@@ -64,7 +64,7 @@
             class="product"
           >
             <div class="product-image">
-              <img :src="item.selectable.image" />
+              <img class="img-thumbnail" :src="item.selectable.image" />
             </div>
             <div class="product-info">
               <span class="product-name">{{ item.selectable.name }}</span>

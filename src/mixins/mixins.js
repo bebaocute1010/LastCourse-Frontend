@@ -92,10 +92,7 @@ export default {
       axios
         .get("auth/me")
         .then((response) => {
-          this.setUser({
-            name: response.data.data.fullname,
-            avatar: response.data.data.avatar,
-          });
+          this.setUser(response.data.data);
         })
         .catch((error) => {
           if (error.response.status === 401) {

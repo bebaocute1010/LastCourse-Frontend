@@ -15,12 +15,15 @@
             height="378"
           >
             <template v-slot:[`item.name`]="{ item }">
-              <div class="product">
+              <router-link
+                class="product"
+                :to="{ name: 'product-detail', params: { slug: item.selectable.slug } }"
+              >
                 <div class="product-image">
-                  <v-img cover :src="item.selectable.image"></v-img>
+                  <v-img class="img-thumbnail" cover :src="item.selectable.image"></v-img>
                 </div>
                 <p class="product-name">{{ item.selectable.name }}</p>
-              </div>
+              </router-link>
             </template>
 
             <template v-slot:[`item.price`]="{ item }">
@@ -36,6 +39,9 @@
             </template>
 
             <template v-slot:bottom>
+              <p class="bill-detail-note" v-if="dialog_detail_data?.note">
+                Ghi chú: {{ dialog_detail_data?.note }}
+              </p>
               <div class="fees-wraper" v-if="dialog_detail_data != null">
                 <div class="fees-name">
                   <p>Tổng tiền hàng</p>
@@ -92,6 +98,7 @@
               {
                 status_selected = i;
                 selected = [];
+                getBills();
               }
             "
           >
@@ -128,15 +135,20 @@
           show-select
           height="500"
         >
-          <template v-slot:[`item.code`]="{ item }">
-            <div class="bill-code-box">
+          <template v-slot:[`item.image`]="{ item }">
+            <div class="img-size-44 img-thumbnail">
               <v-img cover :src="item.selectable.image" width="40" height="40"></v-img>
-              <span class="bill_code">{{ item.selectable.code }}</span>
             </div>
+          </template>
+          <template v-slot:[`item.code`]="{ item }">
+            <span>{{ item.selectable.code }}</span>
           </template>
           <template v-slot:[`item.delivery`]="{ item }">
             <div class="delivery">
-              <p>{{ item.selectable.phone }}</p>
+              <p>
+                <span>{{ item.selectable.receiver }}</span
+                ><span>{{ item.selectable.phone }}</span>
+              </p>
               <p class="delivery__address">{{ item.selectable.address }}</p>
             </div>
           </template>
@@ -144,7 +156,7 @@
           <template v-slot:[`item.detail`]="{ item }">
             <div class="detail">
               <button @click="viewDetail(item.selectable.id)">
-                Xem <v-icon>mdi-eye</v-icon>
+                <v-icon>mdi-eye</v-icon>
               </button>
             </div>
           </template>
@@ -324,15 +336,15 @@ export default {
       ],
       table_headers: [
         {
-          title: "Đơn hàng",
+          title: "Sản phẩm",
           sortable: false,
-          key: "code",
-          width: 150,
+          key: "image",
+          width: 100,
         },
         {
-          title: "Họ tên",
+          title: "Mã đơn",
           sortable: false,
-          key: "receiver",
+          key: "code",
           width: 150,
         },
         {
@@ -342,31 +354,31 @@ export default {
           width: 200,
         },
         {
-          title: "Thông tin sản phẩm",
+          title: "Chi tiết",
           sortable: false,
           key: "detail",
           align: "center",
-          width: 120,
+          width: 80,
         },
         {
           title: "Thời gian đặt",
           sortable: false,
           key: "order_time",
           align: "center",
-          width: 170,
+          width: 120,
         },
         {
           title: "Trạng thái",
           sortable: false,
           key: "status",
           align: "center",
+          width: 150,
         },
         {
           title: "Hành động",
           sortable: false,
           key: "actions",
           align: "center",
-          width: 200,
         },
       ],
       table_rows: [],
@@ -390,11 +402,9 @@ export default {
     this.setWindowTitle("Quản lý đơn hàng");
     await this.getBills();
     if (this.$route.query.code != null) {
-      const item = this.table_rows.find(
-        ({ code }) => code == "#" + this.$route.query.code
-      );
+      const item = this.table_rows.find(({ code }) => code == this.$route.query.code);
       if (item) {
-        this.viewBillDetail(item.id);
+        this.viewDetail(item.id);
       }
     }
   },
@@ -498,7 +508,7 @@ export default {
             title = response.data.title;
             message = response.data.message;
             type = "success";
-            this.delayMethod(this.getNotifications, 1000);
+            this.delayMethod(this.getNotifications, 2000);
           }
         } catch (error) {
           console.log(error);
@@ -587,7 +597,7 @@ export default {
           ({ code }) => code == "#" + this.$route.query.code
         );
         if (item) {
-          this.viewBillDetail(item.id);
+          this.viewDetail(item.id);
         }
       }
     },
@@ -596,6 +606,18 @@ export default {
 </script>
 
 <style scoped>
+.bill-detail-note {
+  padding-left: 16px;
+  height: 1.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+.detail:hover {
+  color: #ec1c24;
+}
 .content-search-table {
   font-size: 14px;
 }
@@ -624,18 +646,22 @@ export default {
 .pagination-bar {
   padding-bottom: 20px;
 }
-.delivery__address {
-  height: 3em;
+.delivery p {
+  height: 1.5em;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
 }
 .delivery {
   font-size: 14px;
   padding: 8px 0;
-  width: 250px;
+  width: 200px;
+}
+.delivery p:first-child > span:first-child::after {
+  content: "•";
+  padding: 0 8px;
 }
 .dialog_detail {
   padding: 12px;
@@ -751,6 +777,9 @@ export default {
   column-gap: 16px;
   padding: 16px 0;
   align-items: center;
+}
+.product:hover .product-name {
+  color: #ec1c24;
 }
 .product-image {
   width: 48px;

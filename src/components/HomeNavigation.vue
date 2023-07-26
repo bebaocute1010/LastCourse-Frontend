@@ -8,7 +8,13 @@
           :to="{ name: 'search' }"
           :class="{
             'user-not-select': true,
-            'v-list-item--active': $route?.name == 'product-detail',
+            'nav-item__active': [
+              'product-detail',
+              'products-category',
+              'search',
+              'featured-products',
+              'top-selling-products',
+            ].includes($route?.name),
           }"
         >
           <v-icon>mdi-magnify</v-icon>
@@ -18,7 +24,10 @@
           value="home"
           key="home"
           :to="{ name: 'home' }"
-          class="user-not-select"
+          :class="{
+            'user-not-select': true,
+            'nav-item__active': $route?.name == 'home',
+          }"
         >
           <div class="v-list-item__image-prepend">
             <img src="/src/assets/logo.svg" />
@@ -66,7 +75,11 @@
         <v-list-item
           value="cart"
           key="cart"
-          class="user-not-select item-badge"
+          :class="{
+            'user-not-select': true,
+            'item-badge': true,
+            'nav-item__active': $route?.name == 'cart',
+          }"
           :to="{ name: 'cart' }"
         >
           <v-badge v-if="number_carts" :content="number_carts" color="#0074BD">

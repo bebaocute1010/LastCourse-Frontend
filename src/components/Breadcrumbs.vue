@@ -36,7 +36,7 @@ export default {
 
 <style scoped>
 #breadcrumbs {
-  padding: 16px 0;
+  padding: 0 0 24px;
 }
 #breadcrumbs .v-breadcrumbs-item {
   color: #2a2a2a;

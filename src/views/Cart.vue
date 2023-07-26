@@ -23,10 +23,13 @@
             >
               <div class="product">
                 <div class="product-image">
-                  <img :src="item.selectable.image" />
+                  <img class="img-thumbnail" :src="item.selectable.image" />
                 </div>
                 <div class="product-info">
                   <span class="product-name">{{ item.selectable.name }}</span>
+                  <span v-if="item.selectable.variant != null" class="product-variant"
+                    >Phân loại: {{ item.selectable.variant }}</span
+                  >
                 </div>
               </div>
             </router-link>
@@ -179,7 +182,7 @@ export default {
       clearTimeout(this.timer);
       this.timer = setTimeout(() => {
         this.updateCart(id, quantity);
-      }, 100);
+      }, 500);
     },
     async updateCart(id, quantity) {
       if (quantity <= 0) {
@@ -192,10 +195,16 @@ export default {
           id: id,
           quantity: quantity,
         });
-        await this.getCarts();
       } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          null
+        );
         console.log(error);
       }
+      await this.getCarts();
       this.finishLoad();
     },
     async deleteCart(ids) {
@@ -340,6 +349,10 @@ export default {
 }
 .product:hover .product-name {
   color: #ec1c24;
+}
+.product-variant {
+  font-size: 12px;
+  text-decoration: underline;
 }
 .product {
   display: flex;

@@ -246,7 +246,7 @@
         <div class="block-info">
           <div class="heading-2"><h2>Thông tin kiện hàng</h2></div>
           <div class="form-group">
-            <label class="form-group__label">Cân nặng (kg):</label>
+            <label class="form-group__label">Cân nặng (Kg):</label>
             <v-text-field
               pattern="[0-9]*"
               inputmode="numeric"
@@ -410,7 +410,6 @@
           <div class="table-rows" v-if="itemsCombination">
             <div class="table-row__item" v-for="(item, i) in itemsCombination" :key="i">
               <div class="table-row__title">
-                <!-- <span>{{ item?.name?.name ?? "..." }}</span> -->
                 <span>{{ item.name }}</span>
               </div>
               <v-row v-for="(val, j) in item.items" :key="j">
@@ -574,7 +573,7 @@ export default {
       set(value) {
         const parsed_value = parseInt(value.replace(/,/g, ""));
         if (!isNaN(parsed_value)) {
-          this.product.promotional_price = parsed_value;
+          this.product.promotional_price = parsed_value == 0 ? null : parsed_value;
         }
       },
     },
@@ -675,7 +674,7 @@ export default {
         return {
           get() {
             try {
-              if (j != null ? array[i][j] : array[i]) {
+              if (j != null ? array[i][j] != null : array[i] != null) {
                 return j != null
                   ? array[i][j].toLocaleString()
                   : array[i].toLocaleString();
@@ -787,10 +786,8 @@ export default {
             form_data.append(key, obj[key] ? 1 : 0);
           }
         } else if (key == "inventory") {
-          if (!this.product.is_variant) {
-            if (obj[key] != null) {
-              form_data.append(key, obj[key]);
-            }
+          if (!this.product.is_variant && obj[key] != null) {
+            form_data.append(key, obj[key]);
           }
         } else {
           if (obj[key] != null) {
@@ -917,8 +914,7 @@ export default {
     onChangeImages(e) {
       let files = e.target.files;
       let fileArray = Array.from(files);
-      this.product.images = fileArray;
-      this.image_urls.length = 0;
+      this.product.images = this.product.images.concat(fileArray);
       for (let i = 0; i < files.length; i++) {
         this.image_urls.push(URL.createObjectURL(files[i]));
       }

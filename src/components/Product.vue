@@ -2,7 +2,7 @@
   <router-link :to="{ name: 'product-detail', params: { slug: slug } }">
     <div class="product__container" :style="getStyleObject(width, height)">
       <div class="product__image" :style="getStyleObject(image_w, image_h)">
-        <v-img cover :src="image"></v-img>
+        <v-img class="img-thumbnail" cover :src="image"></v-img>
       </div>
 
       <div class="product__name">
