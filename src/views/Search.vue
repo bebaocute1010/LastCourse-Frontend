@@ -1,12 +1,12 @@
 <template>
-  <DefaultLayout @search="search">
-    <div id="search-scr">
-      <div class="container screen-body">
-        <div id="filters">
-          <div class="filter-item">
-            <h3 class="filter-item-heading">DANH MỤC SẢN PHẨM</h3>
-            <div class="filter-item-body">
-              <v-list class="filter-item__list">
+  <div id="search-scr">
+    <div class="container screen-body">
+      <div id="filters">
+        <div class="filter-item">
+          <h3 class="filter-item-heading">DANH MỤC SẢN PHẨM</h3>
+          <div class="filter-item-body">
+            <v-list class="filter-item__list">
+              <div class="checkbox-group" v-if="page_type != 1">
                 <v-list-item
                   class="filter-item__list__item"
                   v-for="(item, i) in filterCats"
@@ -25,147 +25,155 @@
                     </v-list-item-action>
                   </template>
                 </v-list-item>
-              </v-list>
-            </div>
-            <div class="filter-footer">
-              <button
-                v-if="!more_filter_cats"
-                id="btn-more-cats"
-                @click="more_filter_cats = true"
-              >
-                Thêm
-              </button>
-              <button v-else id="btn-less-cats" @click="more_filter_cats = false">
-                Bớt
-              </button>
-            </div>
-          </div>
-
-          <div class="filter-item">
-            <h3 class="filter-item-heading">KHOẢNG GIÁ</h3>
-            <div id="filter-range-price" class="filter-item-body">
-              <input
-                class="filter-range-price__input"
-                type="number"
-                v-model="filters_search_result.filter_price_min"
-              />
-              <v-icon>mdi-minus</v-icon>
-              <input
-                class="filter-range-price__input"
-                type="number"
-                v-model="filters_search_result.filter_price_max"
-              />
-            </div>
-
-            <div class="btn-center">
-              <button @click="getResultsSearch">Áp dụng</button>
-            </div>
-          </div>
-
-          <div class="filter-item">
-            <h3 class="filter-item-heading">ĐÁNH GIÁ</h3>
-            <div id="filter-rating" class="filter-item-body">
-              <v-rating
-                v-model="filters_search_result.filter_rating"
-                bg-color="orange-lighten-1"
-                color="#FFB800"
-                size="26"
-                @update:modelValue="getResultsSearch"
-              ></v-rating>
-
-              <div class="rating-values" v-if="filters_search_result.filter_rating">
-                <span>
-                  {{
-                    filters_search_result.filter_rating < 5
-                      ? "Từ " + filters_search_result.filter_rating + " sao"
-                      : "5 sao"
-                  }}
-                </span>
               </div>
-            </div>
+
+              <v-radio-group
+                v-else
+                v-model="filters_search_result.filter_cats[0]"
+                @update:modelValue="
+                  updateValueRadio(filters_search_result.filter_cats[0])
+                "
+              >
+                <v-radio
+                  class="category-radio-btn"
+                  v-for="(item, i) in filter_cats"
+                  :key="i"
+                  color="#EC1C24"
+                  :label="item.name"
+                  :value="item.id"
+                ></v-radio>
+              </v-radio-group>
+            </v-list>
+          </div>
+          <div class="filter-footer" v-if="page_type != 1">
+            <button
+              v-if="!more_filter_cats"
+              class="btn-show-cats"
+              @click="more_filter_cats = true"
+            >
+              Thêm
+            </button>
+            <button v-else class="btn-show-cats" @click="more_filter_cats = false">
+              Bớt
+            </button>
           </div>
         </div>
 
-        <div id="results-filter">
-          <div class="results__title" v-if="filters_search_result.search">
-            <p>Kết quả tìm kiếm cho ‘ {{ filters_search_result.search }} ‘</p>
+        <div class="filter-item">
+          <h3 class="filter-item-heading">KHOẢNG GIÁ</h3>
+          <div id="filter-range-price" class="filter-item-body">
+            <input class="filter-range-price__input" v-model="priceMinFormated" />
+            <v-icon>mdi-minus</v-icon>
+            <input class="filter-range-price__input" v-model="priceMaxFormated" />
           </div>
 
-          <div class="results__filter-options">
-            <ul class="results__filter-options__list">
-              <li
-                :class="{
-                  'results__filter-option__item': true,
-                  active: filter_option_selected === i,
-                }"
-                v-for="(item, i) in filter_options"
-                :key="i"
-                @click="filter_option_selected = i"
-              >
-                <span>{{ item }}</span>
-              </li>
-              <li
-                :class="{
-                  'results__filter-option__item': true,
-                  active: filter_option_selected === 3,
-                }"
-                @click="
-                  {
-                    if (filter_option_selected === 3) {
-                      filters_search_result.sort_desc_price = !filters_search_result.sort_desc_price;
-                      getResultsSearch();
-                    } else {
-                      filter_option_selected = 3;
-                    }
-                  }
-                "
-              >
-                <span>Giá</span>
-                <v-icon>{{
-                  filters_search_result.sort_desc_price
-                    ? "mdi-chevron-down"
-                    : "mdi-chevron-up"
-                }}</v-icon>
-              </li>
-            </ul>
+          <div class="btn-center">
+            <button @click="getResultsSearch">Áp dụng</button>
           </div>
+        </div>
 
-          <div class="products-grid">
-            <div class="producst-grid__grid">
-              <div
-                class="products-grid__item"
-                v-for="(item, i) in products_grid"
-                :key="i"
-              >
-                <Product
-                  width="100%"
-                  height="100%"
-                  :image="item.image"
-                  :name="item.name"
-                  :price="item.price"
-                  :sold="item?.sold"
-                  :rate="item?.rate"
-                  :slug="item?.slug"
-                  imageW="184px"
-                  imageH="184px"
-                ></Product>
-              </div>
-            </div>
+        <div class="filter-item">
+          <h3 class="filter-item-heading">ĐÁNH GIÁ</h3>
+          <div id="filter-rating" class="filter-item-body">
+            <v-rating
+              v-model="filters_search_result.filter_rating"
+              bg-color="orange-lighten-1"
+              color="#FFB800"
+              size="26"
+              hover
+              @update:modelValue="getResultsSearch"
+            ></v-rating>
 
-            <div class="paginate-bar" v-if="num_page > 1">
-              <v-pagination
-                v-model="filters_search_result.page"
-                :length="num_page"
-                total-visible="6"
-                active-color="#EC1C24"
-                @update:modelValue="getResultsSearch()"
-              ></v-pagination>
+            <div class="rating-values" v-if="filters_search_result.filter_rating">
+              <span>
+                {{
+                  filters_search_result.filter_rating < 5
+                    ? "Từ " + filters_search_result.filter_rating + " sao"
+                    : "5 sao"
+                }}
+              </span>
             </div>
           </div>
         </div>
       </div>
+
+      <div id="results-filter">
+        <div class="results__title" v-if="getTitleResults() != null">
+          <p>
+            {{ getTitleResults() }}
+          </p>
+        </div>
+
+        <div class="results__filter-options" v-if="page_type == 0 || page_type == 1">
+          <ul class="results__filter-options__list">
+            <li
+              :class="{
+                'results__filter-option__item': true,
+                active: filter_option_selected === i,
+              }"
+              v-for="(item, i) in filter_options"
+              :key="i"
+              @click="filter_option_selected = i"
+            >
+              <span>{{ item }}</span>
+            </li>
+            <li
+              :class="{
+                'results__filter-option__item': true,
+                active: filter_option_selected === 3,
+              }"
+              @click="
+                {
+                  if (filter_option_selected === 3) {
+                    filters_search_result.sort_desc_price = !filters_search_result.sort_desc_price;
+                    getResultsSearch();
+                  } else {
+                    filter_option_selected = 3;
+                  }
+                }
+              "
+            >
+              <span>Giá</span>
+              <v-icon>{{
+                filters_search_result.sort_desc_price
+                  ? "mdi-chevron-down"
+                  : "mdi-chevron-up"
+              }}</v-icon>
+            </li>
+          </ul>
+        </div>
+
+        <div class="products-grid">
+          <div class="producst-grid__grid">
+            <div class="products-grid__item" v-for="(item, i) in products_grid" :key="i">
+              <Product
+                width="100%"
+                height="100%"
+                :image="item.image"
+                :name="item.name"
+                :price="item.price"
+                :sold="item?.sold"
+                :rate="item?.rate"
+                :slug="item?.slug"
+                image_w="184px"
+                image_h="184px"
+              ></Product>
+            </div>
+          </div>
+
+          <div class="paginate-bar" v-if="num_page > 1">
+            <v-pagination
+              v-model="filters_search_result.page"
+              :length="num_page"
+              total-visible="6"
+              active-color="#EC1C24"
+              @update:modelValue="getResultsSearch()"
+            ></v-pagination>
+          </div>
+        </div>
+      </div>
     </div>
-  </DefaultLayout>
+  </div>
 </template>
 
 <script>
@@ -177,6 +185,42 @@ export default {
   name: "Search",
   components: { DefaultLayout, Product, ProductsGrid },
   computed: {
+    priceMinFormated: {
+      get() {
+        if (this.filters_search_result.filter_price_min) {
+          return this.filters_search_result.filter_price_min.toLocaleString();
+        }
+        return null;
+      },
+      set(value) {
+        const parsed_value = parseInt(value.replace(/,/g, ""));
+        if (!isNaN(parsed_value)) {
+          if (parsed_value == 0) {
+            this.filters_search_result.filter_price_min = null;
+          } else {
+            this.filters_search_result.filter_price_min = parsed_value;
+          }
+        }
+      },
+    },
+    priceMaxFormated: {
+      get() {
+        if (this.filters_search_result.filter_price_max) {
+          return this.filters_search_result.filter_price_max.toLocaleString();
+        }
+        return null;
+      },
+      set(value) {
+        const parsed_value = parseInt(value.replace(/,/g, ""));
+        if (!isNaN(parsed_value)) {
+          if (parsed_value == 0) {
+            this.filters_search_result.filter_price_max = null;
+          } else {
+            this.filters_search_result.filter_price_max = parsed_value;
+          }
+        }
+      },
+    },
     filterCats() {
       if (!this.more_filter_cats) {
         return this.filter_cats.filter((item, i) => i < 7);
@@ -200,9 +244,15 @@ export default {
       }
       this.getResultsSearch();
     },
+    $route() {
+      this.handleUpdateCategoryValue(this.$route.query?.id);
+      this.processPageType();
+    },
   },
   data() {
     return {
+      radio_selected: 0,
+      page_type: 0,
       num_page: 1,
       more_filter_cats: false,
       filter_option_selected: 0,
@@ -219,36 +269,122 @@ export default {
         sort_desc_price: null,
         sort_newest: null,
         sort_sell: null,
+        type: null,
       },
       products_grid: [],
     };
   },
   created() {
-    this.getResultsSearch();
+    this.processPageType();
+    this.$eventBus.on("search", (keywords) => {
+      this.filters_search_result.search = keywords;
+      this.getResultsSearch();
+    });
   },
   methods: {
-    getFormData() {},
+    updateValueRadio(cat_id) {
+      const category = this.filter_cats.find(({ id }) => id == cat_id);
+      this.$router.push({
+        name: "products-category",
+        query: {
+          name: category.name,
+          id: category.id,
+        },
+      });
+    },
+    handleUpdateCategoryValue(cat_id) {
+      if (this.page_type == 1) {
+        this.filters_search_result.filter_cats[0] = parseInt(cat_id);
+      }
+    },
+    async processPageType() {
+      this.startLoad();
+      await this.setTypePage();
+      if (!this.filter_cats?.length) {
+        await this.getCategories();
+      }
+      this.handleUpdateCategoryValue(this.$route.query.id);
+      await this.getResultsSearch();
+      this.finishLoad();
+    },
+    async getCategories() {
+      const response = await axios.get("get/category/all");
+      this.filter_cats = response.data.data;
+    },
+    async setTypePage() {
+      this.page_type = 0;
+      let window_title = "M Clothing";
+      if (this.$route.name == "search") {
+        window_title = "Tìm kiếm sản phẩm";
+        if (this.$route.query.search) {
+          this.filters_search_result.search = this.$route.query.search;
+        }
+      } else if (this.$route.name == "products-category") {
+        this.page_type = 1;
+        window_title = "Sản phẩm danh mục";
+        this.filters_search_result.search = "";
+      } else if (this.$route.name == "featured-products") {
+        this.page_type = 2;
+        window_title = "Sản phẩm nổi bật";
+      } else if (this.$route.name == "top-selling-products") {
+        this.page_type = 3;
+        window_title = "Sản phẩm bán chạy";
+      }
+      this.filters_search_result.type = this.page_type;
+      this.setWindowTitle(window_title);
+    },
+    getTitleResults() {
+      switch (this.page_type) {
+        case 0:
+          return this.filters_search_result.search
+            ? `Kết quả tìm kiếm cho ‘ ${this.filters_search_result.search} ‘`
+            : null;
+        case 1:
+          return `Sản phẩm danh mục: ${this.$route.query.name}`;
+        case 2:
+          return "Sản phẩm nổi bật";
+        case 3:
+          return "Sản phẩm bán chạy";
+        default:
+          return null;
+      }
+    },
     async getResultsSearch() {
       this.startLoad();
       const form_data = new FormData();
-      this.filter_cats_selected.forEach((item, index) => {
-        if (item) {
-          this.filters_search_result.filter_cats.push(this.filter_cats[index].id);
-        }
-      });
+      if (this.page_type != 1) {
+        this.filters_search_result.filter_cats.length = 0;
+        this.filter_cats_selected.forEach((item, index) => {
+          if (item) {
+            this.filters_search_result.filter_cats.push(this.filter_cats[index].id);
+          }
+        });
+      }
       for (let key in this.filters_search_result) {
         if (key == "filter_cats" && this.filters_search_result[key].length > 0) {
-          for (let k in this.filters_search_result.filter_cats) {
-            form_data.append(`filter_cats[${k}]`, this.filters_search_result[key][k]);
+          if (this.page_type == 1) {
+            form_data.append(`filter_cats[0]`, this.filters_search_result[key][0]);
+          } else {
+            for (let k in this.filters_search_result.filter_cats) {
+              form_data.append(`filter_cats[${k}]`, this.filters_search_result[key][k]);
+            }
           }
         } else if (this.filters_search_result[key] !== null) {
           form_data.append(key, this.filters_search_result[key]);
         }
       }
-      const response = await axios.post("get/search-products", form_data);
-      this.products_grid = response.data.data.products;
-      this.num_page = response.data.data.num_page;
-      this.filter_cats = response.data.data.categories;
+      try {
+        const response = await axios.post("get/search-products", form_data);
+        this.products_grid = response.data.data.products;
+        this.num_page = response.data.data.num_page;
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          "home"
+        );
+      }
       this.finishLoad();
     },
     search(value) {
@@ -261,6 +397,9 @@ export default {
 </script>
 
 <style scoped>
+.btn-show-cats:hover {
+  color: #ec1c24;
+}
 .paginate-bar {
   padding-bottom: 40px;
 }
@@ -330,6 +469,14 @@ export default {
   border-bottom: 2px solid #e5e5e5;
   border-right: 2px solid #e5e5e5;
   width: 100%;
+}
+
+.filter-item:first-child {
+  max-height: 795px;
+  overflow: scroll;
+}
+.filter-item:last-child {
+  border-bottom: unset;
 }
 #filters {
   display: flex;

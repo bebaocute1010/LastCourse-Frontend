@@ -1,5 +1,5 @@
 <template>
-  <default-layout :hidden_footer="true">
+  <div>
     <v-dialog
       class="dialog"
       v-model="dialog_show"
@@ -41,10 +41,10 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue-darken-1" variant="text" @click="closeDialog()">
-            Close
+            Đóng
           </v-btn>
           <v-btn color="blue-darken-1" variant="text" @click="updateShipping()">
-            Save
+            Lưu
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -84,12 +84,12 @@
             </div>
             <div>
               <p class="shop__item-product__price">
-                đ {{ getLocaleStringNumber(product.price) }}
+                {{ getLocaleStringNumber(product.price) }} đ
               </p>
               <p class="shop__item-product__quantity">x{{ product.quantity }}</p>
             </div>
             <p class="shop__item-product__into-money">
-              đ {{ getLocaleStringNumber(product.quantity * product.price) }}
+              {{ getLocaleStringNumber(product.quantity * product.price) }} đ
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@
               <p class="heading-text">Chi phí vận chuyển</p>
               <p>
                 {{ shop.shipping_carrier }}
-                <span>đ {{ getLocaleStringNumber(shop.shipping_fee) }}</span>
+                <span>{{ getLocaleStringNumber(shop.shipping_fee) }} đ</span>
               </p>
               <p>(Nhận hàng {{ shop.delivery_time }})</p>
             </div>
@@ -144,7 +144,7 @@
                 v-model="payment_method"
                 value="1"
               />
-              <label>Zalo pay</label>
+              <label>ZaloPay</label>
               <div class="payment-method-item__image">
                 <img src="/src/assets/icons/zalo-pay.svg" />
               </div>
@@ -161,9 +161,9 @@
             </div>
 
             <div class="fees-sum">
-              <p>đ {{ getLocaleStringNumber(subTotal()) }}</p>
-              <p>đ {{ getLocaleStringNumber(totalShipping()) }}</p>
-              <p>đ {{ getLocaleStringNumber(subTotal() + totalShipping()) }}</p>
+              <p>{{ getLocaleStringNumber(subTotal()) }} đ</p>
+              <p>{{ getLocaleStringNumber(totalShipping()) }} đ</p>
+              <p>{{ getLocaleStringNumber(subTotal() + totalShipping()) }} đ</p>
             </div>
           </div>
 
@@ -171,11 +171,11 @@
         </div>
       </div>
     </div>
-  </default-layout>
+  </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
 export default {
   name: "Payment",
@@ -195,16 +195,28 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["cart_products_selected"]),
+    ...mapGetters(["cart_products_selected", "user"]),
   },
-  created() {
+  async created() {
+    this.setWindowTitle("Thanh toán");
     if (!this.cart_products_selected || this.cart_products_selected.length <= 0) {
       this.$router.push({ name: "cart" });
       return;
     }
+    await this.getUser();
+    this.receiver = {
+      name: this.user.last_receiver,
+      address: this.user.last_address,
+      phone: this.user.last_phone,
+    };
     this.getPreviewOrder();
   },
+  beforeRouteLeave(to, from, next) {
+    this.unsetCartProductsSelected();
+    next();
+  },
   methods: {
+    ...mapActions(["unsetCartProductsSelected"]),
     createBills() {
       const isReceiverComplete = Object.values(this.receiver).every(
         (value) => value !== null && value !== ""
@@ -224,9 +236,15 @@ export default {
             payment_method: this.payment_method,
             note: this.notes[note_index],
           });
+          this.delayMethod(this.getNotifications, 2000);
           this.finishLoad();
         });
-        this.showAlert("Thành công", "Tạo đơn hàng thành công, hãy theo dõi đơn hàng của bạn nhé.", "success", "bills")
+        this.showAlert(
+          "Thành công",
+          "Tạo đơn hàng thành công, hãy theo dõi đơn hàng của bạn nhé.",
+          "success",
+          "bills"
+        );
       } catch (error) {
         console.log(error);
       }
@@ -239,6 +257,7 @@ export default {
         });
         this.shops = response.data.data;
       } catch (error) {
+        this.showAlert("Lỗi", "Đã xảy ra lỗi", "error", "home");
         console.log(error);
       }
       this.finishLoad();
@@ -314,6 +333,9 @@ export default {
   flex-direction: column;
   align-items: flex-end;
   row-gap: 17px;
+}
+.fees-sum {
+  text-align: right;
 }
 .order-summary button {
   padding: 12px 136px;
@@ -402,11 +424,11 @@ export default {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   display: flex;
-  align-items: center;
+  width: 265px;
 }
 .shop__item-product__image img {
-  width: 100%;
-  height: 100%;
+  width: 48px;
+  height: 48px;
   object-fit: cover;
 }
 .shop__item-product__image {

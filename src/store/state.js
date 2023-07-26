@@ -8,8 +8,11 @@ export default {
     to: null,
   },
   email_register: "",
+  route_verified: "",
   user: null,
   loading: false,
   shop: null,
   cart_products_selected: [],
+  notifications: [],
+  canumber_cartsrts: 0,
 };

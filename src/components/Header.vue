@@ -149,7 +149,6 @@
       <div class="header-images" :to="{ name: 'home' }">
         <router-link :to="{ name: 'home' }">
           <img class="header-image__item" src="/src/assets/logo.svg" />
-          <img class="header-image__item" src="/src/assets/con-ho.svg" />
         </router-link>
       </div>
       <div class="header-search">
@@ -158,9 +157,11 @@
             class="header-search__input"
             placeholder="Tìm kiếm"
             v-model="search_text"
-            @input="startSearch"
+            v-on:keyup.enter="search"
           />
-          <v-btn class="header-search__icon" icon><v-icon>mdi-magnify</v-icon></v-btn>
+          <v-btn class="header-search__icon" icon @click="search"
+            ><v-icon>mdi-magnify</v-icon></v-btn
+          >
         </div>
 
         <div class="header-search__results" v-if="search_rs?.length > 0">
@@ -178,7 +179,7 @@
       <v-menu v-else open-on-hover>
         <template v-slot:activator="{ props }">
           <div class="user-info" v-bind="props">
-            <p class="user__name" v-bind="props">{{ user?.name }}</p>
+            <p class="user__name" v-bind="props">{{ user?.fullname }}</p>
 
             <v-avatar class="user__avatar">
               <v-img cover :src="user?.avatar"></v-img>
@@ -372,10 +373,18 @@ export default {
     },
     startSearch() {
       clearTimeout(this.timer);
-      this.timer = setTimeout(this.search, 200);
+      this.timer = setTimeout(this.search, 500);
     },
     search() {
-      this.$emit("search", this.search_text.trim());
+      if (
+        !["featured-products", "top-selling-products", "products-category"].includes(
+          this.$route.name
+        )
+      ) {
+        this.$router.push({ name: "search", query: { search: this.search_text.trim() } });
+      } else {
+        this.$eventBus.emit("search", this.search_text.trim());
+      }
     },
   },
 };
@@ -394,6 +403,9 @@ export default {
 }
 .dialog {
   padding: 24px;
+}
+.user__avatar__overlay:hover {
+  background: #000000dd;
 }
 .user__avatar__overlay {
   position: absolute;
@@ -444,11 +456,11 @@ export default {
 }
 .header-images {
   width: 25%;
-  padding: 25px 0;
+  padding: 10px 0;
   display: flex;
 }
 .header-image__item {
-  max-width: 50%;
+  /* max-width: 50%; */
   max-height: 100%;
 }
 .header-search {

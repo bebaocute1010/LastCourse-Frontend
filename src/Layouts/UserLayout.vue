@@ -4,6 +4,7 @@
     <SystemBar
       :dialog="dialog_shop_update"
       @closeDialogShopUpdate="dialog_shop_update = false"
+      @showDialogShopUpdate="dialog_shop_update = true"
     />
     <Header />
     <div id="body-content">
@@ -11,9 +12,9 @@
         <Alert />
         <UserNavigation @openDialogShopUpdate="openDialogShopUpdate" />
 
-        <v-main style="background: #e5e5e5; max-width: 75%">
+        <v-main style="background: #e5e5e5">
           <div class="main-content">
-            <slot></slot>
+            <router-view></router-view>
           </div>
         </v-main>
       </v-row>
@@ -44,6 +45,9 @@ export default {
 </script>
 
 <style scoped>
+main {
+  width: calc(100% - 340px);
+}
 .container {
   max-width: 1175px;
 }

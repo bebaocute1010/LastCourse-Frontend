@@ -42,24 +42,22 @@
         <div class="footer__row">
           <div class="footer__block">
             <div class="footer__logo">
-              <v-img contain src="/src/assets/logo.svg"></v-img>
+              <router-link :to="{ name: 'home' }">
+                <v-img contain src="/src/assets/logo.svg"></v-img>
+              </router-link>
             </div>
             <p>
               Sàn thương mại điện tử uy tín, chất lượng. Tất cả các sản phẩm trên M
               Clothing đều được đăng bán bởi các nhà cung cấp, uy tín và đảm bảo chât
               lượng
             </p>
-
-            <div class="footer__verified">
-              <v-img contain src="/src/assets/da-xac-minh.svg"></v-img>
-            </div>
           </div>
 
           <div class="footer__block">
             <h3 class="footer-h3">CHĂM SÓC KHÁCH HÀNG</h3>
             <ul class="footer-list">
               <li class="footer-list__item" v-for="(item, i) in customers" :key="i">
-                {{ item }}
+                <router-link :to="{ name: 'coming-soon' }">{{ item }}</router-link>
               </li>
             </ul>
           </div>
@@ -68,7 +66,7 @@
             <h3 class="footer-h3">VỀ M Clothing</h3>
             <ul class="footer-list">
               <li class="footer-list__item" v-for="(item, i) in about" :key="i">
-                {{ item }}
+                <router-link :to="{ name: 'coming-soon' }">{{ item }}</router-link>
               </li>
             </ul>
           </div>
@@ -78,13 +76,19 @@
               <h3 class="footer-h3">KẾT NỐI VỚI CHÚNG TÔI</h3>
               <div class="footer-list-icon">
                 <div class="footer-list-icon__item">
-                  <v-img contain src="/src/assets/icons/facebook.svg"></v-img>
+                  <router-link :to="{ name: 'coming-soon' }"
+                    ><v-img contain src="/src/assets/icons/facebook.svg"></v-img
+                  ></router-link>
                 </div>
                 <div class="footer-list-icon__item">
-                  <v-img contain src="/src/assets/icons/instagram.svg"></v-img>
+                  <router-link :to="{ name: 'coming-soon' }"
+                    ><v-img contain src="/src/assets/icons/instagram.svg"></v-img
+                  ></router-link>
                 </div>
                 <div class="footer-list-icon__item">
-                  <v-img contain src="/src/assets/icons/zalo.svg"></v-img>
+                  <router-link :to="{ name: 'coming-soon' }"
+                    ><v-img contain src="/src/assets/icons/zalo.svg"></v-img
+                  ></router-link>
                 </div>
               </div>
             </div>
@@ -92,10 +96,17 @@
               <h3 class="footer-h3">TẢI ỨNG DỤNG M Clothing MOBILE</h3>
               <div class="footer-list-icon">
                 <div class="footer-list-icon__item">
-                  <v-img contain src="/src/assets/icons/download-apple-store.svg"></v-img>
+                  <router-link :to="{ name: 'coming-soon' }">
+                    <v-img
+                      contain
+                      src="/src/assets/icons/download-apple-store.svg"
+                    ></v-img
+                  ></router-link>
                 </div>
                 <div class="footer-list-icon__item">
-                  <v-img contain src="/src/assets/icons/download-ch-play.svg"></v-img>
+                  <router-link :to="{ name: 'coming-soon' }">
+                    <v-img contain src="/src/assets/icons/download-ch-play.svg"></v-img
+                  ></router-link>
                 </div>
               </div>
             </div>
@@ -137,6 +148,10 @@ export default {
 </script>
 
 <style scoped>
+.footer-list__item:hover a,
+.footer-list__item:hover {
+  color: #ec1c24;
+}
 .footer-copyright {
   padding: 15px;
   text-align: center;
@@ -152,9 +167,13 @@ export default {
   width: 96px;
   height: 32px;
 }
+.footer-list-icon__item:hover {
+  transform: scale(1.2);
+}
 .footer-list-icon__item {
   width: 28px;
   height: 28px;
+  transition: transform 0.3s;
 }
 .footer-list-icon {
   display: flex;

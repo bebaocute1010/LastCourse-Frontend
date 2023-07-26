@@ -1,12 +1,11 @@
 <template>
-  <div class="basic-page account-info-register-page center-row">
-    <Alert />
-    <AccountLayout class="hide-logo">
-      <div class="form-content">
-        <div class="form-heading">
-          <p class="form-heading-title">Hoàn tất đăng ký</p>
-        </div>
-        <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
+  <div class="form-content">
+    <div class="form-heading">
+      <p class="form-heading-title">Hoàn tất đăng ký</p>
+    </div>
+    <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
+      <v-window v-model="step">
+        <v-window-item :value="1">
           <TextFieldWithValidation
             class="my-input"
             name="username"
@@ -41,6 +40,9 @@
             variant="outlined"
             color="red"
           />
+        </v-window-item>
+
+        <v-window-item :value="2">
           <TextFieldWithValidation
             class="my-input"
             name="fullname"
@@ -68,10 +70,27 @@
               :items="['Nam', 'Nữ', 'Khác']"
             />
           </Field>
-          <v-btn type="submit" class="base-button button-finish">Xong</v-btn>
-        </Form>
-      </div>
-    </AccountLayout>
+        </v-window-item>
+      </v-window>
+
+      <v-btn
+        type="button"
+        class="base-button"
+        color="blue"
+        v-if="step == 1"
+        @click="step++"
+        >Tiếp tục</v-btn
+      >
+      <v-btn
+        type="button"
+        class="base-button"
+        v-if="step == 2"
+        @click="step--"
+        color="blue"
+        >Quay lại</v-btn
+      >
+      <v-btn type="submit" class="base-button button-finish" v-if="step == 2">Xong</v-btn>
+    </Form>
   </div>
 </template>
 
@@ -86,6 +105,7 @@ export default {
   components: { AccountLayout },
   data() {
     return {
+      step: 1,
       show_password: false,
       show_password_2: false,
     };
@@ -98,13 +118,13 @@ export default {
     const schema = {
       username: (value) => {
         if (!value) return "Vui lòng điền tên đăng nhập.";
-        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value))
+        if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?]+/.test(value))
           return "Tên đăng nhập không hợp lệ.";
         if (value?.length < 8) return "Tên đăng nhập phải nhiều hơn 8 ký tự.";
         return true;
       },
       password: (value) => {
-        if (value?.length > 8) {
+        if (value?.length >= 8) {
           password.value = value;
           return true;
         }
@@ -135,7 +155,7 @@ export default {
     return { schema };
   },
   created() {
-    this.setWindowTitle("Fill Information");
+    this.setWindowTitle("Đăng ký thông tin");
     if (!this.email_register) {
       router.push({ name: "register" });
     }
@@ -144,11 +164,10 @@ export default {
     onSubmit(values) {
       values.email = this.email_register;
       values.gender = values.gender == "Nam" ? 0 : values.gender == "Nữ" ? 1 : -1;
-      console.log(values.gender);
       axios
         .post("auth/register-information", values)
         .then((response) => {
-          this.showAlert(response.data.title, response.data.message, "success", null);
+          this.showAlert(response.data.title, response.data.message, "success", "login");
         })
         .catch((error) => {
           this.showAlert(

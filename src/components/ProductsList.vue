@@ -2,36 +2,18 @@
   <div class="products-list container">
     <div class="products-list__heading">
       <p class="products-list__title" v-if="!flash_sale">{{ name }}</p>
-      <div class="flash-sale user-not-select" v-else>
-        <div class="flash-sale__logo">
-          <v-img contain src="/src/assets/flash-sale.svg"></v-img>
-        </div>
-        <div class="flash-sale__countdown">
-          <span>{{ count_down }}</span>
-        </div>
-      </div>
-      <button :id="'btn-view-all-' + id" class="products-list__btn-view-all">
+      <button
+        :id="'btn-view-all-' + id"
+        class="products-list__btn-view-all"
+        @click="handleClickBtn()"
+      >
         Xem tất cả
       </button>
     </div>
-    <div
-      class="user-not-select slide-group-container"
-      ref="slideGroupContainer"
-      @mousedown="startDrag"
-      @mousemove="handleDrag"
-      @mouseup="endDrag"
-      @mouseleave="endDrag"
-      @touchstart="startDrag"
-      @touchmove="handleDrag"
-      @touchend="endDrag"
-      @click.prevent="handleClick"
-    >
-      <v-slide-group
-        v-model="currentSlide"
-        show-arrows="false"
-        class="slide-group"
-      >
-        <v-slide-group-item v-for="(item, i) in items" :key="i">
+
+    <Carousel v-bind="settings" class="custom-carousel">
+      <Slide v-for="(item, i) in items" :key="i">
+        <div class="carousel__item">
           <Product
             :image="item.image"
             :name="item.name"
@@ -41,17 +23,23 @@
             :show_rate="show_rate"
             :slug="item?.slug"
           ></Product>
-        </v-slide-group-item>
-      </v-slide-group>
-    </div>
+        </div>
+      </Slide>
+
+      <template #addons>
+        <Navigation />
+      </template>
+    </Carousel>
   </div>
 </template>
 
 <script>
 import Product from "@/components/Product.vue";
+import { Carousel, Navigation, Slide } from "vue3-carousel";
+import "vue3-carousel/dist/carousel.css";
 export default {
   name: "ProductsList",
-  components: { Product },
+  components: { Product, Carousel, Navigation, Slide },
   created() {
     if (this.flash_sale) {
       this.countDown();
@@ -59,11 +47,12 @@ export default {
   },
   data() {
     return {
-      currentSlide: 0,
-      startX: 0,
-      currentX: 0,
-      isDragging: false,
-      count_down: "00 : 00 : 00",
+      settings: {
+        itemsToShow: 6.5,
+        itemsToScroll: 3.5,
+        mouseDrag: false,
+        snapAlign: "center",
+      },
     };
   },
   props: {
@@ -85,39 +74,8 @@ export default {
     },
   },
   methods: {
-    startDrag(event) {
-      this.isDragging = true;
-      this.startX = this.getClientX(event);
-    },
-    handleDrag(event) {
-      if (!this.isDragging) return;
-      this.currentX = this.getClientX(event);
-      const container = this.$refs.slideGroupContainer;
-      const containerWidth = container.offsetWidth;
-      const dragDistance = this.currentX - this.startX;
-      container.scrollLeft -= dragDistance;
-      this.startX = this.currentX;
-    },
-    endDrag() {
-      this.isDragging = false;
-    },
-    getClientX(event) {
-      return event.type.startsWith("touch") ? event.touches[0].clientX : event.clientX;
-    },
-    countDown() {
-      this.interval_id = setInterval(() => {
-        let current_time = new Date().getTime();
-        let distance = this.flash_sale.expired_at - current_time;
-        let seconds = Math.floor(distance / 1000) % 60;
-        let minutes = Math.floor(distance / (1000 * 60)) % 60;
-        let hours = Math.floor(distance / (1000 * 60 * 60));
-
-        let formattedHours = hours < 10 ? `0${hours}` : hours;
-        let formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-        let formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-
-        this.count_down = `${formattedHours} : ${formattedMinutes} : ${formattedSeconds}`;
-      }, 500);
+    handleClickBtn() {
+      this.$emit("btnViewallClicked");
     },
   },
 };

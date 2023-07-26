@@ -33,4 +33,13 @@ export default {
   setCartProductsSelected(state, selected) {
     state.cart_products_selected = selected;
   },
+  setRouteVerified(state, route_name) {
+    state.route_verified = route_name;
+  },
+  setNotifications(state, notifications) {
+    state.notifications = notifications;
+  },
+  setNumberCarts(state, number_carts) {
+    state.number_carts = number_carts;
+  },
 };

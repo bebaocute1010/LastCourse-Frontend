@@ -32,4 +32,13 @@ export default {
   unsetCartProductsSelected({ commit }) {
     commit("setCartProductsSelected", []);
   },
+  setRouteVerified({ commit }, route_name) {
+    commit("setRouteVerified", route_name);
+  },
+  setNotifications({ commit }, notifications) {
+    commit("setNotifications", notifications);
+  },
+  setNumberCarts({ commit }, number_carts) {
+    commit("setNumberCarts", number_carts);
+  },
 };

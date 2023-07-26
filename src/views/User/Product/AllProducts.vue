@@ -1,150 +1,160 @@
 <template>
-  <UserLayout>
+  <div id="main-content">
     <DialogDelete
       :dialog="dialog.show"
       :title="dialog.title"
       :text="dialog.text"
       @emitResultDialog="processResultDialogDelete"
     />
-    <div id="main-content">
-      <div class="content-heading">
-        <div>
-          <ul class="content-heading__list">
-            <li
-              :class="{
-                'content-heading__item': true,
-                'content-heading__active': i === status_selected,
-              }"
-              v-for="(item, i) in heading_items"
-              :key="i"
-              @click="status_selected = i"
+    <div class="content-heading">
+      <div>
+        <ul class="content-heading__list">
+          <li
+            :class="{
+              'content-heading__item': true,
+              'content-heading__active': i === status_selected,
+            }"
+            v-for="(item, i) in heading_items"
+            :key="i"
+            @click="status_selected = i"
+          >
+            <span class="content-heading__item-title">{{ item.title }}</span>
+            <span class="content-heading__item-quantity"
+              >({{ filterStatus(i).length }})</span
             >
-              <span class="content-heading__item-title">{{ item.title }}</span>
-              <span class="content-heading__item-quantity"
-                >({{ filterStatus(i).length }})</span
-              >
-            </li>
-          </ul>
-        </div>
-
-        <div class="content-heading__buttons">
-          <router-link :to="{ name: 'add-product' }">
-            <button id="button-add-product">+ Thêm sản phẩm</button>
-          </router-link>
-        </div>
+          </li>
+        </ul>
       </div>
 
-      <div class="content-search">
-        <div class="content-search-box">
-          <input
-            type="text"
-            class="content-search__input"
-            placeholder="Tìm kiếm ..."
-            v-model="search"
-          />
-          <v-icon class="content-search__icon">mdi-magnify</v-icon>
-        </div>
-      </div>
-
-      <div class="content-search-table">
-        <v-data-table
-          v-model:page="page"
-          :headers="table_headers"
-          :items="filterStatus(status_selected)"
-          :search="search"
-          v-model="selected"
-          class="elevation-1"
-          show-select
-          height="460"
-        >
-          <template v-slot:[`item.product`]="{ item }">
-            <div class="product">
-              <div class="product-image">
-                <img :src="item.selectable.image" />
-              </div>
-              <div class="product-info">
-                <span class="product-name">{{ item.selectable.name }}</span>
-                <span class="product-price">
-                  {{ getLocaleStringNumber(item.selectable.price) }}
-                </span>
-              </div>
-            </div>
-          </template>
-          <template v-slot:[`item.status`]="{ item }">
-            <span
-              :class="{
-                available: item.selectable.status === 'Còn hàng',
-                unavailable: item.selectable.status === 'Hết hàng',
-                hidden: item.selectable.status === 'Đã ẩn',
-              }"
-              >{{ item.selectable.status }}</span
-            >
-          </template>
-          <template v-slot:[`item.actions`]="{ item }">
-            <div class="actions-group-button">
-              <div
-                class="user-not-select action-button edit-item-button"
-                @click="editeProduct(item.selectable.id)"
-              >
-                <v-icon>mdi-pencil-box</v-icon>
-                <span>Sửa</span>
-              </div>
-              <div
-                class="user-not-select action-button delete-item-button"
-                @click="showDialog(item.selectable.id)"
-              >
-                <v-icon>mdi-delete</v-icon>
-                <span>Xóa</span>
-              </div>
-            </div>
-          </template>
-          <template v-slot:bottom>
-            <v-pagination
-              v-if="pageCount > 1"
-              v-model="page"
-              :length="pageCount"
-              :total-visible="5"
-            ></v-pagination>
-            <div id="table-footer" v-if="selected.length > 0">
-              <div class="table-footer__checkbox-group">
-                <input
-                  type="checkbox"
-                  class="table-checkbox"
-                  id="table-footer__checkbox"
-                  v-model="selected_all"
-                  @change="footerSelectAll"
-                />
-                <label for="table-footer__checkbox" id="table-footer__label"
-                  >Chọn tất cả</label
-                >
-              </div>
-              <div id="table-footer__number-selected">
-                <span>{{ selected.length }} sản phẩm đã được chọn</span>
-                <div class="table-footer__buttons-group">
-                  <button
-                    class="table-footer__buttons-item"
-                    id="footer__button-hidden"
-                    v-if="status_selected < 3"
-                    @click="updateProductStatuses(0)"
-                  >
-                    Ẩn
-                  </button>
-                  <button
-                    class="table-footer__buttons-item"
-                    id="footer__button-show"
-                    v-if="status_selected == 0 || status_selected == 3"
-                    @click="updateProductStatuses(1)"
-                  >
-                    Hiển thị
-                  </button>
-                </div>
-              </div>
-            </div>
-          </template>
-        </v-data-table>
+      <div class="content-heading__buttons">
+        <router-link :to="{ name: 'add-product' }">
+          <button id="button-add-product">+ Thêm sản phẩm</button>
+        </router-link>
       </div>
     </div>
-  </UserLayout>
+
+    <div class="content-search">
+      <div class="content-search-box">
+        <input
+          type="text"
+          class="content-search__input"
+          placeholder="Tìm kiếm ..."
+          v-model="search"
+          @input="searchProducts(search)"
+        />
+        <v-icon class="content-search__icon" @click="searchProducts(search)"
+          >mdi-magnify</v-icon
+        >
+      </div>
+    </div>
+
+    <div class="content-search-table">
+      <v-data-table
+        v-model:page="page"
+        :headers="table_headers"
+        :items="filterStatus(status_selected)"
+        v-model="selected"
+        class="elevation-1"
+        show-select
+        height="460"
+      >
+        <template v-slot:[`item.product`]="{ item }">
+          <router-link
+            :to="{ name: 'product-detail', params: { slug: item.selectable.slug } }"
+            class="product"
+          >
+            <div class="product-image">
+              <img class="img-thumbnail" :src="item.selectable.image" />
+            </div>
+            <div class="product-info">
+              <span class="product-name">{{ item.selectable.name }}</span>
+              <span class="product-price">
+                {{ getLocaleStringNumber(item.selectable.price) }}
+              </span>
+            </div>
+          </router-link>
+        </template>
+        <template v-slot:[`item.sold`]="{ item }">
+          <span>{{ this.getLocaleStringNumber(item.selectable.sold) }}</span>
+        </template>
+        <template v-slot:[`item.inventory`]="{ item }">
+          <span>{{ this.getLocaleStringNumber(item.selectable.inventory) }}</span>
+        </template>
+        <template v-slot:[`item.status`]="{ item }">
+          <span
+            :class="{
+              available: item.selectable.status === 'Còn hàng',
+              unavailable: item.selectable.status === 'Hết hàng',
+              hidden: item.selectable.status === 'Đã ẩn',
+            }"
+            >{{ item.selectable.status }}</span
+          >
+        </template>
+        <template v-slot:[`item.actions`]="{ item }">
+          <div class="actions-group-button">
+            <div
+              class="user-not-select action-button edit-item-button"
+              @click="editeProduct(item.selectable.id)"
+            >
+              <v-icon>mdi-pencil-box</v-icon>
+              <span>Sửa</span>
+            </div>
+            <div
+              class="user-not-select action-button delete-item-button"
+              @click="showDialog(item.selectable.id)"
+            >
+              <v-icon>mdi-delete</v-icon>
+              <span>Xóa</span>
+            </div>
+          </div>
+        </template>
+        <template v-slot:bottom>
+          <v-pagination
+            class="pagination-bar"
+            v-if="pageCount > 1"
+            v-model="page"
+            :length="pageCount"
+            :total-visible="5"
+          ></v-pagination>
+          <div id="table-footer" v-if="selected.length > 0">
+            <div class="table-footer__checkbox-group">
+              <input
+                type="checkbox"
+                class="table-checkbox"
+                id="table-footer__checkbox"
+                v-model="selected_all"
+                @change="footerSelectAll"
+              />
+              <label for="table-footer__checkbox" id="table-footer__label"
+                >Chọn tất cả</label
+              >
+            </div>
+            <div id="table-footer__number-selected">
+              <span>{{ selected.length }} sản phẩm đã được chọn</span>
+              <div class="table-footer__buttons-group">
+                <button
+                  class="table-footer__buttons-item"
+                  id="footer__button-hidden"
+                  v-if="status_selected < 3"
+                  @click="updateProductStatuses(0)"
+                >
+                  Ẩn
+                </button>
+                <button
+                  class="table-footer__buttons-item"
+                  id="footer__button-show"
+                  v-if="status_selected == 0 || status_selected == 3"
+                  @click="updateProductStatuses(1)"
+                >
+                  Hiển thị
+                </button>
+              </div>
+            </div>
+          </div>
+        </template>
+      </v-data-table>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -196,12 +206,6 @@ export default {
           align: "center",
         },
         {
-          title: "Kho hàng",
-          sortable: false,
-          key: "warehouse",
-          align: "center",
-        },
-        {
           title: "Đã bán",
           key: "sold",
           align: "center",
@@ -220,6 +224,7 @@ export default {
       ],
       table_rows: [],
       product_edited_id: null,
+      timeout_id: null,
     };
   },
   computed: {
@@ -236,9 +241,24 @@ export default {
     },
   },
   created() {
+    this.setWindowTitle("Tất cả sản phẩm");
     this.getProducts();
   },
   methods: {
+    searchProducts(search) {
+      clearTimeout(this.timeout_id);
+
+      this.timeout_id = setTimeout(async () => {
+        this.startLoad();
+        try {
+          const response = await axios.get(`shop/products?search=${search}`);
+          this.table_rows = response.data.data;
+        } catch (error) {
+          console.log(error);
+        }
+        this.finishLoad();
+      }, 500);
+    },
     editeProduct(id) {
       this.$router.push({ name: "edit-product", params: { id: id } });
     },
@@ -273,8 +293,17 @@ export default {
     async showProducts() {},
     async getProducts() {
       this.startLoad();
-      const response = await axios.get("shop/products");
-      this.table_rows = response.data.data;
+      try {
+        const response = await axios.get("shop/products");
+        this.table_rows = response.data.data;
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          "home"
+        );
+      }
       this.finishLoad();
     },
     isSelectedAll() {
@@ -313,7 +342,7 @@ export default {
       this.hideDialog();
     },
     getLocaleStringNumber(num) {
-      return num.toLocaleString("de-DE");
+      return num.toLocaleString();
     },
     getStatusCode(status) {
       return status === "Còn hàng" ? 0 : status === "Hết hàng" ? 1 : 2;
@@ -344,6 +373,9 @@ export default {
 </script>
 
 <style scoped>
+.pagination-bar {
+  padding-bottom: 20px;
+}
 #main-content {
   width: 100%;
   background-color: #ffffff;
@@ -382,17 +414,13 @@ export default {
 .content-heading__item-quantity {
   font-size: 12px;
 }
+#button-add-product:hover {
+  background-color: #01395d;
+}
 #button-add-product {
   padding: 8px 14px;
   background: #0172cb;
   color: #ffffff;
-  border-radius: 100px;
-}
-#button-filter {
-  padding: 8px 14px;
-  background: #ec1c24;
-  color: #ffffff;
-  margin-left: 30px;
   border-radius: 100px;
 }
 .content-search {
@@ -410,6 +438,9 @@ export default {
   background: #f1f1f1;
   border-radius: 100px;
 }
+.content-search__icon:hover {
+  background: #3a01cb;
+}
 .content-search__icon {
   position: absolute;
   top: 3px;
@@ -419,6 +450,7 @@ export default {
   background: #0172cb;
   color: #ffffff;
   border-radius: 100px;
+  cursor: pointer;
 }
 .table-footer__checkbox-group {
   display: flex;
@@ -428,6 +460,9 @@ export default {
 .product {
   display: flex;
   padding: 15px 0;
+}
+.product:hover .product-name {
+  color: #ec1c24;
 }
 .product-image {
   width: 48px;
@@ -457,8 +492,8 @@ export default {
   font-size: 14px;
   line-height: 22px;
 }
-.product-price::before {
-  content: "đ";
+.product-price::after {
+  content: " đ";
 }
 .available {
   color: #0172cb;

@@ -2,9 +2,9 @@
   <div class="products-grid container">
     <div v-if="!hidden_heading ?? true" class="products-grid__heading">
       <p class="products-grid__title">{{ name }}</p>
-      <button :id="'btn-view-all-' + id" class="products-grid__btn-view-all">
+      <!-- <button :id="'btn-view-all-' + id" class="products-grid__btn-view-all">
         Xem tất cả
-      </button>
+      </button> -->
     </div>
 
     <div class="producst-grid__grid" :style="getStyleObject()">

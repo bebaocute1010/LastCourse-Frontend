@@ -1,65 +1,58 @@
 <template>
-  <div class="basic-page login-page">
-    <Alert />
-    <AccountLayout>
-      <div class="form-content">
-        <div class="form-heading">
-          <p class="form-heading-title">Đăng nhập</p>
-          <p class="form-heading-subtitle">Đăng nhập tài khoản ngay bây giờ</p>
-        </div>
-        <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
-          <TextFieldWithValidation
-            class="my-input"
-            name="account"
-            label="E-mail/Tên đăng nhập"
-            type="text"
-            variant="outlined"
-            color="red"
+  <div class="form-content">
+    <div class="form-heading">
+      <p class="form-heading-title">Đăng nhập</p>
+      <p class="form-heading-subtitle">Đăng nhập tài khoản ngay bây giờ</p>
+    </div>
+    <Form as="v-form" :validation-schema="schema" @submit="onSubmit">
+      <TextFieldWithValidation
+        class="my-input"
+        name="account"
+        label="E-mail/Tên đăng nhập"
+        type="text"
+        variant="outlined"
+        color="red"
+      />
+      <TextFieldWithValidation
+        class="my-input"
+        name="password"
+        label="Mật khẩu"
+        :type="show_password ? 'text' : 'password'"
+        :append-inner-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
+        @click:append-inner="show_password = !show_password"
+        variant="outlined"
+        color="red"
+      />
+
+      <div class="form-bottom-row">
+        <Field
+          name="remember"
+          :value="true"
+          type="checkbox"
+          v-slot="{ value, handleChange }"
+        >
+          <v-checkbox
+            class="my-check-box hide-input-detail"
+            :model-value="value"
+            @update:modelValue="handleChange"
+            label="Nhớ mật khẩu"
+            color="#0074BD"
           />
-          <TextFieldWithValidation
-            class="my-input"
-            name="password"
-            label="Mật khẩu"
-            :type="show_password ? 'text' : 'password'"
-            :append-inner-icon="show_password ? 'mdi-eye' : 'mdi-eye-off'"
-            @click:append-inner="show_password = !show_password"
-            variant="outlined"
-            color="red"
-          />
-
-          <div class="form-bottom-row">
-            <Field
-              name="remember"
-              :value="true"
-              type="checkbox"
-              v-slot="{ value, handleChange }"
-            >
-              <v-checkbox
-                class="my-check-box hide-input-detail"
-                :model-value="value"
-                @update:modelValue="handleChange"
-                label="Nhớ mật khẩu"
-                color="#0074BD"
-              />
-            </Field>
-            <span class="forgot-password" @click="forgotPasswordShow">
-              Quên mật khẩu ?
-            </span>
-          </div>
-
-          <v-btn type="submit" class="base-button button-login">Đăng nhập</v-btn>
-        </Form>
-
-        <div class="bottom-content">
-          <p>
-            Bạn chưa có tài khoản
-            <router-link :to="{ name: 'register' }" class="another-action"
-              >Đăng ký</router-link
-            >
-          </p>
-        </div>
+        </Field>
+        <span class="forgot-password" @click="forgotPasswordShow"> Quên mật khẩu ? </span>
       </div>
-    </AccountLayout>
+
+      <v-btn type="submit" class="base-button button-login">Đăng nhập</v-btn>
+    </Form>
+
+    <div class="bottom-content">
+      <p>
+        Bạn chưa có tài khoản
+        <router-link :to="{ name: 'register' }" class="another-action"
+          >Đăng ký</router-link
+        >
+      </p>
+    </div>
   </div>
 </template>
 
@@ -97,7 +90,7 @@ export default {
   },
   created() {
     this.finishLoad();
-    this.setWindowTitle("Login");
+    this.setWindowTitle("Đăng nhập");
   },
   methods: {
     onSubmit(values) {
@@ -117,11 +110,7 @@ export default {
         });
     },
     forgotPasswordShow() {
-      this.showAlert(
-        "Bạn quên mật khẩu rồi à ?",
-        "Quên thì tạo account mới đi nhé =))",
-        "success"
-      );
+      this.$router.push({ name: "forgot-password" });
     },
   },
 };

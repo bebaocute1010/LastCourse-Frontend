@@ -1,8 +1,8 @@
 <template>
-  <v-col cols="3">
+  <v-col class="user-nav-col" cols="3">
     <div id="user-navigation">
-      <div class="user-info" @click="openDialogUpdateShop">
-        <v-avatar class="user-info__avatar">
+      <div class="user-info">
+        <v-avatar class="user-info__avatar" @click="openDialogShopUpdate">
           <v-img cover :src="shop?.avatar"></v-img>
         </v-avatar>
         <span class="user-info__name">{{ shop?.name }}</span>
@@ -53,13 +53,16 @@ export default {
     if (localStorage.getItem("logged_in") === null) {
       this.$router.push({ name: "login" });
     } else if (!this.shop) {
+      this.$eventBus.on("updateShopInfor", () => {
+        this.getShopInfor();
+      });
       this.getShopInfor();
     }
   },
   methods: {
     ...mapActions(["setShop", "unsetShop"]),
-    openDialogUpdateShop() {
-      this.$emit("openDialogShopUpdate")
+    openDialogShopUpdate() {
+      this.$emit("openDialogShopUpdate");
     },
     async getShopInfor() {
       this.startLoad();
@@ -76,8 +79,9 @@ export default {
   position: sticky;
   height: 100%;
 }
-.v-col-3 {
-  max-width: 25%;
+.user-nav-col {
+  width: 340px;
+  max-width: 340px;
   height: 100vh;
   position: -webkit-sticky;
   position: sticky;
@@ -89,10 +93,13 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-
+.user-info__avatar:hover {
+  box-shadow: 0 4px 16px rgba(236, 28, 36, 0.5);
+}
 .user-info__avatar {
   width: 73px !important;
   height: 73px !important;
+  cursor: pointer;
   margin-bottom: 24px;
 }
 

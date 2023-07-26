@@ -1,5 +1,5 @@
 <template>
-  <v-overlay v-model="alert.show">
+  <v-overlay v-model="alert.show" @click="onHide">
     <div class="alert-container">
       <v-alert
         closable
@@ -19,10 +19,13 @@
 export default {
   name: "Alert",
   data() {
-    return {};
+    return {
+      alert_closed: false,
+    };
   },
   methods: {
     onHide() {
+      this.alert_closed = true;
       this.hideAlert();
     },
   },

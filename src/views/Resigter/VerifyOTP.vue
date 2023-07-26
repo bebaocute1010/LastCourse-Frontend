@@ -1,51 +1,46 @@
 <template>
-  <div class="basic-page verify-otp-page center-row">
-    <Alert />
-    <AccountLayout class="hide-logo">
-      <div class="form-content">
-        <div class="form-heading">
-          <p class="form-heading-title">Nhập mã OTP</p>
-          <p class="form-heading-subtitle">Mã OTP sẽ được gửi đến email của bạn</p>
-        </div>
-        <div class="otp-container">
-          <input
-            v-for="(digit, index) in otp_digits"
-            :key="index"
-            v-model="otp_digits[index]"
-            type="text"
-            maxlength="1"
-            @input="handleInput(index, $event)"
-            ref="otp"
-            class="otp-input"
-          />
-        </div>
-        <div class="otp-wait-time">
-          <button :disabled="!(otp_time_wait === '')" @click="sendOtp">
-            {{ otp_time_wait ? "Gửi lại mã OTP(" + otp_time_wait + ")" : "Gửi mã OTP" }}
-          </button>
-        </div>
+  <div class="form-content">
+    <div class="form-heading">
+      <p class="form-heading-title">Nhập mã OTP</p>
+      <p class="form-heading-subtitle">Mã OTP sẽ được gửi đến email của bạn</p>
+    </div>
+    <div class="otp-container">
+      <input
+        v-for="(digit, index) in otp_digits"
+        :key="index"
+        v-model="otp_digits[index]"
+        type="text"
+        maxlength="1"
+        @input="handleInput(index, $event)"
+        ref="otp"
+        class="otp-input"
+      />
+    </div>
+    <div class="otp-wait-time">
+      <button :disabled="!(otp_time_wait === '')" @click="sendOtp">
+        {{ otp_time_wait ? "Gửi lại mã OTP(" + otp_time_wait + ")" : "Gửi mã OTP" }}
+      </button>
+    </div>
 
-        <v-btn
-          :disabled="!isAllDigitsFilled"
-          :class="{
-            'base-button': true,
-            'btn-confirm': true,
-            'otp-filled': isAllDigitsFilled,
-          }"
-          @click="onsubmit"
-          >Xác nhận
-        </v-btn>
+    <v-btn
+      :disabled="!isAllDigitsFilled"
+      :class="{
+        'base-button': true,
+        'btn-confirm': true,
+        'otp-filled': isAllDigitsFilled,
+      }"
+      @click="onsubmit"
+      >Xác nhận
+    </v-btn>
 
-        <div class="bottom-content">
-          <p>
-            Bạn đã có tài khoản
-            <router-link :to="{ name: 'login' }" class="another-action"
-              >Đăng Nhập</router-link
-            >
-          </p>
-        </div>
-      </div>
-    </AccountLayout>
+    <div class="bottom-content">
+      <p>
+        Bạn đã có tài khoản
+        <router-link :to="{ name: 'login' }" class="another-action"
+          >Đăng Nhập</router-link
+        >
+      </p>
+    </div>
   </div>
 </template>
 
@@ -74,10 +69,10 @@ export default {
       }
       return true;
     },
-    ...mapGetters(["email_register"]),
+    ...mapGetters(["email_register", "route_verified"]),
   },
   created() {
-    this.setWindowTitle("Verify OTP");
+    this.setWindowTitle("Xác minh OTP");
   },
   mounted() {
     if (!this.email_register) {
@@ -99,7 +94,7 @@ export default {
             response.data.title,
             response.data.message,
             "success",
-            "register-information"
+            this.route_verified
           );
         })
         .catch((error) => {
@@ -166,9 +161,6 @@ export default {
 </script>
 
 <style scoped>
-.form-content {
-}
-
 .otp-container:focus-within .otp-input {
   border: 1px solid #ec1c24;
   outline: none;

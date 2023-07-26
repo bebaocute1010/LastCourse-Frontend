@@ -1,153 +1,199 @@
 <template>
-  <DefaultLayout>
+  <div>
     <section id="product">
       <div class="container">
-        <div id="product-images">
-          <BannerSlides
-            :height="480"
-            :items="details?.images"
-            style="width: 480px"
-          ></BannerSlides>
-          <div id="images__arrow">
-            <p style="font-weight: 600">Hình ảnh sản phẩm</p>
-            <div class="image__arrow-btn">
-              <v-icon> mdi-chevron-left-circle </v-icon>
-              <v-icon> mdi-chevron-right-circle </v-icon>
-            </div>
-          </div>
-          <SlideImages
-            :items="details?.images"
-            :refe="'slideImageDetail'"
-            img_width="87px"
-            style="height: 87px"
-          >
-          </SlideImages>
-          <div id="shares">
-            <p>Chia sẻ:</p>
-            <div class="share__social__image">
-              <v-img contain src="/src/assets/icons/facebook.svg"></v-img>
-            </div>
-
-            <div class="share__social__image">
-              <v-img contain src="/src/assets/icons/messenger.svg"></v-img>
-            </div>
-
-            <div class="share__social__image">
-              <v-img contain src="/src/assets/icons/twiter.svg"></v-img>
-            </div>
-
-            <div class="share__social__image">
-              <v-img contain src="/src/assets/icons/share.svg"></v-img>
-            </div>
-          </div>
-        </div>
-
-        <div id="product-info">
-          <p class="product__name">{{ details?.name ?? "..." }}</p>
-
-          <div class="product__evaluates" v-if="details">
-            <v-rating
-              v-model="details.rating"
-              class="icon-size-14"
-              size="14"
-              color="#FFB800"
-              readonly
-              half-increments
-            ></v-rating>
-            <p>{{ details.rating }}/5</p>
-            <p class="product__evaluate__sold">
-              Đã bán {{ prefixSymbolsNumber(details?.sold) }}
-            </p>
-          </div>
-
-          <div
-            id="product__variants"
-            v-if="details && (details.sizes !== null || details.colors !== null)"
-          >
-            <p class="product__variant__heading">Phân loại</p>
-            <div class="product__variants__list" v-if="details?.colors">
-              <p class="product__variants__list__name heading-text">Màu sắc</p>
-              <div class="product__variants__list__items">
-                <div
-                  :class="{
-                    product__variant__item: true,
-                    product__variant__item__active: i === color_active,
-                  }"
-                  v-for="(variant, i) in details?.colors"
-                  :key="i"
-                  @click="chooseVariant(0, i)"
+        <Breadcrumbs
+          v-if="details"
+          :items="details.breadcrumb"
+          @clickBreadcrumb="handleClickBreadcrumb"
+        ></Breadcrumbs>
+        <div class="flex-box">
+          <div id="product-images">
+            <BannerSlides
+              :height="480"
+              :items="details?.images"
+              style="width: 480px"
+              :slide_model="slide_model"
+              @updateSlideModel="updateSlideModel"
+            ></BannerSlides>
+            <div id="images__arrow">
+              <p style="font-weight: 600">Hình ảnh sản phẩm</p>
+              <div class="image__arrow-btn">
+                <v-icon
+                  class="btn-arrow-slide"
+                  @click="slide_model = Math.max(slide_model - 1, 0)"
                 >
-                  <div class="product__variant__img" v-if="variant.image">
-                    <img :src="variant.image" />
+                  mdi-chevron-left-circle
+                </v-icon>
+                <v-icon
+                  class="btn-arrow-slide"
+                  @click="
+                    slide_model = Math.min(slide_model + 1, details.images.length - 1)
+                  "
+                >
+                  mdi-chevron-right-circle
+                </v-icon>
+              </div>
+            </div>
+            <SlideImages
+              :items="details?.images"
+              :refe="'slideImageDetail'"
+              img_width="87px"
+              style="height: 87px"
+              @clickItem="processItemClicked"
+            >
+            </SlideImages>
+            <div id="shares">
+              <p>Chia sẻ:</p>
+              <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
+                <v-img contain src="/src/assets/icons/facebook.svg"></v-img>
+              </router-link>
+
+              <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
+                <v-img contain src="/src/assets/icons/messenger.svg"></v-img>
+              </router-link>
+
+              <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
+                <v-img contain src="/src/assets/icons/twiter.svg"></v-img>
+              </router-link>
+
+              <router-link :to="{ name: 'coming-soon' }" class="share__social__image">
+                <v-img contain src="/src/assets/icons/share.svg"></v-img>
+              </router-link>
+            </div>
+          </div>
+
+          <div id="product-info">
+            <p class="product__name">{{ details?.name ?? "..." }}</p>
+
+            <div class="product__evaluates" v-if="details">
+              <v-rating
+                v-model="details.rating"
+                class="icon-size-14"
+                size="14"
+                color="#FFB800"
+                readonly
+                half-increments
+              ></v-rating>
+              <p>{{ details.rating }}/5</p>
+              <p class="product__evaluate__sold">
+                Đã bán {{ prefixSymbolsNumber(details?.sold) }}
+              </p>
+            </div>
+
+            <div
+              id="product__variants"
+              v-if="
+                details &&
+                ((details?.sizes.length > 0 && details.sizes[0].name != null) ||
+                  (details?.colors.length > 0 && details.colors[0].name != null))
+              "
+            >
+              <p class="product__variant__heading">Phân loại</p>
+              <div
+                class="product__variants__list"
+                v-if="details?.colors.length && details.colors[0].name"
+              >
+                <p class="product__variants__list__name heading-text">Màu sắc</p>
+                <div class="product__variants__list__items">
+                  <div
+                    :class="{
+                      product__variant__item: true,
+                      product__variant__item__active: i === color_active,
+                    }"
+                    v-for="(variant, i) in details.colors"
+                    :key="i"
+                    @click="chooseVariant(0, i)"
+                  >
+                    <div class="product__variant__img" v-if="variant.image">
+                      <img :src="variant.image" />
+                    </div>
+                    <p class="product__variant__name">{{ variant.name }}</p>
                   </div>
-                  <p class="product__variant__name">{{ variant.name }}</p>
+                </div>
+              </div>
+
+              <div
+                class="product__variants__list"
+                v-if="details?.sizes.length && details.sizes[0].name != null"
+              >
+                <p class="product__variants__list__name heading-text">Kích thước</p>
+                <div class="product__variants__list__items">
+                  <div
+                    :class="{
+                      product__variant__item: true,
+                      product__variant__item__active: i === size_active,
+                    }"
+                    v-for="(variant, i) in details?.sizes"
+                    :key="i"
+                    @click="chooseVariant(1, i)"
+                  >
+                    <div class="product__variant__img" v-if="variant.image">
+                      <img :src="variant.image" />
+                    </div>
+                    <p class="product__variant__name">{{ variant.name }}</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="product__variants__list" v-if="details?.sizes">
-              <p class="product__variants__list__name heading-text">Kích thước</p>
-              <div class="product__variants__list__items">
+            <div id="quantity-order">
+              <p class="heading-text">Số lượng:</p>
+              <div>
                 <div
-                  :class="{
-                    product__variant__item: true,
-                    product__variant__item__active: i === size_active,
-                  }"
-                  v-for="(variant, i) in details?.sizes"
-                  :key="i"
-                  @click="chooseVariant(1, i)"
+                  class="quantity-order__button user-not-select"
+                  @click="order_quantity = Math.max(order_quantity - 1, 1)"
                 >
-                  <div class="product__variant__img" v-if="variant.image">
-                    <img :src="variant.image" />
-                  </div>
-                  <p class="product__variant__name">{{ variant.name }}</p>
+                  <v-icon>mdi-minus</v-icon>
+                </div>
+                <input
+                  type="number"
+                  class="quantity-order__input"
+                  v-model="order_quantity"
+                />
+                <div
+                  class="quantity-order__button user-not-select"
+                  @click="
+                    order_quantity = Math.min(order_quantity + 1, details.inventory)
+                  "
+                >
+                  <v-icon>mdi-plus</v-icon>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div id="quantity-order">
-            <p class="heading-text">Số lượng:</p>
-            <div>
-              <div
-                class="quantity-order__button user-not-select"
-                @click="order_quantity = Math.max(order_quantity - 1, 1)"
-              >
-                <v-icon>mdi-minus</v-icon>
-              </div>
-              <input
-                type="number"
-                class="quantity-order__input"
-                v-model="order_quantity"
-              />
-              <div
-                class="quantity-order__button user-not-select"
-                @click="order_quantity = Math.min(order_quantity + 1, inventory)"
-              >
-                <v-icon>mdi-plus</v-icon>
-              </div>
+            <div id="inventory">
+              <p class="heading-text">
+                Tồn kho: <span>{{ this.getLocaleStringNumber(inventory) }}</span>
+              </p>
+              <p class="heading-text">
+                Giá:
+                <span v-if="details?.promotional_price == null">
+                  {{ this.getLocaleStringNumber(price) }} đ</span
+                >
+
+                <span v-if="details?.promotional_price != null">
+                  <strong class="default-price">
+                    {{ this.getLocaleStringNumber(price) }} đ</strong
+                  >
+                  <strong class="promotional-price">
+                    {{ this.getLocaleStringNumber(details.promotional_price) }} đ</strong
+                  >
+                </span>
+              </p>
             </div>
-          </div>
 
-          <div id="inventory">
-            <p class="heading-text">
-              Tồn kho: <span>{{ inventory }}</span>
-            </p>
-            <p class="heading-text">
-              Giá: <span>{{ price }} đ</span>
-            </p>
-          </div>
-
-          <div id="actions">
-            <button id="btn-add-to-cart" @click="addToCart()">Thêm vào giỏ hàng</button>
-            <button id="btn-buy-now" @click="addToCart(true)">Mua ngay</button>
+            <div id="actions">
+              <button id="btn-add-to-cart" @click="addToCart()">Thêm vào giỏ hàng</button>
+              <button id="btn-buy-now" @click="addToCart(true)">Mua ngay</button>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <section id="product-extend">
-      <div class="container">
+      <div class="container flex-box">
         <div id="product-extend-content" ref="extendContent">
           <div id="product-extend__heading" class="user-not-select">
             <div id="shop-info">
@@ -189,8 +235,8 @@
                 <router-link
                   id="btn-view-shop"
                   :to="
-                    details?.shop.id
-                      ? { name: 'shop-profile', params: { id: details.shop.id } }
+                    details?.shop.slug
+                      ? { name: 'shop-profile', params: { slug: details.shop.slug } }
                       : '#'
                   "
                   >Xem shop</router-link
@@ -254,22 +300,22 @@
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 0,
+                        '__item__rating__filter-item__active': rating_filter_select === 0,
                       }"
+                      @click="rating_filter_select = 0"
                     >
                       <p>Tất cả</p>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.all) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[0]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 5,
+                        '__item__rating__filter-item__active': rating_filter_select === 5,
                       }"
+                      @click="rating_filter_select = 5"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -280,16 +326,16 @@
                         model-value="5"
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_5) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[5]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 4,
+                        '__item__rating__filter-item__active': rating_filter_select === 4,
                       }"
+                      @click="rating_filter_select = 4"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -300,16 +346,16 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_4) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[4]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 3,
+                        '__item__rating__filter-item__active': rating_filter_select === 3,
                       }"
+                      @click="rating_filter_select = 3"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -320,16 +366,16 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_3) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[3]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 2,
+                        '__item__rating__filter-item__active': rating_filter_select === 2,
                       }"
+                      @click="rating_filter_select = 2"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -340,16 +386,16 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_2) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[2]) }})
                       </p>
                     </div>
 
                     <div
                       :class="{
                         '__item__rating__filter-item': true,
-                        '.__item__rating__filter-item__active':
-                          rating_filter_select === 1,
+                        '__item__rating__filter-item__active': rating_filter_select === 1,
                       }"
+                      @click="rating_filter_select = 1"
                     >
                       <v-rating
                         class="icon-size-14"
@@ -360,13 +406,13 @@
                         readonly
                       ></v-rating>
                       <p class="____quantity">
-                        ({{ prefixSymbolsNumber(details?.rating_count.star_1) }})
+                        ({{ prefixSymbolsNumber(details?.rating_count[1]) }})
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div class="__item__rating__body">
+                <div class="__item__rating__body" v-if="details?.comments.num_page > 0">
                   <div
                     class="__item__rating__comment"
                     v-for="comment in comments"
@@ -405,10 +451,12 @@
                     </div>
                   </div>
                 </div>
+                <div class="rating-not-item" v-else>Không có đánh giá nào.</div>
               </div>
             </div>
 
             <v-pagination
+              v-if="details?.comments.num_page > 1"
               v-model="page_active"
               :length="details?.comments.num_page"
               :total-visible="5"
@@ -433,25 +481,29 @@
         </div>
       </div>
     </section>
-  </DefaultLayout>
+  </div>
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import BannerSlides from "../components/BannerSlides.vue";
+import Breadcrumbs from "../components/Breadcrumbs.vue";
 import Product from "../components/Product.vue";
 import SlideImages from "../components/SlideImages.vue";
 import DefaultLayout from "../Layouts/DefaultLayout.vue";
 export default {
-  components: { DefaultLayout, BannerSlides, SlideImages, Product },
+  components: { DefaultLayout, BannerSlides, SlideImages, Product, Breadcrumbs },
   name: "ProductDetail",
   data() {
     return {
+      rating_filter: null,
+      slide_model: 0,
       color_active: null,
       size_active: null,
       inventory: "...",
       price: "...",
       page_active: 1,
-      rating_filter_select: 1,
+      rating_filter_select: 0,
       expand: false,
       order_quantity: 1,
       comments: [],
@@ -459,21 +511,37 @@ export default {
       product_variant_id: null,
     };
   },
-  created() {
-    this.getProductDetails();
-  },
   watch: {
     $route(to, from) {
-      if (to.params.slug !== from.params.slug) {
+      if (to.name == "product-detail" && to.params.slug !== from.params.slug) {
         this.getProductDetails();
       }
     },
+    rating_filter_select() {
+      this.page_active = 1;
+      this.getComments(this.page_active);
+    },
   },
-  mounted() {},
-  beforeDestroy() {
-    window.removeEventListener("resize", this.setMaxHeight);
+  created() {
+    this.setWindowTitle("Chi tiết sản phẩm");
+    this.getProductDetails();
   },
   methods: {
+    ...mapActions(["setCartProductsSelected"]),
+    handleClickBreadcrumb(item) {
+      if (item.id !== -1) {
+        this.$router.push({
+          name: "products-category",
+          query: { name: item.name, id: item.id },
+        });
+      }
+    },
+    updateSlideModel(value) {
+      this.slide_model = value;
+    },
+    processItemClicked(index) {
+      this.slide_model = index;
+    },
     async addToCart(buy_now = false) {
       if (this.details.is_variant && this.product_variant_id === null) {
         this.showAlert("Cảnh báo", "Vui lòng chọn phân loại hàng", "warning", null);
@@ -486,6 +554,7 @@ export default {
           product_variant_id: this.product_variant_id,
           quantity: this.order_quantity,
         });
+        this.setCartProductsSelected([response.data.id]);
         this.showAlert(
           response.data.title,
           response.data.message,
@@ -496,9 +565,10 @@ export default {
         this.showAlert(
           error.response.data.title,
           error.response.data.message,
-          "errror",
-          buy_now ? "payment" : null
+          "error",
+          null
         );
+        this.setCartProductsSelected([]);
         console.log(error);
       }
       this.finishLoad();
@@ -507,9 +577,9 @@ export default {
       this.startLoad();
       const slug = this.$route.params.slug;
       if (type == 0) {
-        this.color_active = index;
+        this.color_active = this.color_active != index ? index : null;
       } else if (type == 1) {
-        this.size_active = index;
+        this.size_active = this.size_active != index ? index : null;
       }
       let url = `product/variant-quantity/${slug}`;
       let color =
@@ -523,6 +593,8 @@ export default {
         });
         this.inventory = response.data.inventory;
         this.product_variant_id = response.data?.product_variant_id ?? null;
+        this.details.promotional_price = response.data.promotional_price;
+        this.price = response.data?.price ?? this.price;
       } catch (error) {
         console.log(error);
       }
@@ -531,37 +603,50 @@ export default {
     async getComments(page) {
       this.startLoad();
       const slug = this.$route.params.slug;
-      const response = await axios.get(`product/comments/${slug}?page=${page}`);
+      const response = await axios.get(
+        `product/comments/${slug}?page=${page}${
+          this.rating_filter_select != 0 ? "&rating=" + this.rating_filter_select : ""
+        }`
+      );
       this.comments = response.data.data;
+      this.details.comments.num_page = Math.ceil(
+        this.details.rating_count[this.rating_filter_select] / 6
+      );
       this.finishLoad();
-      this.setMaxHeight();
     },
     async getProductDetails() {
       this.startLoad();
-      const slug = this.$route.params.slug;
-      const response = await axios.get("product/details/" + slug);
-      this.details = response.data.data;
-      this.comments = this.details.comments.comments;
-      this.inventory = this.getLocaleStringNumber(this.details.inventory);
-      this.price = this.getLocaleStringNumber(this.details.price);
+      try {
+        const slug = this.$route.params.slug;
+        const response = await axios.get("product/details/" + slug);
+        this.details = response.data.data;
+        this.comments = this.details.comments.comments;
+        this.inventory = this.details.inventory;
+        this.price = this.details.price;
+      } catch (error) {
+        this.showAlert(
+          error.response.data.title,
+          error.response.data.message,
+          "error",
+          "home"
+        );
+      }
       this.finishLoad();
-      this.setMaxHeight();
-    },
-    setMaxHeight() {
-      setTimeout(() => {
-        const extendContentHeight = this.$refs.extendContent.offsetHeight;
-        this.$refs.relateProducts.style.maxHeight = extendContentHeight + "px";
-      }, 1000);
     },
   },
 };
 </script>
 
 <style scoped>
+.rating-not-item {
+  padding: 16px 0;
+  width: 100%;
+  text-align: center;
+}
 #product-extend {
   height: 2097px;
 }
-.container {
+.flex-box {
   display: flex;
   column-gap: 16px;
   max-height: 100%;
@@ -644,18 +729,20 @@ export default {
   flex-direction: column;
   row-gap: 16px;
 }
-.__item__rating__filter-item__active {
-  color: #ec1c24;
-  border: 1px solid #ec1c24;
-}
 .__item__rating__filter-item {
   display: flex;
   align-items: center;
+  border: 1px solid #ffffff;
   column-gap: 12px;
   background: #ffffff;
   padding: 12px;
   border-radius: 100px;
   cursor: pointer;
+}
+
+.__item__rating__filter-item__active {
+  color: #ec1c24;
+  border: 1px solid #ec1c24;
 }
 .__item__rating__filters {
   column-gap: 8px;
@@ -798,7 +885,7 @@ export default {
 }
 .quantity-order__input {
   border-radius: 2px;
-  width: 46px;
+  width: 66px;
   border: 1px solid #8f8f8f;
   text-align: center;
 }
@@ -898,6 +985,9 @@ export default {
   column-gap: 16px;
   align-items: center;
 }
+.btn-arrow-slide:hover {
+  color: red;
+}
 .image__arrow-btn {
   display: flex;
   column-gap: 30px;
@@ -913,5 +1003,14 @@ export default {
   flex-direction: column;
   padding: 10px;
   row-gap: 20px;
+}
+
+.default-price {
+  color: black;
+  font-weight: 400;
+  font-size: 14px;
+  text-decoration: line-through;
+  margin-right: 16px;
+  line-height: -0.5;
 }
 </style>

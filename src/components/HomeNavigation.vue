@@ -6,16 +6,28 @@
           value="search"
           key="search"
           :to="{ name: 'search' }"
-          class="user-not-select"
+          :class="{
+            'user-not-select': true,
+            'nav-item__active': [
+              'product-detail',
+              'products-category',
+              'search',
+              'featured-products',
+              'top-selling-products',
+            ].includes($route?.name),
+          }"
         >
-          <v-icon>mdi-home</v-icon>
+          <v-icon>mdi-magnify</v-icon>
         </v-list-item>
 
         <v-list-item
           value="home"
           key="home"
           :to="{ name: 'home' }"
-          class="user-not-select"
+          :class="{
+            'user-not-select': true,
+            'nav-item__active': $route?.name == 'home',
+          }"
         >
           <div class="v-list-item__image-prepend">
             <img src="/src/assets/logo.svg" />
@@ -42,7 +54,11 @@
             </v-list-item>
 
             <div v-else class="notify-item">
-              <v-list-item v-for="notify in notifications" :key="notify.id">
+              <v-list-item
+                v-for="notify in notifications"
+                :key="notify.id"
+                @click="gotoBillDetail(notify)"
+              >
                 <v-list-item-title
                   :class="{ 'notify-item__unread': notify.read_at == null }"
                   >{{ notify.title }}</v-list-item-title
@@ -59,10 +75,14 @@
         <v-list-item
           value="cart"
           key="cart"
-          class="user-not-select item-badge"
+          :class="{
+            'user-not-select': true,
+            'item-badge': true,
+            'nav-item__active': $route?.name == 'cart',
+          }"
           :to="{ name: 'cart' }"
         >
-          <v-badge v-if="number_cart" :content="number_cart" color="#0074BD">
+          <v-badge v-if="number_carts" :content="number_carts" color="#0074BD">
             <v-icon>mdi-cart</v-icon>
           </v-badge>
           <v-icon v-else>mdi-cart</v-icon>
@@ -77,17 +97,18 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
+
 export default {
   name: "HomeNavigation",
   data() {
     return {
-      notifications: [],
       drawer: true,
-      number_cart: 0,
       active_logo: false,
     };
   },
   computed: {
+    ...mapGetters(["number_carts"]),
     numberNotificationUnRead() {
       return this.notifications.filter((item) => item.read_at == null).length;
     },
@@ -97,6 +118,24 @@ export default {
     this.getNumberCart();
   },
   methods: {
+    ...mapActions(["setNumberCarts"]),
+    gotoBillDetail(notify) {
+      axios.put("get/notifications/mark-read?id=" + notify.id).then((response) => {
+        this.getNotifications();
+      });
+      let name = "";
+      if (notify.type == "user") {
+        name = "bills";
+      } else if (notify.type == "shop") {
+        name = "bills-manage";
+      }
+      this.$router.push({
+        name: name,
+        query: {
+          code: notify.code,
+        },
+      });
+    },
     markReadAll() {
       if (!this.notifications.length) {
         return;
@@ -111,20 +150,13 @@ export default {
         });
     },
     getNumberCart() {
+      if (!localStorage.getItem("token")) {
+        return;
+      }
       axios
         .get("get/number-cart")
         .then((response) => {
-          this.number_cart = response.data.number_cart;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getNotifications() {
-      axios
-        .get("get/notifications")
-        .then((response) => {
-          this.notifications = response.data.data;
+          this.setNumberCarts(response.data.number_cart);
         })
         .catch((error) => {
           console.log(error);
@@ -135,6 +167,9 @@ export default {
 </script>
 
 <style>
+.notify-item {
+  cursor: pointer;
+}
 .v-list-item__content .notify-item__unread {
   font-weight: 700;
 }

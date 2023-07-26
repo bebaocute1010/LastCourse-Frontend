@@ -3,9 +3,29 @@ import router from "@/router";
 
 export default {
   computed: {
-    ...mapGetters(["alert", "user", "loading"]),
+    ...mapGetters(["alert", "user", "loading", "notifications"]),
   },
   methods: {
+    delayMethod(method, delay) {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(method());
+        }, delay);
+      });
+    },
+    getNotifications() {
+      if (!localStorage.getItem("token")) {
+        return;
+      }
+      axios
+        .get("get/notifications")
+        .then((response) => {
+          this.setNotifications(response.data.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     getLocaleStringNumber(num) {
       return num.toLocaleString("de-DE");
     },
@@ -27,6 +47,7 @@ export default {
       "setUser",
       "unsetUser",
       "setLoading",
+      "setNotifications",
     ]),
     startLoad() {
       this.setLoading(true);
@@ -35,7 +56,7 @@ export default {
       this.setLoading(false);
     },
     setWindowTitle(title) {
-      document.title = "M Clothing | " + title;
+      document.title = title;
     },
     showAlert(title, message, type, to) {
       this.onAlert({
@@ -45,6 +66,11 @@ export default {
         class_name: type,
         to: to,
       });
+      setTimeout(() => {
+        if (this.alert.show) {
+          this.hideAlert();
+        }
+      }, 1500);
     },
     hideAlert() {
       const to = this.alert.to;
@@ -66,10 +92,7 @@ export default {
       axios
         .get("auth/me")
         .then((response) => {
-          this.setUser({
-            name: response.data.data.fullname,
-            avatar: response.data.data.avatar,
-          });
+          this.setUser(response.data.data);
         })
         .catch((error) => {
           if (error.response.status === 401) {

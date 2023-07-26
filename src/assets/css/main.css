@@ -1,5 +1,24 @@
 @import "./base.css";
 
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: #ffffff;
+  border-radius: inherit;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: inherit;
+  background-color: rgb(255, 27, 27);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(200, 27, 27);
+}
 .v-row {
   margin: unset;
 }
@@ -37,10 +56,15 @@
   padding: 0;
   margin-bottom: 12px;
 }
-#home-nav .v-list-item--active .v-list-item__content {
+#home-nav .v-list-item--active .v-list-item__overlay {
+  background-color: #ffffff;
+}
+
+#home-nav .nav-item__active .v-list-item__content {
   color: #ec1c24;
 }
-#home-nav .v-list-item--active .v-list-item__overlay {
+
+#home-nav .nav-item__active .v-list-item__overlay {
   border-radius: 10px;
   opacity: 1;
   box-shadow: 0 4px 16px rgba(236, 28, 36, 0.25);
@@ -61,6 +85,9 @@
 .slide-group .v-slide-group__container {
   padding: 16px;
 }
+.no-padding .v-slide-group__container {
+  padding: 0;
+}
 
 #product .slide-group .v-slide-group__container {
   padding: 0;
@@ -69,11 +96,55 @@
 footer {
   z-index: 1005;
 }
-
+.filter-item__list__item:hover .v-label {
+  color: #ec1c24;
+}
 .filter-item__list__item .v-label {
   opacity: 1 !important;
+  font-size: 14px;
+  overflow: hidden;
 }
 .filter-item__list__item .mdi-checkbox-blank-outline {
   color: #ec1c24;
   opacity: 1;
+}
+.custom-carousel .carousel__viewport {
+  padding: 16px 0;
+}
+.custom-carousel .carousel__icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+.custom-carousel .carousel__icon:hover {
+  background: #ec1c24;
+  color: #ffffff;
+}
+.custom-carousel .carousel__track {
+  column-gap: 14px;
+}
+.custom-carousel .carousel__slide {
+  flex-shrink: unset;
+}
+.v-col-custom-padding {
+  padding: 0;
+}
+.v-col-custom-padding:first-child {
+  padding-right: 24px;
+}
+.img-size-44 {
+  width: 44px;
+  height: 44px;
+}
+.img-thumbnail {
+  padding: 4px;
+  border: 1px solid #eeeeee;
+  border-radius: inherit;
+}
+.category-radio-btn label.v-label.v-label--clickable {
+  opacity: 1;
+}
+.category-radio-btn:hover label.v-label.v-label--clickable {
+  color: #ec1c24;
 }
