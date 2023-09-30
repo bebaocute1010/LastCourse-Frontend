@@ -19,6 +19,8 @@ import Payment from "@/views/Payment.vue";
 import Bills from "@/views/Bills.vue";
 import BillsManage from "@/views/User/BillsManage.vue";
 import ComingSoon from "@/views/ComingSoon.vue";
+import Admin from "../Layouts/Admin.vue";
+import CategoryList from "../views/CategoryList.vue";
 
 const router = createRouter({
   mode: "history",
@@ -150,6 +152,24 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/admin",
+      name: "admin",
+      component: Admin,
+      children: [
+        {
+          path: "danh-muc",
+          name: "category",
+          children: [
+            {
+              path: "",
+              name: "category-list",
+              component: CategoryList
+            },
+          ]
+        }
+      ]
+    }
   ],
   scrollBehavior(to, from, savedPosition) {
     if (to.hash && to.hash !== "#") {

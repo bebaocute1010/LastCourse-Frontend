@@ -58,7 +58,7 @@ export default {
     setWindowTitle(title) {
       document.title = title;
     },
-    showAlert(title, message, type, to) {
+    showAlert(title, message, type, to = null) {
       this.onAlert({
         title: title,
         message: message,
